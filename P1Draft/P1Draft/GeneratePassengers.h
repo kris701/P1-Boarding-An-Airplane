@@ -11,9 +11,9 @@
 #include <time.h>
 #include <math.h>
 
-void GeneratePassengers(int Count, struct Person _PersonList[MaxRows * 2 + 1][MaxPersons], enum MethodIndex Index, struct MethodDefinition _MDef);
-void Method_Random(int Count, struct Person _PersonList[MaxRows * 2 + 1][MaxPersons], struct MethodDefinition _MDef);
-int GetValueFromFunction(int Min, int Max, struct FunctionDefinition _FDef);
-struct Point Random_GetTargetLocation(struct Person _PersonList[MaxRows * 2 + 1][MaxPersons], int Index);
+void GeneratePassengers(int _Count, Person _PersonList[MaxPersons], MethodIndex _Index, MethodDefinition _MDef);
+void Method_Random(int _Count, Person _PersonList[MaxPersons], MethodDefinition _MDef);
+int GetValueFromFunction(int _Min, int _Max, FunctionDefinition _FDef);
+Point Random_GetTargetLocation(Person _PersonList[MaxPersons], int _Index);
 
 #endif

@@ -4,14 +4,18 @@
 #include <stdbool.h>
 
 enum XAxis { Col_a, Col_b, Col_c, Col_d, Col_e, Col_f, Col_g, Col_h, Col_i, Col_j, Col_k, Col_l, Col_m, Col_n, Col_o, Col_p, Col_q, Col_r, Col_s, Col_t};
+typedef enum XAxis XAxis;
 enum MethodIndex { MI_Random };
+typedef enum MethodIndex MethodIndex;
 enum FunctionType { Line, Exp };
+typedef enum FunctionType FunctionType;
 
 struct Point
 {
 	enum XAxis X;
 	int Y;
 };
+typedef struct Point Point;
 
 struct Person
 {
@@ -23,11 +27,12 @@ struct Person
 	char PersonCharacter;
 	int LuggageCount;
 	int OrgLuggageCount;
-	bool IsPuttingLuggage;
-	bool BackingUp;
+	bool IsBackingUp;
+	int ShuffleDelay;
 	int StepsTaken;
 	int StartIndex;
 };
+typedef struct Person Person;
 
 struct FunctionDefinition
 {
@@ -36,6 +41,7 @@ struct FunctionDefinition
 	double b;
 	double c;
 };
+typedef struct FunctionDefinition FunctionDefinition;
 
 struct MethodDefinition
 {
@@ -56,5 +62,6 @@ struct MethodDefinition
 	int MaxWalkSpeed;
 	struct FunctionDefinition WalkSpeedFunction;
 };
+typedef struct MethodDefinition MethodDefinition;
 
 #endif

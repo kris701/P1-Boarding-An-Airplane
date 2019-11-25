@@ -1,6 +1,6 @@
 #include "GeneratePassengers.h"
 
-void GeneratePassengers(int Count, struct Person _PersonList[MaxRows * 2 + 1][MaxPersons], enum MethodIndex Index, struct MethodDefinition _MDef)
+void GeneratePassengers(int Count, Person _PersonList[MaxPersons], MethodIndex Index, MethodDefinition _MDef)
 {
 	srand(time(NULL));
 
@@ -12,15 +12,15 @@ void GeneratePassengers(int Count, struct Person _PersonList[MaxRows * 2 + 1][Ma
 	}
 }
 
-void Method_Random(int Count, struct Person _PersonList[MaxRows * 2 + 1][MaxPersons], struct MethodDefinition _MDef)
+void Method_Random(int Count, Person _PersonList[MaxPersons], MethodDefinition _MDef)
 {
 	for (int i = 0; i < Count; i++)
 	{
 		int DoorIndex = GetValueFromFunction(_MDef.MinDoorChoice, _MDef.MaxDoorChoice, _MDef.DoorFunction);
 		int LuggageCount = GetValueFromFunction(_MDef.MinLuggage, _MDef.MaxLuggage, _MDef.LuggageFunction);
-		struct Point NewTarget = Random_GetTargetLocation(_PersonList, i);
+		Point NewTarget = Random_GetTargetLocation(_PersonList, i);
 
-		struct Person NewPerson = {
+		Person NewPerson = {
 			GetValueFromFunction(_MDef.MinWalkSpeed, _MDef.MaxWalkSpeed, _MDef.WalkSpeedFunction),
 			Doors[DoorIndex],
 			NewTarget,
@@ -30,15 +30,15 @@ void Method_Random(int Count, struct Person _PersonList[MaxRows * 2 + 1][MaxPers
 			LuggageCount,
 			LuggageCount,
 			false,
-			false,
+			0,
 			0,
 			i
 		};
-		_PersonList[0][i] = NewPerson;
+		_PersonList[i] = NewPerson;
 	}
 }
 
-int GetValueFromFunction(int Min, int Max, struct FunctionDefinition _FDef)
+int GetValueFromFunction(int Min, int Max, FunctionDefinition _FDef)
 {
 	int X = GetRandomNumberRanged(Min, Max);
 	switch (_FDef.Type)
@@ -53,9 +53,9 @@ int GetValueFromFunction(int Min, int Max, struct FunctionDefinition _FDef)
 	return 0;
 }
 
-struct Point Random_GetTargetLocation(struct Person _PersonList[MaxRows * 2 + 1][MaxPersons], int Index)
+Point Random_GetTargetLocation(Person _PersonList[MaxPersons], int Index)
 {
-	struct Point NewTarget = { 0, 0 };
+	Point NewTarget = { 0, 0 };
 	bool FoundAvailable = true;
 	while (FoundAvailable)
 	{
@@ -73,7 +73,7 @@ struct Point Random_GetTargetLocation(struct Person _PersonList[MaxRows * 2 + 1]
 			{
 				if (i != Index)
 				{
-					if (IsPointEqu(_PersonList[0][i].Target, NewTarget))
+					if (IsPointEqu(_PersonList[i].Target, NewTarget))
 					{
 						FoundAvailable = true;
 						break;

@@ -1,7 +1,9 @@
 ﻿  P1Draft.c
+C:\Users\Kristian\OneDrive\Programming\_ GitHub _\School Projects\P1Draft\Backup\P1Draft\P1Draft\P1Draft.c(37,44): warning C4047: 'function': 'Person (*)[146]' differs in levels of indirection from 'Person [146]'
+C:\Users\Kristian\OneDrive\Programming\_ GitHub _\School Projects\P1Draft\Backup\P1Draft\P1Draft\P1Draft.c(37,44): warning C4024: 'GeneratePassengers': different types for formal and actual parameter 2
   Generating code
-  1 of 28 functions ( 3.6%) were compiled, the rest were copied from previous compilation.
+  24 of 26 functions (92.3%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
-  P1Draft.vcxproj -> C:\Users\Kristian\OneDrive\Programming\C\P1Draft\Release\P1Draft.exe
+  P1Draft.vcxproj -> C:\Users\Kristian\OneDrive\Programming\_ GitHub _\School Projects\P1Draft\Backup\P1Draft\Release\P1Draft.exe

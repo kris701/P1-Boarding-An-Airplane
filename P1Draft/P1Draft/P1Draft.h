@@ -12,16 +12,15 @@
 #define MaxRuns 1000000
 #define ProgressBarSteps 10
 
-void PrintField(struct Person _PersonList[MaxRows * 2 + 1][MaxPersons], int _PersonListIndexes[MaxRows * 2 + 1], const char _BaseFieldData[MaxRows][MaxSeatsPrRow]);
-bool IsAnyOnPoint(struct Person _PersonList[MaxRows * 2 + 1][MaxPersons], int _PersonListIndexes[MaxRows * 2 + 1], struct Point TargetPoint, int ExcludeIndex, int RowIndex);
-struct Point PredictedPoint(struct Point CurrentPoint, struct Point TargetPoint);
-struct Point PredictedPointInvX(struct Point _CurrentPos, enum XAxis TargX, enum XAxis DoorX);
-bool IsSeatedFurtherIn(struct Person _PersonList[MaxRows * 2 + 1][MaxPersons], int _PersonListIndexes[MaxRows * 2 + 1], int ExcludeIndex, int RowIndex);
-void SendRowBack(struct Person _PersonList[MaxRows * 2 + 1][MaxPersons], int _PersonListIndexes[MaxRows * 2 + 1], int ExcludeIndex, int RowIndex);
-void PersonMovement(int Index, int RowIndex, struct Person _PersonList[MaxRows * 2 + 1][MaxPersons], int _PersonListIndexes[MaxRows * 2 + 1]);
-void GenerateProgressBar(char PBar[ProgressBarSteps], int Run, int MxRun);
-void SaveRunDataToFile(FILE* fp, struct Person PersonList[MaxRows * 2 + 1][MaxPersons], int _PersonListIndexes[MaxRows * 2 + 1], int RunTime, int RunNumber);
-void RunSim(struct Person PersonList[MaxRows * 2 + 1][MaxPersons], int _PersonListIndexes[MaxRows * 2 + 1], bool UpdateVisuals);
-void MoveToNewArray(struct Person _PersonList[MaxRows * 2 + 1][MaxPersons], int _PersonListIndexes[MaxRows * 2 + 1], int* RowIndex, int* Index, int _NewRowIndex);
+void PrintField(Person _PersonList[MaxPersons], const char _BaseFieldData[MaxRows][MaxSeatsPrRow]);
+bool IsAnyOnPoint(Person* _IsPersonArray[MaxRows][MaxSeatsPrRow], Person *_Person);
+Point PredictedPoint(Point _CurrentPoint, Point _TargetPoint);
+Point PredictedPointInvX(Point _CurrentPos, XAxis _TargX, XAxis _DoorX);
+void SendRowBack(Person* _IsPersonArray[MaxRows][MaxSeatsPrRow], Person *_Person);
+void PersonMovement(int _Index, Person _PersonList[MaxPersons], Person* _IsPersonArray[MaxRows][MaxSeatsPrRow]);
+void GenerateProgressBar(char _PBar[ProgressBarSteps], int _Run, int _MxRun);
+void SaveRunDataToFile(FILE* _fp, Person _PersonList[MaxPersons], int _RunTime, int _RunNumber);
+void RunSim(Person _PersonList[MaxPersons], Person *_IsPersonArray[MaxRows][MaxSeatsPrRow], bool _UpdateVisuals);
+int BackupWaitSteps(int _TargetSeat, int _InnerBlockingSeat);
 
 #endif

@@ -1,6 +1,6 @@
 #include "BasicCalls.h"
 
-bool IsPointEqu(struct Point A, struct Point B)
+bool IsPointEqu(Point A, Point B)
 {
 	if (A.X == B.X)
 	{
@@ -12,9 +12,9 @@ bool IsPointEqu(struct Point A, struct Point B)
 	return false;
 }
 
-struct Point SetPoint(int X, int Y)
+Point SetPoint(int X, int Y)
 {
-	struct Point NewPoint = { X, Y };
+	Point NewPoint = { X, Y };
 	return NewPoint;
 }
 
