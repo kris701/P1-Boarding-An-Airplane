@@ -48,9 +48,11 @@ static const char BaseFieldData[MaxRows][MaxSeatsPrRow] = {
 		DoorRow
 };
 
-static const struct Point Doors[2] = {
+static const Point Doors[2] = {
 	{Col_d,27},
 	{Col_d,0}
 };
+
+static const BaseSimulationRules BSR = { 0, 5 };
 
 #endif

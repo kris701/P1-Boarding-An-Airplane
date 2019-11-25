@@ -1,9 +1,9 @@
 ﻿  P1Draft.c
-C:\Users\Kristian\OneDrive\Programming\_ GitHub _\School Projects\P1Draft\Backup\P1Draft\P1Draft\P1Draft.c(37,44): warning C4047: 'function': 'Person (*)[146]' differs in levels of indirection from 'Person [146]'
-C:\Users\Kristian\OneDrive\Programming\_ GitHub _\School Projects\P1Draft\Backup\P1Draft\P1Draft\P1Draft.c(37,44): warning C4024: 'GeneratePassengers': different types for formal and actual parameter 2
+C:\Users\Kristian\OneDrive\Programming\_ GitHub _\School Projects\P1Draft\GitHub\P1-Boarding-An-Airplane\P1Draft\P1Draft\P1Draft.c(39,30): warning C4047: 'function': 'int' differs in levels of indirection from 'void *'
+C:\Users\Kristian\OneDrive\Programming\_ GitHub _\School Projects\P1Draft\GitHub\P1-Boarding-An-Airplane\P1Draft\P1Draft\P1Draft.c(39,30): warning C4024: 'memset': different types for formal and actual parameter 2
   Generating code
-  24 of 26 functions (92.3%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
+  7 of 26 functions (26.9%) were compiled, the rest were copied from previous compilation.
+    1 functions were new in current compilation
     0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
-  P1Draft.vcxproj -> C:\Users\Kristian\OneDrive\Programming\_ GitHub _\School Projects\P1Draft\Backup\P1Draft\Release\P1Draft.exe
+  P1Draft.vcxproj -> C:\Users\Kristian\OneDrive\Programming\_ GitHub _\School Projects\P1Draft\GitHub\P1-Boarding-An-Airplane\P1Draft\Release\P1Draft.exe

@@ -29,21 +29,22 @@ struct Person
 	int OrgLuggageCount;
 	bool IsBackingUp;
 	int ShuffleDelay;
+	int CrossDelay;
 	int StepsTaken;
 	int StartIndex;
 };
 typedef struct Person Person;
 
-struct FunctionDefinition
+struct PassengerFunctionDefinition
 {
 	enum FunctionType Type;
 	double a;
 	double b;
 	double c;
 };
-typedef struct FunctionDefinition FunctionDefinition;
+typedef struct PassengerFunctionDefinition FunctionDefinition;
 
-struct MethodDefinition
+struct PassengerMethodDefinition
 {
 	int FromY;
 	int ToY;
@@ -52,16 +53,23 @@ struct MethodDefinition
 
 	int MinLuggage;
 	int MaxLuggage;
-	struct FunctionDefinition LuggageFunction;
+	struct PassengerFunctionDefinition LuggageFunction;
 
 	int MinDoorChoice;
 	int MaxDoorChoice;
-	struct FunctionDefinition DoorFunction;
+	struct PassengerFunctionDefinition DoorFunction;
 
 	int MinWalkSpeed;
 	int MaxWalkSpeed;
-	struct FunctionDefinition WalkSpeedFunction;
+	struct PassengerFunctionDefinition WalkSpeedFunction;
 };
-typedef struct MethodDefinition MethodDefinition;
+typedef struct PassengerMethodDefinition MethodDefinition;
+
+struct BaseSimulationRules
+{
+	int BSR_ShuffleDelay;
+	int BSR_CrossDelay;
+};
+typedef struct BaseSimulationRules BaseSimulationRules;
 
 #endif
