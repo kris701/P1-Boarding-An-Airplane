@@ -1,6 +1,6 @@
 #include "BasicCalls.h"
 
-bool IsPointEqu(Point A, Point B)
+bool IsPointEqual(Point A, Point B)
 {
 	if (A.X == B.X)
 	{

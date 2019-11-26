@@ -73,7 +73,7 @@ Point Random_GetTargetLocation(Person _PersonList[MaxPersons], int Index)
 			{
 				if (i != Index)
 				{
-					if (IsPointEqu(_PersonList[i].Target, NewTarget))
+					if (IsPointEqual(_PersonList[i].Target, NewTarget))
 					{
 						FoundAvailable = true;
 						break;
