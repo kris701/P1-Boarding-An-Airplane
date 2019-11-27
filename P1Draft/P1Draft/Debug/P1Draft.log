@@ -1,4 +1,0 @@
-﻿  P1Draft.c
-C:\Users\Kristian\OneDrive\Programming\_ GitHub _\School Projects\P1Draft\GitHub\P1-Boarding-An-Airplane\P1Draft\P1Draft\P1Draft.c(41,31): warning C4047: 'function': 'int' differs in levels of indirection from 'void *'
-C:\Users\Kristian\OneDrive\Programming\_ GitHub _\School Projects\P1Draft\GitHub\P1-Boarding-An-Airplane\P1Draft\P1Draft\P1Draft.c(41,31): warning C4024: 'memset': different types for formal and actual parameter 2
-  P1Draft.vcxproj -> C:\Users\Kristian\OneDrive\Programming\_ GitHub _\School Projects\P1Draft\GitHub\P1-Boarding-An-Airplane\P1Draft\Debug\P1Draft.exe
