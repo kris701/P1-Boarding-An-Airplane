@@ -4,53 +4,51 @@ void GeneratePassengers(int Count, Person _PersonList[MaxPersons], MethodIndex I
 {
 	srand(time(NULL));
 
-	switch (Index)
-	{
-	case MI_Random:
-		Method_Random(Count, _PersonList, _MDef);
-		break;
-	}
+    for (int i = 0; i < Count; i++) {
+        GeneratePassenger(&(_PersonList[i]));
+        AssignPassengerToAvailableSeat(_PersonList, i);
+    }
+
+	//switch (Index)
+	//{
+	//    case MI_Random:
+	//	    Method_Random(Count, _PersonList, _MDef);
+	//	    break;
+	//}
 }
 
-void Method_Random(int Count, Person _PersonList[MaxPersons], MethodDefinition _MDef)
-{
-	for (int i = 0; i < Count; i++)
-	{
-		int DoorIndex = GetValueFromFunction(_MDef.MinDoorChoice, _MDef.MaxDoorChoice, _MDef.DoorFunction);
-		int LuggageCount = GetValueFromFunction(_MDef.MinLuggage, _MDef.MaxLuggage, _MDef.LuggageFunction);
-		Point NewTarget = Random_GetTargetLocation(_PersonList, i);
+void GeneratePassenger(Person* Passenger) {  
+    Passenger->WalkingSpeed = GenerateWalkSpeed(Passenger);
 
-		Person NewPerson = {
-			GetValueFromFunction(_MDef.MinWalkSpeed, _MDef.MaxWalkSpeed, _MDef.WalkSpeedFunction),
-			Doors[DoorIndex],
-			NewTarget,
-			false,
-			DoorIndex,
-			'P',
-			LuggageCount,
-			LuggageCount,
-			false,
-			0,
-			0,
-			i
-		};
-		_PersonList[i] = NewPerson;
-	}
+    Passenger->StartingDoorID = GetStartingDoorID(Passenger);
+    Passenger->CurrentPos = Doors[Passenger->StartingDoorID];
+    Passenger->IsSeated = false;
+    Passenger->PersonCharacter = 'P';
+
+    Passenger->OrgLuggageCount = GenerateLuggage(Passenger);
+    Passenger->LuggageCount = Passenger->OrgLuggageCount;
+
+    Passenger->IsBackingUp = false;
+    Passenger->ShuffleDelay = 0;
+    Passenger->CrossDelay = 0;
+    Passenger->StepsTaken = 0;
 }
 
-int GetValueFromFunction(int Min, int Max, FunctionDefinition _FDef)
-{
-	int X = GetRandomNumberRanged(Min, Max);
-	switch (_FDef.Type)
-	{
-	case Line:
-		return (int)(_FDef.a * X + _FDef.b);
-		break;
-	case Exp:
-		return (int)(pow(X, _FDef.a) + _FDef.b * X + _FDef.c);
-		break;
-	}
-	return 0;
+int GenerateLuggage(const Person* Passenger) {
+    return GetRandomNumberRanged(2, 6);
+}
+
+int GetStartingDoorID(const Person* Passenger) {
+    return GetRandomNumberRanged(0, 1);
+}
+
+int GenerateWalkSpeed(const Person* Passenger) {
+    return GetRandomNumberRanged(3, 4);
+}
+
+bool AssignPassengerToAvailableSeat(Person _PassengerList[MaxPersons], int index) {
+    _PassengerList[index].Target = Random_GetTargetLocation(_PassengerList, index);
+    return true;
 }
 
 Point Random_GetTargetLocation(Person _PersonList[MaxPersons], int Index)
