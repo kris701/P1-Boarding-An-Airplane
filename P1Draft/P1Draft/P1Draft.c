@@ -202,11 +202,11 @@ bool IsAnyOnPoint(Person *_PassengerArray[MaxRows][MaxSeatsPrRow], Person *_Pers
 		if (IsPointEqual(SecondNewPoint, FirstPerson.CurrentPos))
 		{
 			OtherPerson->CurrentPos = SecondNewPoint;
-			OtherPerson->CrossDelay = BSR.BSR_CrossDelay;
+			OtherPerson->CrossDelay = BSR.CrossDelay;
 			_PassengerArray[SecondNewPoint.Y][SecondNewPoint.X] = OtherPerson;
 
 			_Person->CurrentPos = NewPoint;
-			_Person->CrossDelay = BSR.BSR_CrossDelay;
+			_Person->CrossDelay = BSR.CrossDelay;
 			_PassengerArray[NewPoint.Y][NewPoint.X] = _Person;
 
 			return true;
@@ -261,46 +261,29 @@ void SendRowBack(Person* _PassengerArray[MaxRows][MaxSeatsPrRow], Person *_Perso
 {
 	Person SenderPerson = *_Person;
 
-	if (SenderPerson.Target.X > Doors[SenderPerson.StartingDoorID].X)
+	int CurrentXPosition = SenderPerson.Target.X;
+	int DistanceToTargetSeat = abs(SenderPerson.Target.X - Doors[SenderPerson.StartingDoorID].X);
+	int InnerMostSeat = -1;
+	while (CurrentXPosition != Doors[SenderPerson.StartingDoorID].X)
 	{
-		int InnerMostSeat = -1;
-		for (int i = SenderPerson.Target.X; i > Doors[SenderPerson.StartingDoorID].X; i--)
+		if (_PassengerArray[SenderPerson.CurrentPos.Y][CurrentXPosition] != NULL)
 		{
-			if (_PassengerArray[SenderPerson.CurrentPos.Y][i] != NULL)
-			{
-				Person MomentPerson = *_PassengerArray[SenderPerson.CurrentPos.Y][i];
-				if (InnerMostSeat == -1)
-					InnerMostSeat = MomentPerson.Target.X - Doors[SenderPerson.StartingDoorID].X;
-				_PassengerArray[SenderPerson.CurrentPos.Y][i]->IsBackingUp = true;
-				_PassengerArray[SenderPerson.CurrentPos.Y][i]->ShuffleDelay = BackupWaitSteps(SenderPerson.Target.X - Doors[SenderPerson.StartingDoorID].X, InnerMostSeat, BSR.BSR_ShuffleDelay);
-			}
+			Person* MomentPerson = _PassengerArray[SenderPerson.CurrentPos.Y][CurrentXPosition];
+			if (InnerMostSeat == -1)
+				InnerMostSeat = abs(MomentPerson->Target.X - Doors[SenderPerson.StartingDoorID].X);
+
+			MomentPerson->IsBackingUp = true;
+			MomentPerson->ShuffleDelay = BackupWaitSteps(DistanceToTargetSeat, InnerMostSeat, BSR.ShuffleDelay);
 		}
-		if (_PassengerArray[SenderPerson.CurrentPos.Y][SenderPerson.CurrentPos.X] != NULL)
-		{
-			_Person->IsBackingUp = true;
-			_Person->ShuffleDelay = BackupWaitSteps(SenderPerson.Target.X - Doors[SenderPerson.StartingDoorID].X, InnerMostSeat, BSR.BSR_ShuffleDelay);
-		}
+
+		if (SenderPerson.Target.X > Doors[SenderPerson.StartingDoorID].X)
+			CurrentXPosition--;
+		else
+			CurrentXPosition++;
 	}
-	else
-	{
-		int InnerMostSeat = -1;
-		for (int i = SenderPerson.Target.X; i < Doors[SenderPerson.StartingDoorID].X; i++)
-		{
-			if (_PassengerArray[SenderPerson.CurrentPos.Y][i] != NULL)
-			{
-				Person MomentPerson = *_PassengerArray[SenderPerson.CurrentPos.Y][i];
-				if (InnerMostSeat == -1)
-					InnerMostSeat = MomentPerson.Target.X;
-				_PassengerArray[SenderPerson.CurrentPos.Y][i]->IsBackingUp = true;
-				_PassengerArray[SenderPerson.CurrentPos.Y][i]->ShuffleDelay = BackupWaitSteps(SenderPerson.Target.X, InnerMostSeat, BSR.BSR_ShuffleDelay);
-			}
-		}
-		if (_PassengerArray[SenderPerson.CurrentPos.Y][SenderPerson.CurrentPos.X] != NULL)
-		{
-			_Person->IsBackingUp = true;
-			_Person->ShuffleDelay = BackupWaitSteps(SenderPerson.Target.X, InnerMostSeat, BSR.BSR_ShuffleDelay);
-		}
-	}
+
+	_Person->IsBackingUp = true;
+	_Person->ShuffleDelay = BackupWaitSteps(DistanceToTargetSeat, InnerMostSeat, BSR.ShuffleDelay);
 }
 
 int BackupWaitSteps(int TargetSeat, int InnerBlockingSeat, int ExtraPenalty)

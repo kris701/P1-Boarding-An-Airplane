@@ -1,9 +1,12 @@
-﻿  P1Draft.c
-C:\Users\Kristian\OneDrive\Programming\_ GitHub _\School Projects\P1Draft\GitHub\P1-Boarding-An-Airplane\P1Draft\P1Draft\P1Draft.c(39,30): warning C4047: 'function': 'int' differs in levels of indirection from 'void *'
-C:\Users\Kristian\OneDrive\Programming\_ GitHub _\School Projects\P1Draft\GitHub\P1-Boarding-An-Airplane\P1Draft\P1Draft\P1Draft.c(39,30): warning C4024: 'memset': different types for formal and actual parameter 2
+﻿  BasicCalls.c
+  GeneratePassengers.c
+  P1Draft.c
+C:\Users\Kristian\OneDrive\Programming\_ GitHub _\School Projects\P1Draft\GitHub\P1-Boarding-An-Airplane\P1Draft\P1Draft\GeneratePassengers.c(5,18): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\Kristian\OneDrive\Programming\_ GitHub _\School Projects\P1Draft\GitHub\P1-Boarding-An-Airplane\P1Draft\P1Draft\P1Draft.c(41,31): warning C4047: 'function': 'int' differs in levels of indirection from 'void *'
+C:\Users\Kristian\OneDrive\Programming\_ GitHub _\School Projects\P1Draft\GitHub\P1-Boarding-An-Airplane\P1Draft\P1Draft\P1Draft.c(41,31): warning C4024: 'memset': different types for formal and actual parameter 2
   Generating code
-  1 of 26 functions ( 3.8%) were compiled, the rest were copied from previous compilation.
-    0 functions were new in current compilation
-    0 functions had inline decision re-evaluated but remain unchanged
+  11 of 25 functions (44.0%) were compiled, the rest were copied from previous compilation.
+    1 functions were new in current compilation
+    1 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   P1Draft.vcxproj -> C:\Users\Kristian\OneDrive\Programming\_ GitHub _\School Projects\P1Draft\GitHub\P1-Boarding-An-Airplane\P1Draft\Release\P1Draft.exe

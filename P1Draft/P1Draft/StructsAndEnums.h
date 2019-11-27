@@ -67,8 +67,8 @@ typedef struct PassengerMethodDefinition MethodDefinition;
 
 struct BaseSimulationRules
 {
-	int BSR_ShuffleDelay;
-	int BSR_CrossDelay;
+	int ShuffleDelay;
+	int CrossDelay;
 };
 typedef struct BaseSimulationRules BaseSimulationRules;
 
