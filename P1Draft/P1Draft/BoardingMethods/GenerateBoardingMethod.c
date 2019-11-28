@@ -76,7 +76,7 @@ int main(void) {
                 return 1;
             break;
         }
-        BI.PeasentClassBoardingGroupOffset = CreateFirstClassRows(&BI, FP);
+        //BI.PeasentClassBoardingGroupOffset = CreateFirstClassRows(&BI, FP);
         CreatePeasentClassRows(&BI, FP);
         fclose(FP);
     }
@@ -96,8 +96,7 @@ int CreateFirstClassRows(BoardingInfo *_BI, FILE *_FP) {
     char SeatString[10];
     for (int j = 0; j < FIRST_CLASS_ROWS; j++) {
         if (WITH_WALLS) 
-            fputs("|,", _FP);
-        
+            fputs("|,", _FP);  
         for (int i = 1; i <= seats / 2 + seats % 2; i++) {
             GetSeatNumber(_BI, i, SeatString);
             fputs(SeatString, _FP);
@@ -114,7 +113,7 @@ int CreateFirstClassRows(BoardingInfo *_BI, FILE *_FP) {
             fputs(SeatString, _FP);
         }
         if (_BI->BoardingMethod == BMJanModified)
-            _Bå I->CurrentBoardingGroup--;
+            _BI->CurrentBoardingGroup--;
         else if (_BI->BoardingMethod == BMSteffenModified)
             _BI->CurrentBoardingGroup -=2;
 
@@ -145,15 +144,23 @@ void CreatePeasentClassRows(BoardingInfo *_BI, FILE *_FP) {
         _BI->CurrentBoardingGroup = 2 * PEASENT_CLASS_ROWS;
 
     for (int j = 0; j < PEASENT_CLASS_ROWS; j++) {
-        if (WITH_WALLS) 
-            fputs("|,", _FP);
-        
+
+        if (_BI->BoardingMethod == BMSteffenModified)
+        {
+            _BI->CurrentBoardingGroup = 2 * PEASENT_CLASS_ROWS - PEASENT_CLASS_ROWS / 2;
+             if (_BI->BoardingGroupRowCounter % 2 == 0)
+                _BI->CurrentBoardingGroup -= PEASENT_CLASS_ROWS;
+            _BI->CurrentBoardingGroup -= _BI->BoardingGroupRowCounter / 2;
+        }
+
         for (int i = 1; i <= seats; i++) {
             GetSeatNumber(_BI, i, SeatString);
             fputs(SeatString, _FP);
         }
         if (_BI->BoardingMethod == BMJanModified)
             _BI->CurrentBoardingGroup--;
+        else if (_BI->BoardingMethod == BMSteffenModified)
+            _BI->CurrentBoardingGroup += PEASENT_CLASS_ROWS / 2;
         fputs("-,", _FP);
         for (int i = seats; i > 0; i--) {
             GetSeatNumber(_BI, i, SeatString);
@@ -162,8 +169,6 @@ void CreatePeasentClassRows(BoardingInfo *_BI, FILE *_FP) {
         if (_BI->BoardingMethod == BMJanModified)
             _BI->CurrentBoardingGroup--;    
 
-        if (WITH_WALLS) 
-            fputs("|", _FP);
         fputs("\n", _FP);
 
         if (_BI->BoardingMethod == BMFrontToBack || _BI->BoardingMethod == BMBackToFront) {
@@ -175,7 +180,8 @@ void CreatePeasentClassRows(BoardingInfo *_BI, FILE *_FP) {
                 else
                     _BI->CurrentBoardingGroup--;
             }
-        }
+        } else if (_BI->BoardingMethod == BMSteffenModified)
+            _BI->BoardingGroupRowCounter++;
     }
 }
 
