@@ -32,6 +32,9 @@ void GeneratePassenger(Person* Passenger) {
     Passenger->ShuffleDelay = 0;
     Passenger->CrossDelay = 0;
     Passenger->StepsTaken = 0;
+
+	Passenger->MovedLastTurn = true;
+	Passenger->NextMove = SetPoint(0,0);
 }
 
 int GenerateLuggage(const Person* Passenger) {

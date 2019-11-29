@@ -192,29 +192,48 @@ void PrintField(Person* _PassengerArray[MaxRows][MaxSeatsPrRow], const char _Bas
 
 bool IsAnyOnPoint(Person *_PassengerArray[MaxRows][MaxSeatsPrRow], Person *_Person)
 {
-	Person FirstPerson = *_Person;
-	Point NewPoint = PredictedPoint(FirstPerson.CurrentPos, FirstPerson.Target);
+	Point NewPoint;
+	if (_Person->MovedLastTurn)
+	{
+		NewPoint = PredictedPoint(_Person->CurrentPos, _Person->Target);
+		_Person->NextMove = NewPoint;
+		_Person->MovedLastTurn = false;
+	}
+	else
+		NewPoint = _Person->NextMove;
+
 	if (_PassengerArray[NewPoint.Y][NewPoint.X] != NULL)
 	{
 		Person* OtherPerson = _PassengerArray[NewPoint.Y][NewPoint.X];
-		Point SecondNewPoint = PredictedPoint(OtherPerson->CurrentPos, OtherPerson->Target);
+		Point SecondNewPoint;
+		if (OtherPerson->MovedLastTurn)
+		{
+			SecondNewPoint = PredictedPoint(OtherPerson->CurrentPos, OtherPerson->Target);
+			OtherPerson->NextMove = NewPoint;
+			OtherPerson->MovedLastTurn = false;
+		}
+		else
+			SecondNewPoint = OtherPerson->NextMove;
 
 		// Shuffle dance
-		if (FirstPerson.Target.Y == OtherPerson->Target.Y && FirstPerson.CurrentPos.Y == OtherPerson->CurrentPos.Y)
+		if (_Person->Target.Y == OtherPerson->Target.Y && _Person->CurrentPos.Y == OtherPerson->CurrentPos.Y)
 		{
 			SendRowBack(_PassengerArray, _Person);
+
 			return true;
 		}
 
 		// Cross
-		if (IsPointEqual(SecondNewPoint, FirstPerson.CurrentPos))
+		if (IsPointEqual(SecondNewPoint, _Person->CurrentPos))
 		{
 			OtherPerson->CurrentPos = SecondNewPoint;
 			OtherPerson->CrossDelay = BSR.CrossDelay;
+			OtherPerson->MovedLastTurn = true;
 			_PassengerArray[SecondNewPoint.Y][SecondNewPoint.X] = OtherPerson;
 
 			_Person->CurrentPos = NewPoint;
 			_Person->CrossDelay = BSR.CrossDelay;
+			_Person->MovedLastTurn = true;
 			_PassengerArray[NewPoint.Y][NewPoint.X] = _Person;
 
 			return true;
@@ -222,6 +241,8 @@ bool IsAnyOnPoint(Person *_PassengerArray[MaxRows][MaxSeatsPrRow], Person *_Pers
 
 		return true;
 	}
+
+	_Person->MovedLastTurn = true;
 
 	return false;
 }
@@ -271,6 +292,7 @@ void SendRowBack(Person* _PassengerArray[MaxRows][MaxSeatsPrRow], Person *_Perso
 
 			MomentPerson->IsBackingUp = true;
 			MomentPerson->ShuffleDelay = BackupWaitSteps(DistanceToTargetSeat, InnerMostSeat, BSR.ShuffleDelay);
+			MomentPerson->MovedLastTurn = true;
 		}
 
 		if (_Person->Target.X > Doors[_Person->StartingDoorID].X)
@@ -281,6 +303,7 @@ void SendRowBack(Person* _PassengerArray[MaxRows][MaxSeatsPrRow], Person *_Perso
 
 	_Person->IsBackingUp = true;
 	_Person->ShuffleDelay = BackupWaitSteps(DistanceToTargetSeat, InnerMostSeat, BSR.ShuffleDelay);
+	_Person->MovedLastTurn = true;
 }
 
 int BackupWaitSteps(int TargetSeat, int InnerBlockingSeat, int ExtraPenalty)
