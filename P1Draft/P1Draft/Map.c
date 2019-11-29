@@ -22,10 +22,11 @@ bool ReadMapFromFile(Map* map, FILE* file) {
     int x=0, y=0;
     while (fgets(buffer, bufferLength, file) != NULL) { // One iteration per line, until NULL is returned at EOF
         char field[32];
-        while (sscanf_s(buffer, "%[^,\0]", field, 32) == 1) { // One iteration per field of data in a line
+        while (sscanf_s(buffer, "%32[^,]s", field) == 1) { // One iteration per field of data in a line
             switch (field[0]) {
                 case '|':  break;
                 case '\r': break;
+                case '\0': break;
                 case '-': x++; break;
 
                 default:
@@ -49,14 +50,14 @@ bool ReadMapFromFile(Map* map, FILE* file) {
 
 bool AllocateMapPoints(Map* map) {
     if (map->Seats == NULL) {
-        fprintf(stderr, "Failed to allocate %d bytes for map width\n", map->Width * sizeof(Seat*));
+        fprintf(stderr, "Failed to allocate %d bytes for map width\n", (int)(map->Width * sizeof(Seat*)));
         return false;
     }
 
     for (int i = 0; i < map->Width; i++) {
         map->Seats[i] = calloc(map->Height, sizeof(Point));
         if (map->Seats[i] == NULL) {
-            fprintf(stderr, "Failed to allocate %d bytes for map row %d\n", map->Height * sizeof(Point), i);
+            fprintf(stderr, "Failed to allocate %d bytes for map row %d\n", (int)(map->Height * sizeof(Point)), i);
             return false;
         }
     }
