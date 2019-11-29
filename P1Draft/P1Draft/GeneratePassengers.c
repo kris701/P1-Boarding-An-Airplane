@@ -43,7 +43,7 @@ int GetStartingDoorID(const Person* Passenger) {
 }
 
 int GenerateWalkSpeed(const Person* Passenger) {
-    return GetRandomNumberRanged(3, 4);
+    return GetRandomNumberRanged(1, 2);
 }
 
 bool AssignPassengerToAvailableSeat(Person _PassengerList[MaxPersons], int index) {
@@ -51,8 +51,7 @@ bool AssignPassengerToAvailableSeat(Person _PassengerList[MaxPersons], int index
     return true;
 }
 
-Point Random_GetTargetLocation(Person _PersonList[MaxPersons], int Index)
-{
+Point Random_GetTargetLocation(Person _PersonList[MaxPersons], int Index) {
 	Point NewTarget = { 0, 0 };
 	bool FoundAvailable = true;
 	while (FoundAvailable)
@@ -83,3 +82,36 @@ Point Random_GetTargetLocation(Person _PersonList[MaxPersons], int Index)
 
 	return NewTarget;
 }
+
+
+
+void SortPointsAccordingToMethod(Point Points[], FILE* methodFile) {    
+    /* Qsort with comp based on filecontents */
+
+    /*
+        Look through file, find number of boarding groups
+        Allocate 1 int for each boarding group
+        Count how many seats for each group
+        Go through the seats and assign them to passengers from start to end
+        Free array
+    */
+
+    /*
+    Generate map from file, then pass map to this function
+    */
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+

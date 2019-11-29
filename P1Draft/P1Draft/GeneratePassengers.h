@@ -1,16 +1,16 @@
 #pragma once
 
-#include "StructsAndEnums.h"
-#include "BasicCalls.h"
-#include "MapDefinition.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
 #include <math.h>
+#include <stdio.h>
 
-#include "GeneratePassengers.h"
+#include "StructsAndEnums.h"
+#include "BasicCalls.h"
+#include "MapDefinition.h"
 
 void GeneratePassengers(int Count, Person _PersonList[MaxPersons], MethodIndex Index, MethodDefinition _MDef);
 void GeneratePassenger(Person* Passenger);
