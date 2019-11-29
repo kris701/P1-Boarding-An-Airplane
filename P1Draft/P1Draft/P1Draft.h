@@ -12,7 +12,7 @@
 #define MaxRuns 1000000
 #define ProgressBarSteps 10
 
-void PrintField(Person _PassengerList[MaxPersons], const char _BaseFieldData[MaxRows][MaxSeatsPrRow]);
+void PrintField(Person* _PassengerArray[MaxRows][MaxSeatsPrRow], const char _BaseFieldData[MaxRows][MaxSeatsPrRow]);
 bool IsAnyOnPoint(Person* _PassengerArray[MaxRows][MaxSeatsPrRow], Person *_Person);
 Point PredictedPoint(Point CurrentPoint, Point TargetPoint);
 Point PredictedPointInvX(Point CurrentPos, XAxis TargX, XAxis DoorX);

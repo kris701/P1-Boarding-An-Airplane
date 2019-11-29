@@ -22,8 +22,3 @@ int GetRandomNumberRanged(int _Min, int _Max)
 {
 	return rand() % (_Max + 1 - _Min) + _Min;
 }
-
-bool IsNumberOdd(int _Value)
-{
-	return _Value % 2;
-}
