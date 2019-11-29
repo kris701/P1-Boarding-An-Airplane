@@ -10,7 +10,7 @@ bool ReadMapFromFile(Map* map, FILE* file) {
     }
 
     int bufferLength = GetNumberOfCharsForLongestLineInFile(file);
-    char buffer = calloc(bufferLength, sizeof(char));
+    char* buffer = calloc(bufferLength, sizeof(char));
     if (buffer == NULL) {
         fprintf(stderr, "Failed to allocate %d bytes for filebuffer while reading map\n", bufferLength);
         return false;
@@ -22,7 +22,7 @@ bool ReadMapFromFile(Map* map, FILE* file) {
     int x=0, y=0;
     while (fgets(buffer, bufferLength, file) != NULL) { // One iteration per line, until NULL is returned at EOF
         char field[32];
-        while (sscanf_s(buffer, "%[^,\0]", field, 32) == 1) { // One iteration per field of data in a line
+        while (sscanf_s(buffer, "%[^,]", field, 32) == 1) { // One iteration per field of data in a line
             switch (field[0]) {
                 case '|':  break;
                 case '\r': break;

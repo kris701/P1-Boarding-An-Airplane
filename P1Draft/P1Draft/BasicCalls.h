@@ -10,6 +10,5 @@
 bool IsPointEqual(Point _A, Point _B);
 Point SetPoint(int _X, int _Y);
 int GetRandomNumberRanged(int _Min, int _Max);
-bool IsNumberOdd(int _Value);
 
 #endif
