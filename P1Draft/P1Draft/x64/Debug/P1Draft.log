@@ -1,0 +1,8 @@
+﻿  BasicCalls.c
+  GeneratePassengers.c
+  P1Draft.c
+C:\Users\vufer\OneDrive\Documents\GitHub\P1-Boarding-An-Airplane\P1Draft\P1Draft\GeneratePassengers.c(5,18): warning C4244: 'function': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\vufer\OneDrive\Documents\GitHub\P1-Boarding-An-Airplane\P1Draft\P1Draft\P1Draft.c(39,30): warning C4047: 'function': 'int' differs in levels of indirection from 'void *'
+  Generating Code...
+C:\Users\vufer\OneDrive\Documents\GitHub\P1-Boarding-An-Airplane\P1Draft\P1Draft\P1Draft.c(39,30): warning C4024: 'memset': different types for formal and actual parameter 2
+  P1Draft.vcxproj -> C:\Users\vufer\OneDrive\Documents\GitHub\P1-Boarding-An-Airplane\P1Draft\x64\Debug\P1Draft.exe

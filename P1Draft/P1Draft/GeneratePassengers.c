@@ -85,3 +85,22 @@ Point Random_GetTargetLocation(Person _PersonList[MaxPersons], int Index)
 
 	return NewTarget;
 }
+
+/* Data from: https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0023299 */
+int GetWalkingSpeed(int age) {
+    if (age >= 60) {
+        return 121;
+    }
+    else if(age >= 50){
+        return 123;
+    }
+    else if (age >= 40) {
+        return 126;
+    }
+    else if (age >= 30) {
+        return 126;
+    }
+    else {
+        return 134;
+    }
+}
