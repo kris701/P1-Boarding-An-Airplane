@@ -31,7 +31,8 @@ struct Person
 	int ShuffleDelay;
 	int CrossDelay;
 	int StepsTaken;
-	int StartIndex;
+	bool MovedLastTurn;
+	struct Point NextMove;
 };
 typedef struct Person Person;
 
