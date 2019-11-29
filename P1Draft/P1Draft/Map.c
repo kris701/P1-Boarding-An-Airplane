@@ -22,14 +22,14 @@ bool ReadMapFromFile(Map* map, FILE* file) {
     int x=0, y=0;
     while (fgets(buffer, bufferLength, file) != NULL) { // One iteration per line, until NULL is returned at EOF
         char field[32];
-        while (sscanf_s(buffer, "%[^,\0]", field) == 1) { // One iteration per field of data in a line
+        while (sscanf_s(buffer, "%[^,\0]", field, 32) == 1) { // One iteration per field of data in a line
             switch (field[0]) {
                 case '|':  break;
                 case '\r': break;
                 case '-': x++; break;
 
                 default:
-                    if (sscanf_s(field, "%d", &(map->Seats[x][y].BoardingGroup) == 1)) {
+                    if (sscanf_s(field, "%d", &(map->Seats[x][y].BoardingGroup)) == 1) {
                         x++;
                     }
                     else {
@@ -68,8 +68,8 @@ void FreeMapPoints(Map* map) {
     if (map->Seats == NULL) return;
 
     for (int i = 0; i < map->Width; i++) {
-        if (map->Seats[i] != NULL) {
-            free(map->Seats[i]);
+        if (map->Seats != NULL) {
+			free(map->Seats[i]);
         }
     }
     free(map->Seats);
@@ -94,7 +94,7 @@ int GetSeatsPerLine(FILE* file) {
         default:
             break;
         }
-    } while (ch != EOF);
+    } while (!feof(file));
 
     fseek(file, initialFileCursorLocation, SEEK_SET);
     return highestWidth;
