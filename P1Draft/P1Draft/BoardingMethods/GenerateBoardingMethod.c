@@ -37,7 +37,9 @@ typedef struct BoardingInfo {
     Classes CurrentClass;
 } BoardingInfo;
 
+int OpenConfigFile(BoardingInfo *_BI, FILE *_FP);
 void ReadConfigFile(BoardingInfo *_BI, FILE *_FP);
+void SetBoardingMethod(BoardingInfo *_BI, FILE *_FP, int _Index);
 BoardingInfo ResetBI(BoardingInfo _BI);
 int CreateFirstClassRows(BoardingInfo *_BI, FILE *_FP);
 void CreatePeasentClassRows(BoardingInfo *_BI, FILE *_FP);
@@ -53,13 +55,9 @@ int main(void) {
     FILE *FP;
     BoardingInfo BI = {{0, 0, 0, 0, 0}, BMWilma, 1, 0, 0, 0};
 
-    FP = fopen("config.ini", "r");
-    if (FP == NULL) {
-        printf("Missing config file\nShutting down\n");
+    if (!OpenConfigFile(&BI, FP))
         return 0;
-    }
-    ReadConfigFile(&BI, FP);
-
+    // The program can't handle uneven amount of seats
     if (BI.PlaneInfo.SeatsPerRow % 2 != 0) {
         printf("Uneven amount of seats per row\nShutting down\n");
         return 0;
@@ -67,39 +65,7 @@ int main(void) {
 
 
     for (int i = 0; i < 7; i++) {
-        switch((BoardingMethods) i) {
-            case BMRandom:
-                FP = fopen("random.txt", "w");
-                BI.BoardingMethod = BMRandom;
-            break;
-            case BMWilma:
-                FP = fopen("wilma.txt", "w");
-                BI.BoardingMethod = BMWilma;
-            break;
-            case BMFrontToBack:
-                FP = fopen("fronttoback.txt", "w");
-                BI.BoardingMethod = BMFrontToBack;
-            break;
-            case BMBackToFront:
-                FP = fopen("backtofront.txt", "w");
-                BI.BoardingMethod = BMBackToFront;
-            break;
-            case BMSteffenModified:
-                FP = fopen("steffenmodified.txt", "w");
-                BI.BoardingMethod = BMSteffenModified;
-            break;
-            case BMJanModified:
-                FP = fopen("janmodified.txt", "w");
-                BI.BoardingMethod = BMJanModified;
-            break;
-            case BMSteffenPerfect:
-                FP = fopen("steffenperfect.txt", "w");
-                BI.BoardingMethod = BMSteffenPerfect;
-            break;
-            default:
-                return 1;
-            break;
-        }
+        SetBoardingMethod(&BI, FP, i);
         BI = ResetBI(BI);
         BI.PeasentClassBoardingGroupOffset = CreateFirstClassRows(&BI, FP);
         BI.BoardingGroupRowCounter = 0;
@@ -109,6 +75,16 @@ int main(void) {
     }
 
     return 0;
+}
+
+int OpenConfigFile(BoardingInfo *_BI, FILE *_FP) {
+    _FP = fopen("config.ini", "r");
+    if (_FP == NULL) {
+        printf("Missing config file\nShutting down\n");
+        return 0;
+    }
+    ReadConfigFile(_BI, _FP);
+    return 1;
 }
 
 void ReadConfigFile(BoardingInfo *_BI, FILE *_FP) {
@@ -139,6 +115,42 @@ void ReadConfigFile(BoardingInfo *_BI, FILE *_FP) {
     }
 }
 
+void SetBoardingMethod(BoardingInfo *_BI, FILE *_FP, int _Index) {
+    switch((BoardingMethods) _Index) {
+            case BMRandom:
+                _FP = fopen("random.txt", "w");
+                _BI->BoardingMethod = BMRandom;
+            break;
+            case BMWilma:
+                _FP = fopen("wilma.txt", "w");
+                _BI->BoardingMethod = BMWilma;
+            break;
+            case BMFrontToBack:
+                _FP = fopen("fronttoback.txt", "w");
+                _BI->BoardingMethod = BMFrontToBack;
+            break;
+            case BMBackToFront:
+                _FP = fopen("backtofront.txt", "w");
+                _BI->BoardingMethod = BMBackToFront;
+            break;
+            case BMSteffenModified:
+                _FP = fopen("steffenmodified.txt", "w");
+                _BI->BoardingMethod = BMSteffenModified;
+            break;
+            case BMJanModified:
+                _FP = fopen("janmodified.txt", "w");
+                _BI->BoardingMethod = BMJanModified;
+            break;
+            case BMSteffenPerfect:
+                _FP = fopen("steffenperfect.txt", "w");
+                _BI->BoardingMethod = BMSteffenPerfect;
+            break;
+            default:
+                printf("Array out of index in boardingmethods\n");
+            break;
+        }
+}
+
 BoardingInfo ResetBI(BoardingInfo _BI) {
     _BI.CurrentBoardingGroup = 1;
     _BI.PeasentClassBoardingGroupOffset = 0;
@@ -155,12 +167,14 @@ int CreateFirstClassRows(BoardingInfo *_BI, FILE *_FP) {
         for (int i = 1; i <= seats / 2 + seats % 2; i++) {
             GetSeatNumber(_BI, i, SeatString);
             fputs(SeatString, _FP);
+            // Adds a empty seat if aplicable
             if ((offset == 0 && i == seats / 2 + offset) || i != seats / 2 + offset)
                 fputs("-,", _FP);
         }
         fputs("|,", _FP);
         _BI->BoardingGroupRowCounter++;
         for (int i = seats / 2 + seats % 2; i >= 1; i-- ) {
+            // Adds a empty seat if aplicable
             if ((offset == 0 && i == seats / 2 + offset) || i != seats / 2 + offset)
                 fputs("-,", _FP);
             GetSeatNumber(_BI, i, SeatString);
@@ -197,9 +211,11 @@ void CreatePeasentClassRows(BoardingInfo *_BI, FILE *_FP) {
 void GetSeatNumber(BoardingInfo *_BI, int _SeatIndex, char _SeatString[]) {
     switch(_BI->BoardingMethod) {
         case BMRandom:
+            // Either 1 for first class or 2 for peasent class
             sprintf(_SeatString, "%d,", _BI->CurrentClass == CFirst ? 1 : 2);
         break;
         case BMWilma:
+            // Adds one index per seat between the current seat and the window
             sprintf(_SeatString, "%d,", _SeatIndex + _BI->PeasentClassBoardingGroupOffset);
         break;
         case BMFrontToBack:
@@ -234,6 +250,8 @@ void GetSeatNumber(BoardingInfo *_BI, int _SeatIndex, char _SeatString[]) {
 }
 
 int GetPeasentOffset(BoardingInfo _BI) {
+    // This is the amount of seats in the first class
+    // Thus offsetting peasent class by that amount
     switch(_BI.BoardingMethod) {
         case BMRandom:
             return 1;
@@ -265,51 +283,60 @@ int GetPeasentOffset(BoardingInfo _BI) {
 
 int GetSeatForFrontToBack(BoardingInfo *_BI, int _SeatIndex) {
     int rowCount = ((_BI->CurrentClass == CFirst) ? _BI->PlaneInfo.FirstClassRows : _BI->PlaneInfo.PeasentClassRows);
-    return  (1 + 
-
-                _BI->PeasentClassBoardingGroupOffset +
-
-                (_BI->BoardingGroupRowCounter + 
-                (_BI->BoardingGroupRowCounter % 2 == 1 ? 0 : 1)) 
-                / (2 * _BI->PlaneInfo.BoardingGroupRowCount));
+    return  (_BI->PeasentClassBoardingGroupOffset + 
+            // Offset
+            1 +
+            // Gets the amount of full rows already written
+            (_BI->BoardingGroupRowCounter + (_BI->BoardingGroupRowCounter % 2 == 1 ? 0 : 1)) 
+            // Divides by the boarding group size
+            / (2 * _BI->PlaneInfo.BoardingGroupRowCount));
 }
 
 int GetSeatForBackToFront(BoardingInfo *_BI, int _SeatIndex) {
     int rowCount = ((_BI->CurrentClass == CFirst) ? _BI->PlaneInfo.FirstClassRows : _BI->PlaneInfo.PeasentClassRows);
-    return (_BI->PeasentClassBoardingGroupOffset +
-           (rowCount / _BI->PlaneInfo.BoardingGroupRowCount) + ((rowCount % _BI->PlaneInfo.BoardingGroupRowCount == 0) ? 0 : 1) -
-           ((_BI->BoardingGroupRowCounter + (_BI->BoardingGroupRowCounter % 2 == 1 ? 0 : 1)) / 
-           (2 * _BI->PlaneInfo.BoardingGroupRowCount))
-
-
-        );
+    return  (_BI->PeasentClassBoardingGroupOffset +
+            // Calculates the amount of total boarding groups
+            (rowCount / _BI->PlaneInfo.BoardingGroupRowCount) + ((rowCount % _BI->PlaneInfo.BoardingGroupRowCount == 0) ? 0 : 1) -
+            // Calculates the total amount of full rows alreadt written
+            ((_BI->BoardingGroupRowCounter + (_BI->BoardingGroupRowCounter % 2 == 1 ? 0 : 1)) / 
+            // Divides by the boarding group size
+            (2 * _BI->PlaneInfo.BoardingGroupRowCount)));
 }
 
 int GetSeatForSteffenModified(BoardingInfo *_BI, int _SeatIndex) {
     int rowCount = ((_BI->CurrentClass == CFirst) ? _BI->PlaneInfo.FirstClassRows : _BI->PlaneInfo.PeasentClassRows);
-    return  (2 * rowCount +
-                  _BI->PeasentClassBoardingGroupOffset -
-                ((_BI->BoardingGroupRowCounter % 2 == 1) ? rowCount : rowCount / 2) -
-                 (_BI->BoardingGroupRowCounter / 4) -
-                ((_BI->BoardingGroupRowCounter % 4 == ((rowCount % 2 == 0) ? 2 : 0)) ? rowCount : 0) +
-               (((_BI->BoardingGroupRowCounter % 4 == ((rowCount % 2 == 0) ? 1 : 3)) && (_BI->BoardingGroupRowCounter % 2 == 1)) ? rowCount : 0) +
-               ((rowCount % 2 == 1) ? (((_BI->BoardingGroupRowCounter % 4 == 1) && (_BI->BoardingGroupRowCounter % 2 == 1)) ? 1 : 0) : 0)) ;
+    return  (_BI->PeasentClassBoardingGroupOffset +
+            // Calculates the highest boarding group
+            2 * rowCount -
+            // Subtracts for each row already written
+            ((_BI->BoardingGroupRowCounter % 2 == 1) ? rowCount : rowCount / 2) -
+            // Subtracts 1 for each two full rows already checked
+            (_BI->BoardingGroupRowCounter / 4) -
+            // Subtracts the total amount of full rows of the specific class from half of the plane
+            ((_BI->BoardingGroupRowCounter % 4 == ((rowCount % 2 == 0) ? 2 : 0)) ? rowCount : 0) +
+            // Adds the total amount of full rows of the specific class to 1/4 of the plane rows
+            (((_BI->BoardingGroupRowCounter % 4 == ((rowCount % 2 == 0) ? 1 : 3)) && (_BI->BoardingGroupRowCounter % 2 == 1)) ? rowCount : 0) +
+            // Adds 1 to to 1/4 of the plane rows
+            ((rowCount % 2 == 1) ? (((_BI->BoardingGroupRowCounter % 4 == 1) && (_BI->BoardingGroupRowCounter % 2 == 1)) ? 1 : 0) : 0));
 }
 
+// This was made by accident
 int GetSeatForJanModified(BoardingInfo *_BI, int _SeatIndex) {
     int rowCount = ((_BI->CurrentClass == CFirst) ? _BI->PlaneInfo.FirstClassRows : _BI->PlaneInfo.PeasentClassRows);
     int SeatsPerRow = ((_BI->CurrentClass == CFirst) ? _BI->PlaneInfo.FirstClassSeatsPerRow : _BI->PlaneInfo.SeatsPerRow);
-    return (_BI->PeasentClassBoardingGroupOffset +
+    return  (_BI->PeasentClassBoardingGroupOffset +
+            // Sets the highest boarding group
             rowCount * SeatsPerRow -
+            // Subtracts all seats already written
             _BI->BoardingGroupRowCounter * (SeatsPerRow / 2) -
-            ((SeatsPerRow / 2) - _SeatIndex)
-           );
+            // Subtracts 1 for each seat between this and the window for the specific row
+            ((SeatsPerRow / 2) - _SeatIndex));
 }
 
 int GetSeatForSteffenPerfect(BoardingInfo *_BI, int _SeatIndex) {
     int rowCount = ((_BI->CurrentClass == CFirst) ? _BI->PlaneInfo.FirstClassRows : _BI->PlaneInfo.PeasentClassRows);
     int SeatsPerRow = ((_BI->CurrentClass == CFirst) ? _BI->PlaneInfo.FirstClassSeatsPerRow : _BI->PlaneInfo.SeatsPerRow);
-    return (_BI->PeasentClassBoardingGroupOffset +
+    return  (_BI->PeasentClassBoardingGroupOffset +
             // Sets the maximum seat number to all seats
             rowCount * SeatsPerRow - 
             // Sets the maximum seat number for each column of seats
@@ -325,6 +352,5 @@ int GetSeatForSteffenPerfect(BoardingInfo *_BI, int _SeatIndex) {
             // Subtracts the prior seats
             (((_BI->BoardingGroupRowCounter - _BI->BoardingGroupRowCounter % 2) % 4 == ((rowCount % 2 == 1) ? 0 : 2)) ? rowCount : 0) +
             // Adds 1 to every second row of half the plane
-            ((rowCount % 2 == 1) ? ((_BI->BoardingGroupRowCounter % 4 == 1) ? 1 : 0) : 0)
-           );
+            ((rowCount % 2 == 1) ? ((_BI->BoardingGroupRowCounter % 4 == 1) ? 1 : 0) : 0));
 }
