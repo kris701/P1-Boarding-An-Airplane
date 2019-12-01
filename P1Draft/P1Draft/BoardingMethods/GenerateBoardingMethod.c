@@ -1,13 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <string.h>
 
-#define FIRST_CLASS_ROWS 8
-#define PEASENT_CLASS_ROWS 3
-#define SEATS_PER_ROW 8
-#define FIRST_CLASS_SEATS_PER_ROW (SEATS_PER_ROW / 2 + (SEATS_PER_ROW / 2 % 2))
-#define BOARDING_GROUP_ROW_AMOUNT 4
-#define WITH_WALLS false
 
 typedef enum BoardingMethods{
     BMRandom,
@@ -24,7 +19,16 @@ typedef enum Classes{
     CPeasent
 } Classes;
 
+typedef struct PlaneInformation {
+    int FirstClassRows;
+    int PeasentClassRows;
+    int SeatsPerRow;
+    int FirstClassSeatsPerRow;
+    int BoardingGroupRowCount;
+} PlaneInformation;
+
 typedef struct BoardingInfo {
+    PlaneInformation PlaneInfo;
     BoardingMethods BoardingMethod;
     int CurrentBoardingGroup;
     int PeasentClassBoardingGroupOffset;
@@ -33,6 +37,7 @@ typedef struct BoardingInfo {
     Classes CurrentClass;
 } BoardingInfo;
 
+void ReadConfigFile(BoardingInfo *_BI, FILE *_FP);
 BoardingInfo ResetBI(BoardingInfo _BI);
 int CreateFirstClassRows(BoardingInfo *_BI, FILE *_FP);
 void CreatePeasentClassRows(BoardingInfo *_BI, FILE *_FP);
@@ -46,9 +51,20 @@ int GetSeatForSteffenPerfect(BoardingInfo *_BI, int _SeatIndex);
 
 int main(void) {
     FILE *FP;
-    BoardingInfo BI = {BMWilma, 1, 0, 0, 0};
-    if (SEATS_PER_ROW % 2 != 0)
-        return 1;
+    BoardingInfo BI = {{0, 0, 0, 0, 0}, BMWilma, 1, 0, 0, 0};
+
+    FP = fopen("config.ini", "r");
+    if (FP == NULL) {
+        printf("Missing config file\nShutting down\n");
+        return 0;
+    }
+    ReadConfigFile(&BI, FP);
+
+    if (BI.PlaneInfo.SeatsPerRow % 2 != 0) {
+        printf("Uneven amount of seats per row\nShutting down\n");
+        return 0;
+    }
+
 
     for (int i = 0; i < 7; i++) {
         switch((BoardingMethods) i) {
@@ -95,6 +111,34 @@ int main(void) {
     return 0;
 }
 
+void ReadConfigFile(BoardingInfo *_BI, FILE *_FP) {
+    char str[128];
+    char *substring = "";
+    char *delimiter = "=";
+    for (int i = 0; i < 7; i++) {
+        // If there is text, which should really always be the case
+        if (fgets(str, 128, _FP) != NULL) {
+            // If the line isn't a comment
+            if (str[0] != ';') {
+                if (strstr(str, "first_class_rows")) {
+                    substring = strchr(str, '=') + 1;
+                    _BI->PlaneInfo.FirstClassRows = atoi(substring);
+                } else if (strstr(str, "economy_class_rows")) {
+                    substring = strchr(str, '=') + 1;
+                    _BI->PlaneInfo.PeasentClassRows = atoi(substring);
+                } else if (strstr(str, "seats_per_row")) {
+                    substring = strchr(str, '=') + 1;
+                    _BI->PlaneInfo.SeatsPerRow = atoi(substring);
+                    _BI->PlaneInfo.FirstClassSeatsPerRow = (_BI->PlaneInfo.SeatsPerRow / 2 + (_BI->PlaneInfo.SeatsPerRow / 2 % 2));
+                } else if (strstr(str, "boarding_group_size")) {
+                    substring = strchr(str, '=') + 1;
+                    _BI->PlaneInfo.BoardingGroupRowCount = atoi(substring);
+                }
+            }
+        }
+    }
+}
+
 BoardingInfo ResetBI(BoardingInfo _BI) {
     _BI.CurrentBoardingGroup = 1;
     _BI.PeasentClassBoardingGroupOffset = 0;
@@ -104,10 +148,10 @@ BoardingInfo ResetBI(BoardingInfo _BI) {
 }
 
 int CreateFirstClassRows(BoardingInfo *_BI, FILE *_FP) { 
-    int seats = SEATS_PER_ROW / 2, offset = seats % 2;
+    int seats = _BI->PlaneInfo.SeatsPerRow / 2, offset = seats % 2;
     char SeatString[10];
     _BI->CurrentClass = CFirst;
-    for (int j = 0; j < FIRST_CLASS_ROWS; j++) {  
+    for (int j = 0; j < _BI->PlaneInfo.FirstClassRows; j++) {  
         for (int i = 1; i <= seats / 2 + seats % 2; i++) {
             GetSeatNumber(_BI, i, SeatString);
             fputs(SeatString, _FP);
@@ -129,12 +173,12 @@ int CreateFirstClassRows(BoardingInfo *_BI, FILE *_FP) {
 }
 
 void CreatePeasentClassRows(BoardingInfo *_BI, FILE *_FP) {
-    int seats = SEATS_PER_ROW / 2;
+    int seats = _BI->PlaneInfo.SeatsPerRow / 2;
     char SeatString[10];
     _BI->CurrentClass = CPeasent;
     if (_BI->PeasentClassBoardingGroupOffset == -1)
         _BI->PeasentClassBoardingGroupOffset = 0;
-    for (int j = 0; j < PEASENT_CLASS_ROWS; j++) {
+    for (int j = 0; j < _BI->PlaneInfo.PeasentClassRows; j++) {
         for (int i = 1; i <= seats; i++) {
             GetSeatNumber(_BI, i, SeatString);
             fputs(SeatString, _FP);
@@ -195,22 +239,22 @@ int GetPeasentOffset(BoardingInfo _BI) {
             return 1;
         break;
         case BMWilma:
-            return (SEATS_PER_ROW / 4 + (SEATS_PER_ROW / 2) % 2);
+            return (_BI.PlaneInfo.SeatsPerRow / 4 + (_BI.PlaneInfo.SeatsPerRow / 2) % 2);
         break;
         case BMFrontToBack:
-            return (FIRST_CLASS_ROWS / BOARDING_GROUP_ROW_AMOUNT) + ((FIRST_CLASS_ROWS % BOARDING_GROUP_ROW_AMOUNT == 0) ? 0 : 1);
+            return (_BI.PlaneInfo.FirstClassRows / _BI.PlaneInfo.BoardingGroupRowCount) + ((_BI.PlaneInfo.FirstClassRows % _BI.PlaneInfo.BoardingGroupRowCount == 0) ? 0 : 1);
         break;
         case BMBackToFront:
-            return (FIRST_CLASS_ROWS / BOARDING_GROUP_ROW_AMOUNT) + ((FIRST_CLASS_ROWS % BOARDING_GROUP_ROW_AMOUNT == 0) ? 0 : 1);
+            return (_BI.PlaneInfo.FirstClassRows / _BI.PlaneInfo.BoardingGroupRowCount) + ((_BI.PlaneInfo.FirstClassRows % _BI.PlaneInfo.BoardingGroupRowCount == 0) ? 0 : 1);
         break;
         case BMSteffenModified:
-            return (2 * FIRST_CLASS_ROWS);
+            return (2 * _BI.PlaneInfo.FirstClassRows);
         break;
         case BMJanModified:
-            return (FIRST_CLASS_ROWS * FIRST_CLASS_SEATS_PER_ROW);
+            return (_BI.PlaneInfo.FirstClassRows * _BI.PlaneInfo.FirstClassSeatsPerRow);
         break;
         case BMSteffenPerfect:
-            return (FIRST_CLASS_ROWS * FIRST_CLASS_SEATS_PER_ROW);
+            return (_BI.PlaneInfo.FirstClassRows * _BI.PlaneInfo.FirstClassSeatsPerRow);
         break;
         default:
             return 0;
@@ -220,29 +264,29 @@ int GetPeasentOffset(BoardingInfo _BI) {
 }
 
 int GetSeatForFrontToBack(BoardingInfo *_BI, int _SeatIndex) {
-    int rowCount = ((_BI->CurrentClass == CFirst) ? FIRST_CLASS_ROWS : PEASENT_CLASS_ROWS);
+    int rowCount = ((_BI->CurrentClass == CFirst) ? _BI->PlaneInfo.FirstClassRows : _BI->PlaneInfo.PeasentClassRows);
     return  (1 + 
 
                 _BI->PeasentClassBoardingGroupOffset +
 
                 (_BI->BoardingGroupRowCounter + 
                 (_BI->BoardingGroupRowCounter % 2 == 1 ? 0 : 1)) 
-                / (2 * BOARDING_GROUP_ROW_AMOUNT));
+                / (2 * _BI->PlaneInfo.BoardingGroupRowCount));
 }
 
 int GetSeatForBackToFront(BoardingInfo *_BI, int _SeatIndex) {
-    int rowCount = ((_BI->CurrentClass == CFirst) ? FIRST_CLASS_ROWS : PEASENT_CLASS_ROWS);
+    int rowCount = ((_BI->CurrentClass == CFirst) ? _BI->PlaneInfo.FirstClassRows : _BI->PlaneInfo.PeasentClassRows);
     return (_BI->PeasentClassBoardingGroupOffset +
-           (rowCount / BOARDING_GROUP_ROW_AMOUNT) + ((rowCount % BOARDING_GROUP_ROW_AMOUNT == 0) ? 0 : 1) -
+           (rowCount / _BI->PlaneInfo.BoardingGroupRowCount) + ((rowCount % _BI->PlaneInfo.BoardingGroupRowCount == 0) ? 0 : 1) -
            ((_BI->BoardingGroupRowCounter + (_BI->BoardingGroupRowCounter % 2 == 1 ? 0 : 1)) / 
-           (2 * BOARDING_GROUP_ROW_AMOUNT))
+           (2 * _BI->PlaneInfo.BoardingGroupRowCount))
 
 
         );
 }
 
 int GetSeatForSteffenModified(BoardingInfo *_BI, int _SeatIndex) {
-    int rowCount = ((_BI->CurrentClass == CFirst) ? FIRST_CLASS_ROWS : PEASENT_CLASS_ROWS);
+    int rowCount = ((_BI->CurrentClass == CFirst) ? _BI->PlaneInfo.FirstClassRows : _BI->PlaneInfo.PeasentClassRows);
     return  (2 * rowCount +
                   _BI->PeasentClassBoardingGroupOffset -
                 ((_BI->BoardingGroupRowCounter % 2 == 1) ? rowCount : rowCount / 2) -
@@ -253,8 +297,8 @@ int GetSeatForSteffenModified(BoardingInfo *_BI, int _SeatIndex) {
 }
 
 int GetSeatForJanModified(BoardingInfo *_BI, int _SeatIndex) {
-    int rowCount = ((_BI->CurrentClass == CFirst) ? FIRST_CLASS_ROWS : PEASENT_CLASS_ROWS);
-    int SeatsPerRow = ((_BI->CurrentClass == CFirst) ? FIRST_CLASS_SEATS_PER_ROW : SEATS_PER_ROW);
+    int rowCount = ((_BI->CurrentClass == CFirst) ? _BI->PlaneInfo.FirstClassRows : _BI->PlaneInfo.PeasentClassRows);
+    int SeatsPerRow = ((_BI->CurrentClass == CFirst) ? _BI->PlaneInfo.FirstClassSeatsPerRow : _BI->PlaneInfo.SeatsPerRow);
     return (_BI->PeasentClassBoardingGroupOffset +
             rowCount * SeatsPerRow -
             _BI->BoardingGroupRowCounter * (SeatsPerRow / 2) -
@@ -263,8 +307,8 @@ int GetSeatForJanModified(BoardingInfo *_BI, int _SeatIndex) {
 }
 
 int GetSeatForSteffenPerfect(BoardingInfo *_BI, int _SeatIndex) {
-    int rowCount = ((_BI->CurrentClass == CFirst) ? FIRST_CLASS_ROWS : PEASENT_CLASS_ROWS);
-    int SeatsPerRow = ((_BI->CurrentClass == CFirst) ? FIRST_CLASS_SEATS_PER_ROW : SEATS_PER_ROW);
+    int rowCount = ((_BI->CurrentClass == CFirst) ? _BI->PlaneInfo.FirstClassRows : _BI->PlaneInfo.PeasentClassRows);
+    int SeatsPerRow = ((_BI->CurrentClass == CFirst) ? _BI->PlaneInfo.FirstClassSeatsPerRow : _BI->PlaneInfo.SeatsPerRow);
     return (_BI->PeasentClassBoardingGroupOffset +
             // Sets the maximum seat number to all seats
             rowCount * SeatsPerRow - 
