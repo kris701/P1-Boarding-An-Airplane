@@ -1,58 +1,7 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include <string.h>
-
-
-typedef enum BoardingMethods {
-	BMRandom,
-	BMWilma,
-	BMFrontToBack,
-	BMBackToFront,
-	BMSteffenModified,
-	BMJanModified,
-	BMSteffenPerfect
-} BoardingMethods;
-
-typedef enum Classes {
-	CFirst,
-	CPeasent
-} Classes;
-
-typedef struct PlaneInformation {
-	int FirstClassRows;
-	int PeasentClassRows;
-	int SeatsPerRow;
-	int FirstClassSeatsPerRow;
-	int BoardingGroupRowCount;
-} PlaneInformation;
-
-typedef struct BoardingInfo {
-	PlaneInformation PlaneInfo;
-	BoardingMethods BoardingMethod;
-	int CurrentBoardingGroup;
-	int PeasentClassBoardingGroupOffset;
-	int BoardingGroupRowCounter;
-	int SeatCounter;
-	Classes CurrentClass;
-} BoardingInfo;
-
-int OpenConfigFile(BoardingInfo* _BI, FILE* _FP);
-void ReadConfigFile(BoardingInfo* _BI, FILE* _FP);
-void SetBoardingMethod(BoardingInfo* _BI, FILE* _FP, int _Index);
-BoardingInfo ResetBI(BoardingInfo _BI);
-int CreateFirstClassRows(BoardingInfo* _BI, FILE* _FP);
-void CreatePeasentClassRows(BoardingInfo* _BI, FILE* _FP);
-void GetSeatNumber(BoardingInfo* _BI, int _SeatIndex, char _SeatString[]);
-int GetPeasentOffset(BoardingInfo _BI);
-int GetSeatForFrontToBack(BoardingInfo* _BI, int _SeatIndex);
-int GetSeatForBackToFront(BoardingInfo* _BI, int _SeatIndex);
-int GetSeatForSteffenModified(BoardingInfo* _BI, int _SeatIndex);
-int GetSeatForJanModified(BoardingInfo* _BI, int _SeatIndex);
-int GetSeatForSteffenPerfect(BoardingInfo* _BI, int _SeatIndex);
+#include "Header.h"
 
 int main(void) {
-	FILE* FP;
+	FILE* FP = NULL;
 	BoardingInfo BI = { {0, 0, 0, 0, 0}, BMWilma, 1, 0, 0, 0 };
 
 	if (!OpenConfigFile(&BI, FP))
@@ -65,7 +14,7 @@ int main(void) {
 
 
 	for (int i = 0; i < 7; i++) {
-		SetBoardingMethod(&BI, FP, i);
+		FP = SetBoardingMethod(&BI, FP, i);
 		BI = ResetBI(BI);
 		BI.PeasentClassBoardingGroupOffset = CreateFirstClassRows(&BI, FP);
 		BI.BoardingGroupRowCounter = 0;
@@ -78,7 +27,8 @@ int main(void) {
 }
 
 int OpenConfigFile(BoardingInfo* _BI, FILE* _FP) {
-	_FP = fopen("config.ini", "r");
+	fopen_s(&_FP, "config.ini", "r");
+
 	if (_FP == NULL) {
 		printf("Missing config file\nShutting down\n");
 		return 0;
@@ -118,40 +68,42 @@ void ReadConfigFile(BoardingInfo* _BI, FILE* _FP) {
 	}
 }
 
-void SetBoardingMethod(BoardingInfo* _BI, FILE* _FP, int _Index) {
+FILE* SetBoardingMethod(BoardingInfo* _BI, FILE* _FP, int _Index) {
 	switch ((BoardingMethods)_Index) {
 	case BMRandom:
-		_FP = fopen("random.txt", "w");
+		fopen_s(&_FP, "random.txt", "w");
 		_BI->BoardingMethod = BMRandom;
 		break;
 	case BMWilma:
-		_FP = fopen("wilma.txt", "w");
+		fopen_s(&_FP, "wilma.txt", "w");
 		_BI->BoardingMethod = BMWilma;
 		break;
 	case BMFrontToBack:
-		_FP = fopen("fronttoback.txt", "w");
+		fopen_s(&_FP, "fronttoback.txt", "w");
 		_BI->BoardingMethod = BMFrontToBack;
 		break;
 	case BMBackToFront:
-		_FP = fopen("backtofront.txt", "w");
+		fopen_s(&_FP, "backtofront.txt", "w");
 		_BI->BoardingMethod = BMBackToFront;
 		break;
 	case BMSteffenModified:
-		_FP = fopen("steffenmodified.txt", "w");
+		fopen_s(&_FP, "steffenmodified.txt", "w");
 		_BI->BoardingMethod = BMSteffenModified;
 		break;
 	case BMJanModified:
-		_FP = fopen("janmodified.txt", "w");
+		fopen_s(&_FP, "janmodified.txt", "w");
 		_BI->BoardingMethod = BMJanModified;
 		break;
 	case BMSteffenPerfect:
-		_FP = fopen("steffenperfect.txt", "w");
+		fopen_s(&_FP, "steffenperfect.txt", "w");
 		_BI->BoardingMethod = BMSteffenPerfect;
 		break;
 	default:
 		printf("Array out of index in boardingmethods\n");
 		break;
 	}
+
+	return _FP;
 }
 
 BoardingInfo ResetBI(BoardingInfo _BI) {
@@ -164,7 +116,7 @@ BoardingInfo ResetBI(BoardingInfo _BI) {
 
 int CreateFirstClassRows(BoardingInfo* _BI, FILE* _FP) {
 	int seats = _BI->PlaneInfo.SeatsPerRow / 2, offset = seats % 2;
-	char SeatString[10];
+	char SeatString[10] = { '\0' };
 	_BI->CurrentClass = CFirst;
 	for (int j = 0; j < _BI->PlaneInfo.FirstClassRows; j++) {
 		for (int i = 1; i <= seats / 2 + seats % 2; i++) {
@@ -215,39 +167,39 @@ void GetSeatNumber(BoardingInfo* _BI, int _SeatIndex, char _SeatString[]) {
 	switch (_BI->BoardingMethod) {
 	case BMRandom:
 		// Either 1 for first class or 2 for peasent class
-		sprintf(_SeatString, "%d,", _BI->CurrentClass == CFirst ? 1 : 2);
+		sprintf_s(_SeatString, 10, "%d,", _BI->CurrentClass == CFirst ? 1 : 2);
 		break;
 	case BMWilma:
 		// Adds one index per seat between the current seat and the window
-		sprintf(_SeatString, "%d,", _SeatIndex + _BI->PeasentClassBoardingGroupOffset);
+		sprintf_s(_SeatString, 10, "%d,", _SeatIndex + _BI->PeasentClassBoardingGroupOffset);
 		break;
 	case BMFrontToBack:
-		sprintf(_SeatString, "%d,",
+		sprintf_s(_SeatString, 10, "%d,",
 			GetSeatForFrontToBack(_BI, _SeatIndex)
 		);
 		break;
 	case BMBackToFront:
-		sprintf(_SeatString, "%d,",
+		sprintf_s(_SeatString, 10, "%d,",
 			GetSeatForBackToFront(_BI, _SeatIndex)
 		);
 		break;
 	case BMSteffenModified:
-		sprintf(_SeatString, "%d,",
+		sprintf_s(_SeatString, 10, "%d,",
 			GetSeatForSteffenModified(_BI, _SeatIndex)
 		);
 		break;
 	case BMJanModified:
-		sprintf(_SeatString, "%d,",
+		sprintf_s(_SeatString, 10, "%d,",
 			GetSeatForJanModified(_BI, _SeatIndex)
 		);
 		break;
 	case BMSteffenPerfect:
-		sprintf(_SeatString, "%d,",
+		sprintf_s(_SeatString, 10, "%d,",
 			GetSeatForSteffenPerfect(_BI, _SeatIndex)
 		);
 		break;
 	default:
-		sprintf(_SeatString, "%d,", -1);
+		sprintf_s(_SeatString, 10, "%d,", -1);
 		break;
 	}
 }
