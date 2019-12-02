@@ -2,10 +2,13 @@
 
 int main()
 {
-	char YNSelection = ' ';
+	char UpdateGraphics = ' ';
+	char SaveToFile = ' ';
 	int RunsToDo = 0;
 	bool AllSeated = false;
 	int RunTime = 0;
+	int AvrStepsTaken = 0;
+	int StepsTaken = 0;
 
 	// Dette bliver erstatet snart:
 	MethodDefinition Def = { 0, MaxSeatsPrRow, 0, MaxRows, 0, 3, { Line, 1, 0, 0 }, 0, 1, { Line, 1, 0, 0 }, 1, 1, { Line, 1, 0, 0 } };
@@ -14,10 +17,15 @@ int main()
 	Person *PassengerArray[MaxRows][MaxSeatsPrRow];
 	clock_t TotalWatchStart, TotalWatchEnd, WatchStart, WatchEnd;
 
-	while (YNSelection != 'y' && YNSelection != 'n')
+	while (UpdateGraphics != 'y' && UpdateGraphics != 'n')
 	{
 		printf("Update graphics? (y/n)\n");
-		scanf_s(" %c", &YNSelection, 1);
+		scanf_s(" %c", &UpdateGraphics, 1);
+	}
+	while (SaveToFile != 'y' && SaveToFile != 'n')
+	{
+		printf("Save data to file? (y/n)\n");
+		scanf_s(" %c", &SaveToFile, 1);
 	}
 	while (RunsToDo <= 0 || RunsToDo > MaxRuns)
 	{
@@ -30,7 +38,8 @@ int main()
 	
 	if (fp != NULL)
 	{
-		fprintf(fp, "RunNumber;RunTime;WalkingSpeed;OrgLuggageCount;StartingDoorID;StepsTaken\n");
+		if (SaveToFile == 'y')
+			fprintf(fp, "RunNumber;RunTime;WalkingSpeed;OrgLuggageCount;StartingDoorID;StepsTaken\n");
 
 		TotalWatchStart = clock();
 
@@ -45,27 +54,31 @@ int main()
 
 			WatchStart = clock();
 
-			RunSim(PassengerList, PassengerArray, YNSelection == 'y');
+			RunSim(PassengerList, PassengerArray, UpdateGraphics == 'y', &StepsTaken);
 
 			WatchEnd = clock();
 
 			RunTime = (int)((double)WatchEnd - (double)WatchStart);
 
-			if (YNSelection == 'y')
+			if (UpdateGraphics == 'y')
 			{
-				printf("All seated! Took: %d ticks\n", RunTime);
+				printf("All seated! Took: %d ticks and %d iterations\n", RunTime, StepsTaken);
 
 				Sleep(1000);
 			}
 
-			SaveRunDataToFile(fp, PassengerList, RunTime, i);
+			AvrStepsTaken += StepsTaken;
+			StepsTaken = 0;
+
+			if (SaveToFile == 'y')
+				SaveRunDataToFile(fp, PassengerList, RunTime, i);
 		}
 
 		TotalWatchEnd = clock();
 
 		fclose(fp);
 
-		printf("\n Finished! Took %d ms \n", (int)((((double)TotalWatchEnd - (double)TotalWatchStart) / CLOCKS_PER_SEC) * 1000));
+		printf("\n Finished! Took %d ms and an avr of %d iterations pr run\n", (int)((((double)TotalWatchEnd - (double)TotalWatchStart) / CLOCKS_PER_SEC) * 1000), (AvrStepsTaken / RunsToDo));
 	}
 	system("pause");
 
@@ -80,7 +93,7 @@ void SaveRunDataToFile(FILE* _fp, Person _PassengerList[MaxPersons], int _RunTim
 	}
 }
 
-void RunSim(Person _PassengerList[MaxPersons], Person* _PassengerArray[MaxRows][MaxSeatsPrRow], bool UpdateVisuals)
+void RunSim(Person _PassengerList[MaxPersons], Person* _PassengerArray[MaxRows][MaxSeatsPrRow], bool UpdateVisuals, int* _AvrStepsTaken)
 {
 	bool AllSeated = false;
 	clock_t OneSecWatchStart, OneSecWatchEnd;
@@ -98,7 +111,7 @@ void RunSim(Person _PassengerList[MaxPersons], Person* _PassengerArray[MaxRows][
 			{
 				AllSeated = false;
 
-				PassengerMovement(i, _PassengerList, _PassengerArray);
+				PassengerMovement(i, _PassengerList, _PassengerArray, _AvrStepsTaken);
 
 				if (IsPointEqual(_PassengerList[i].CurrentPos, _PassengerList[i].Target) && !_PassengerList[i].IsBackingUp)
 				{
@@ -111,18 +124,20 @@ void RunSim(Person _PassengerList[MaxPersons], Person* _PassengerArray[MaxRows][
 		{
 			PrintField(_PassengerArray, BaseFieldData);
 			printf("RPS: %d", ShowRPCCount);
+
+			RPSCount++;
+
+			OneSecWatchEnd = clock();
+
+			if ((int)((((double)OneSecWatchEnd - (double)OneSecWatchStart) / CLOCKS_PER_SEC) * 1000) >= 1000)
+			{
+				OneSecWatchStart = clock();
+				ShowRPCCount = RPSCount;
+				RPSCount = 0;
+			}
 		}
 
-		RPSCount++;
-
-		OneSecWatchEnd = clock();
-
-		if ((int)((((double)OneSecWatchEnd - (double)OneSecWatchStart) / CLOCKS_PER_SEC) * 1000) >= 1000)
-		{
-			OneSecWatchStart = clock();
-			ShowRPCCount = RPSCount;
-			RPSCount = 0;
-		}
+		(*_AvrStepsTaken)++;
 	}
 }
 
@@ -150,7 +165,6 @@ void PassengerMovement(int Index, Person _PassengerList[MaxPersons], Person *_Pa
 				{
 					if (!IsAnyOnPoint(_PassengerArray, &_PassengerList[Index]))
 					{
-						//Point NewPoint = PredictedPoint(_PassengerList[Index].CurrentPos, _PassengerList[Index].Target);
 						_PassengerArray[_PassengerList[Index].NextMove.Y][_PassengerList[Index].NextMove.X] = &_PassengerList[Index];
 						_PassengerArray[_PassengerList[Index].CurrentPos.Y][_PassengerList[Index].CurrentPos.X] = NULL;
 						_PassengerList[Index].CurrentPos = _PassengerList[Index].NextMove;

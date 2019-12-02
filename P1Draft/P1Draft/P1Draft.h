@@ -9,7 +9,7 @@
 #include <windows.h>
 #include <time.h>
 
-#define MaxRuns 1000000
+#define MaxRuns 10000000
 #define ProgressBarSteps 10
 
 void PrintField(Person* _PassengerArray[MaxRows][MaxSeatsPrRow], const char _BaseFieldData[MaxRows][MaxSeatsPrRow]);
@@ -19,7 +19,7 @@ Point PredictedPointInvX(Point CurrentPos, XAxis TargX, XAxis DoorX);
 void SendRowBack(Person* _PassengerArray[MaxRows][MaxSeatsPrRow], Person *_Person);
 void PassengerMovement(int Index, Person _PassengerList[MaxPersons], Person* _PassengerArray[MaxRows][MaxSeatsPrRow]);
 void SaveRunDataToFile(FILE* _fp, Person _PassengerList[MaxPersons], int RunTime, int RunNumber);
-void RunSim(Person _PassengerList[MaxPersons], Person *_PassengerArray[MaxRows][MaxSeatsPrRow], bool UpdateVisuals);
+void RunSim(Person _PassengerList[MaxPersons], Person *_PassengerArray[MaxRows][MaxSeatsPrRow], bool UpdateVisuals, int* _AvrStepsTaken);
 int BackupWaitSteps(int _TargetSeat, int _InnerBlockingSeat, int ExtraPenalty);
 bool IsInDelayAction(Person* _Person);
 
