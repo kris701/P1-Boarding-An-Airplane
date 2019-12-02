@@ -150,10 +150,10 @@ void PassengerMovement(int Index, Person _PassengerList[MaxPersons], Person *_Pa
 				{
 					if (!IsAnyOnPoint(_PassengerArray, &_PassengerList[Index]))
 					{
-						Point NewPoint = PredictedPoint(_PassengerList[Index].CurrentPos, _PassengerList[Index].Target);
-						_PassengerArray[NewPoint.Y][NewPoint.X] = &_PassengerList[Index];
+						//Point NewPoint = PredictedPoint(_PassengerList[Index].CurrentPos, _PassengerList[Index].Target);
+						_PassengerArray[_PassengerList[Index].NextMove.Y][_PassengerList[Index].NextMove.X] = &_PassengerList[Index];
 						_PassengerArray[_PassengerList[Index].CurrentPos.Y][_PassengerList[Index].CurrentPos.X] = NULL;
-						_PassengerList[Index].CurrentPos = NewPoint;
+						_PassengerList[Index].CurrentPos = _PassengerList[Index].NextMove;
 
 						TookAStep = true;
 					}
@@ -209,14 +209,14 @@ bool IsAnyOnPoint(Person *_PassengerArray[MaxRows][MaxSeatsPrRow], Person *_Pers
 		if (OtherPerson->MovedLastTurn)
 		{
 			SecondNewPoint = PredictedPoint(OtherPerson->CurrentPos, OtherPerson->Target);
-			OtherPerson->NextMove = NewPoint;
+			OtherPerson->NextMove = SecondNewPoint;
 			OtherPerson->MovedLastTurn = false;
 		}
 		else
 			SecondNewPoint = OtherPerson->NextMove;
 
 		// Shuffle dance
-		if (_Person->Target.Y == OtherPerson->Target.Y && _Person->CurrentPos.Y == OtherPerson->CurrentPos.Y)
+		if (_Person->Target.Y == OtherPerson->Target.Y && _Person->CurrentPos.Y == _Person->Target.Y)
 		{
 			SendRowBack(_PassengerArray, _Person);
 
