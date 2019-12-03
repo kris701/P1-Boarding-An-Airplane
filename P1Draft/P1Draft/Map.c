@@ -26,6 +26,7 @@ bool ReadMapFromFile(Map* map, FILE* file) {
 		int tmpInt;
         while (sscanf_s(buffer+bufferOffset, "%[^,]", field, 32) == 1) { // One iteration per field of data in a line
 			bufferOffset += strlen(field)+1; // +Comma
+			if (bufferOffset > strlen(buffer)) break;
             switch (field[0]) { // Special characters will typically just be the first character of the field.
                 case '|': 
 					MapLocationSetValue(map, x, y, BoardingGroup_Walkway);
@@ -40,6 +41,10 @@ bool ReadMapFromFile(Map* map, FILE* file) {
 				break;
 				case '\r': break;
 				case '\0': break;
+				case '\n':
+					y++;
+					x = 0;
+				break;
 
                 default:
                     if (sscanf_s(field, "%d", &tmpInt) == 1) {

@@ -67,10 +67,10 @@ bool AssignSeatByBoardinggroup(int boardingGroup, Person* passenger, Map map)
 	{
 		for (int x = 0; x < map.Width; x++)
 		{
-			if (map.Locations[y][x].BoardingGroup == boardingGroup && map.Locations[y][x].IsTaken == 0)
+			if (MapLocationGet(&map,x,y)->BoardingGroup == boardingGroup && MapLocationGet(&map, x, y)->IsTaken == 0)
 			{
-				passenger->Target = map.Locations[y][x].Point;
-				map.Locations[y][x].IsTaken = 1;
+				passenger->Target = MapLocationGet(&map, x, y)->Point;
+				MapLocationGet(&map, x, y)->IsTaken = 1;
 				return true;
 			}
 		}
