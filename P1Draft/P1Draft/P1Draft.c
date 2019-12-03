@@ -279,17 +279,6 @@ Point PredictedPoint(Point CurrentPoint, Point TargetPoint)
 	return NewPoint;
 }
 
-Point PredictedPointInvX(Point _CurrentPos, XAxis TargX, XAxis DoorX)
-{
-	Point NewPoint = { _CurrentPos.X, _CurrentPos.Y };
-	if (TargX > DoorX)
-		NewPoint.X -= 1;
-	else
-		NewPoint.X += 1;
-
-	return NewPoint;
-}
-
 void SendRowBack(Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], Person *_Person)
 {
 	int CurrentXPosition = _Person->Target.X;
