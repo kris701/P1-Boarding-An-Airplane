@@ -14,7 +14,7 @@ int main()
 	MethodDefinition Def = { 0, MaxSeatsPrRow, 0, MaxRows, 0, 3, { Line, 1, 0, 0 }, 0, 1, { Line, 1, 0, 0 }, 1, 1, { Line, 1, 0, 0 } };
 
 	Person PassengerList[MaxPersons];
-	Person *PassengerArray[MaxRows][MaxSeatsPrRow];
+	Person *PassengerLocationMatrix[MaxRows][MaxSeatsPrRow];
 	clock_t TotalWatchStart, TotalWatchEnd, WatchStart, WatchEnd;
 
 	while (UpdateGraphics != 'y' && UpdateGraphics != 'n')
@@ -47,14 +47,14 @@ int main()
 		{
 			RunTime = 0;
 
-			memset(PassengerArray, NULL, sizeof PassengerArray);
+			memset(PassengerLocationMatrix, NULL, sizeof PassengerLocationMatrix);
 
 			// Replace this later:
 			GeneratePassengers(MaxPersons, PassengerList, MI_Random, Def);
 
 			WatchStart = clock();
 
-			RunSim(PassengerList, PassengerArray, UpdateGraphics == 'y', &StepsTaken);
+			RunSim(PassengerList, PassengerLocationMatrix, UpdateGraphics == 'y', &StepsTaken);
 
 			WatchEnd = clock();
 
@@ -93,7 +93,7 @@ void SaveRunDataToFile(FILE* _fp, Person _PassengerList[MaxPersons], int _RunTim
 	}
 }
 
-void RunSim(Person _PassengerList[MaxPersons], Person* _PassengerArray[MaxRows][MaxSeatsPrRow], bool UpdateVisuals, int* _AvrStepsTaken)
+void RunSim(Person _PassengerList[MaxPersons], Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], bool UpdateVisuals, int* _AvrStepsTaken)
 {
 	bool AllSeated = false;
 	clock_t OneSecWatchStart, OneSecWatchEnd;
@@ -111,7 +111,7 @@ void RunSim(Person _PassengerList[MaxPersons], Person* _PassengerArray[MaxRows][
 			{
 				AllSeated = false;
 
-				PassengerMovement(i, _PassengerList, _PassengerArray, _AvrStepsTaken);
+				PassengerMovement(&_PassengerList[i], _PassengerLocationMatrix);
 
 				if (IsPointEqual(_PassengerList[i].CurrentPos, _PassengerList[i].Target) && !_PassengerList[i].IsBackingUp)
 				{
@@ -122,7 +122,7 @@ void RunSim(Person _PassengerList[MaxPersons], Person* _PassengerArray[MaxRows][
 
 		if (UpdateVisuals)
 		{
-			PrintField(_PassengerArray, BaseFieldData);
+			PrintField(_PassengerLocationMatrix, BaseFieldData);
 			printf("RPS: %d", ShowRPCCount);
 
 			RPSCount++;
@@ -141,33 +141,33 @@ void RunSim(Person _PassengerList[MaxPersons], Person* _PassengerArray[MaxRows][
 	}
 }
 
-void PassengerMovement(int Index, Person _PassengerList[MaxPersons], Person *_PassengerArray[MaxRows][MaxSeatsPrRow])
+void PassengerMovement(Person* _Passenger, Person *_PassengerLocationMatrix[MaxRows][MaxSeatsPrRow])
 {
 	bool TookAStep = false;
 
-	if (!IsInDelayAction(&_PassengerList[Index]))
+	if (!IsInDelayAction(_Passenger))
 	{
-		for (int j = 0; j < _PassengerList[Index].WalkingSpeed; j++)
+		for (int j = 0; j < _Passenger->WalkingSpeed; j++)
 		{
-			if (!IsPointEqual(_PassengerList[Index].CurrentPos, _PassengerList[Index].Target) || _PassengerList[Index].IsBackingUp)
+			if (!IsPointEqual(_Passenger->CurrentPos, _Passenger->Target) || _Passenger->IsBackingUp)
 			{
-				if (_PassengerList[Index].IsBackingUp)
+				if (_Passenger->IsBackingUp)
 				{
-					_PassengerArray[_PassengerList[Index].Target.Y][_PassengerList[Index].Target.X] = &_PassengerList[Index];
-					_PassengerArray[_PassengerList[Index].CurrentPos.Y][_PassengerList[Index].CurrentPos.X] = NULL;
-					_PassengerList[Index].CurrentPos = _PassengerList[Index].Target;
-					_PassengerList[Index].IsBackingUp = false;
-					_PassengerList[Index].IsSeated = true;
+					_PassengerLocationMatrix[_Passenger->Target.Y][_Passenger->Target.X] = _Passenger;
+					_PassengerLocationMatrix[_Passenger->CurrentPos.Y][_Passenger->CurrentPos.X] = NULL;
+					_Passenger->CurrentPos = _Passenger->Target;
+					_Passenger->IsBackingUp = false;
+					_Passenger->IsSeated = true;
 
 					TookAStep = true;
 				}
 				else
 				{
-					if (!IsAnyOnPoint(_PassengerArray, &_PassengerList[Index]))
+					if (!IsAnyOnPoint(_PassengerLocationMatrix, _Passenger))
 					{
-						_PassengerArray[_PassengerList[Index].NextMove.Y][_PassengerList[Index].NextMove.X] = &_PassengerList[Index];
-						_PassengerArray[_PassengerList[Index].CurrentPos.Y][_PassengerList[Index].CurrentPos.X] = NULL;
-						_PassengerList[Index].CurrentPos = _PassengerList[Index].NextMove;
+						_PassengerLocationMatrix[_Passenger->NextMove.Y][_Passenger->NextMove.X] = _Passenger;
+						_PassengerLocationMatrix[_Passenger->CurrentPos.Y][_Passenger->CurrentPos.X] = NULL;
+						_Passenger->CurrentPos = _Passenger->NextMove;
 
 						TookAStep = true;
 					}
@@ -182,11 +182,11 @@ void PassengerMovement(int Index, Person _PassengerList[MaxPersons], Person *_Pa
 
 	if (TookAStep)
 	{
-		_PassengerList[Index].StepsTaken++;
+		_Passenger->StepsTaken++;
 	}
 }
 
-void PrintField(Person* _PassengerArray[MaxRows][MaxSeatsPrRow], const char _BaseFieldData[MaxRows][MaxSeatsPrRow])
+void PrintField(Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], const char _BaseFieldData[MaxRows][MaxSeatsPrRow])
 {
 	system("cls");
 
@@ -195,8 +195,8 @@ void PrintField(Person* _PassengerArray[MaxRows][MaxSeatsPrRow], const char _Bas
 		printf("| ");
 		for (int j = 0; j < MaxSeatsPrRow; j++)
 		{
-			if (_PassengerArray[i][j] != NULL)
-				printf("%c ", _PassengerArray[i][j]->PersonCharacter);
+			if (_PassengerLocationMatrix[i][j] != NULL)
+				printf("%c ", _PassengerLocationMatrix[i][j]->PersonCharacter);
 			else
 				printf("%c ", _BaseFieldData[i][j]);
 		}
@@ -204,7 +204,7 @@ void PrintField(Person* _PassengerArray[MaxRows][MaxSeatsPrRow], const char _Bas
 	}
 }
 
-bool IsAnyOnPoint(Person *_PassengerArray[MaxRows][MaxSeatsPrRow], Person *_Person)
+bool IsAnyOnPoint(Person *_PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], Person *_Person)
 {
 	Point NewPoint;
 	if (_Person->MovedLastTurn)
@@ -216,9 +216,9 @@ bool IsAnyOnPoint(Person *_PassengerArray[MaxRows][MaxSeatsPrRow], Person *_Pers
 	else
 		NewPoint = _Person->NextMove;
 
-	if (_PassengerArray[NewPoint.Y][NewPoint.X] != NULL)
+	if (_PassengerLocationMatrix[NewPoint.Y][NewPoint.X] != NULL)
 	{
-		Person* OtherPerson = _PassengerArray[NewPoint.Y][NewPoint.X];
+		Person* OtherPerson = _PassengerLocationMatrix[NewPoint.Y][NewPoint.X];
 		Point SecondNewPoint;
 		if (OtherPerson->MovedLastTurn)
 		{
@@ -232,7 +232,7 @@ bool IsAnyOnPoint(Person *_PassengerArray[MaxRows][MaxSeatsPrRow], Person *_Pers
 		// Shuffle dance
 		if (_Person->Target.Y == OtherPerson->Target.Y && _Person->CurrentPos.Y == _Person->Target.Y)
 		{
-			SendRowBack(_PassengerArray, _Person);
+			SendRowBack(_PassengerLocationMatrix, _Person);
 
 			return true;
 		}
@@ -243,12 +243,12 @@ bool IsAnyOnPoint(Person *_PassengerArray[MaxRows][MaxSeatsPrRow], Person *_Pers
 			OtherPerson->CurrentPos = SecondNewPoint;
 			OtherPerson->CrossDelay = BSR.CrossDelay;
 			OtherPerson->MovedLastTurn = true;
-			_PassengerArray[SecondNewPoint.Y][SecondNewPoint.X] = OtherPerson;
+			_PassengerLocationMatrix[SecondNewPoint.Y][SecondNewPoint.X] = OtherPerson;
 
 			_Person->CurrentPos = NewPoint;
 			_Person->CrossDelay = BSR.CrossDelay;
 			_Person->MovedLastTurn = true;
-			_PassengerArray[NewPoint.Y][NewPoint.X] = _Person;
+			_PassengerLocationMatrix[NewPoint.Y][NewPoint.X] = _Person;
 
 			return true;
 		}
@@ -291,16 +291,16 @@ Point PredictedPointInvX(Point _CurrentPos, XAxis TargX, XAxis DoorX)
 	return NewPoint;
 }
 
-void SendRowBack(Person* _PassengerArray[MaxRows][MaxSeatsPrRow], Person *_Person)
+void SendRowBack(Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], Person *_Person)
 {
 	int CurrentXPosition = _Person->Target.X;
 	int DistanceToTargetSeat = abs(_Person->Target.X - Doors[_Person->StartingDoorID].X);
 	int InnerMostSeat = -1;
 	while (CurrentXPosition != Doors[_Person->StartingDoorID].X)
 	{
-		if (_PassengerArray[_Person->CurrentPos.Y][CurrentXPosition] != NULL)
+		if (_PassengerLocationMatrix[_Person->CurrentPos.Y][CurrentXPosition] != NULL)
 		{
-			Person* MomentPerson = _PassengerArray[_Person->CurrentPos.Y][CurrentXPosition];
+			Person* MomentPerson = _PassengerLocationMatrix[_Person->CurrentPos.Y][CurrentXPosition];
 			if (InnerMostSeat == -1)
 				InnerMostSeat = abs(MomentPerson->Target.X - Doors[_Person->StartingDoorID].X);
 
