@@ -5,9 +5,10 @@
 #include "StructsAndEnums.h"
 
 enum BoardingGroup {
-	BoardingGroup_Padding = -2,
-	BoardingGroup_Walkway = -1,
-	BoardingGroup_Door    = 0
+	BoardingGroup_Padding   = -3,
+	BoardingGroup_Walkway   = -2,
+	BoardingGroup_Door      = -1,
+	BoardingGroup_Undefined = 0
 };
 
 typedef struct _location {

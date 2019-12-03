@@ -58,6 +58,7 @@ bool ReadMapFromFile(Map* map, FILE* file) {
                     }
                     else {
                         fprintf(stderr, "Unknown value '%s'\n", field);
+						MapLocationSetValue(map, x, y, BoardingGroup_Undefined);
                     }
                 break;
             }
