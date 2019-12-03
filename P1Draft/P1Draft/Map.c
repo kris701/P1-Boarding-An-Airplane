@@ -33,13 +33,13 @@ bool ReadMapFromFile(Map* map, FILE* file) {
 					MapLocationSetValue(map, x, y, BoardingGroup_Walkway);
 					x++;
 				break;
-                case '\D':
+                case 'D':
 					MapLocationSetValue(map, x, y, BoardingGroup_Door);
 					map->Doors[doorIndex].X = x;
 					map->Doors[doorIndex].Y = y;
 				break;
                 case '-':
-					MapLocationSetValue(map, x, y, BoardingGroup_Walkway);
+					MapLocationSetValue(map, x, y, BoardingGroup_Padding);
 					x++;
 				break;
 				case '\r': break;
