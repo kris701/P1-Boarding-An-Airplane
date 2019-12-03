@@ -93,7 +93,7 @@ void SaveRunDataToFile(FILE* _fp, Person _PassengerList[MaxPersons], int _RunTim
 	}
 }
 
-void RunSim(Person _PassengerList[MaxPersons], Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], bool UpdateVisuals, int* _AvrStepsTaken)
+void RunSim(Person _PassengerList[MaxPersons], Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], bool UpdateVisuals, int* _StepsTaken)
 {
 	bool AllSeated = false;
 	clock_t OneSecWatchStart, OneSecWatchEnd;
@@ -137,7 +137,7 @@ void RunSim(Person _PassengerList[MaxPersons], Person* _PassengerLocationMatrix[
 			}
 		}
 
-		(*_AvrStepsTaken)++;
+		(*_StepsTaken)++;
 	}
 }
 
