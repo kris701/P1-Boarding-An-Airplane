@@ -63,6 +63,10 @@ void MapLocationSetValue(Map* map, int x, int y, int value) {
 	map->Locations[x][y].BoardingGroup = value;
 }
 
+int MapLocationGetValue(Map* map, int x, int y) {
+	return map->Locations[x][y].BoardingGroup;
+}
+
 bool AllocateMapPoints(Map* map) {
 	map->Locations = calloc(map->Width, sizeof(Location*));
     if (map->Locations == NULL) {
