@@ -169,7 +169,6 @@
     <ClInclude Include="BasicCalls.h" />
     <ClInclude Include="GeneratePassengers.h" />
     <ClInclude Include="Map.h" />
-    <ClInclude Include="MapDefinition.h" />
     <ClInclude Include="P1Draft.h" />
     <ClInclude Include="StructsAndEnums.h" />
   </ItemGroup>

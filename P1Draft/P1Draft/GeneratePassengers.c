@@ -1,22 +1,20 @@
 #include "GeneratePassengers.h"
 
-void GeneratePassengers(int Count, Person _PersonList[MaxPersons], Map map)
+void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap)
 {
-	srand(time(NULL));
-
     for (int i = 0; i < Count; i++) {
-        GeneratePassenger(&(_PersonList[i]));
+        GeneratePassenger(&(_PersonList[i]), _PlaneMap);
     }
 
-	for (int y = 0; y < map.Height; y++)
+	for (int y = 0; y < _PlaneMap.Height; y++)
 	{
-		for (int x = 0; x < map.Width; x++)
+		for (int x = 0; x < _PlaneMap.Width; x++)
 		{
-			MapLocationGet(&map, x, y)->IsTaken = false;
+			MapLocationGet(&_PlaneMap, x, y)->IsTaken = false;
 		}
 	}
 
-	AssignPassengersToAvailableSeat(Count, _PersonList, map);
+	AssignPassengersToAvailableSeat(Count, _PersonList, _PlaneMap);
 
 	//switch (Index)
 	//{
@@ -26,11 +24,11 @@ void GeneratePassengers(int Count, Person _PersonList[MaxPersons], Map map)
 	//}
 }
 
-void GeneratePassenger(Person* Passenger) {  
+void GeneratePassenger(Person* Passenger, Map _PlaneMap) {
     Passenger->WalkingSpeed = GenerateWalkSpeed(Passenger);
 
-    Passenger->StartingDoorID = GetStartingDoorID(Passenger);
-    Passenger->CurrentPos = Doors[Passenger->StartingDoorID];
+    Passenger->StartingDoorID = GetStartingDoorID(Passenger, _PlaneMap);
+    Passenger->CurrentPos = _PlaneMap.Doors[Passenger->StartingDoorID];
     Passenger->IsSeated = false;
     Passenger->PersonCharacter = 'P';
 
@@ -45,23 +43,25 @@ void GeneratePassenger(Person* Passenger) {
 	Passenger->NextMove = SetPoint(0,0);
 }
 
+// Read these from config file instead? As well as the SSR.
 int GenerateLuggage(const Person* Passenger) {
     return GetRandomNumberRanged(2, 6);
 }
 
-int GetStartingDoorID(const Person* Passenger) {
-    return GetRandomNumberRanged(0, 1);
+// Take the door closet? Or also make that configurable?
+int GetStartingDoorID(const Person* Passenger, Map _PlaneMap) {
+    return GetRandomNumberRanged(0, _PlaneMap.DoorCount - 1);
 }
 
 int GenerateWalkSpeed(const Person* Passenger) {
     return GetRandomNumberRanged(1, 2);
 }
 
-bool AssignPassengersToAvailableSeat(int Count, Person _PassengerList[MaxPersons], Map map) {
+bool AssignPassengersToAvailableSeat(int Count, Person _PassengerList[], Map _PlaneMap) {
 	int boardingGroup = 1;
 	for (int i = 0; i < Count; i++)
 	{
-		while (!AssignSeatByBoardinggroup(boardingGroup, &_PassengerList[i], map))
+		while (!AssignSeatByBoardinggroup(boardingGroup, &_PassengerList[i], _PlaneMap))
 		{
 			boardingGroup++;
 		}
@@ -69,16 +69,17 @@ bool AssignPassengersToAvailableSeat(int Count, Person _PassengerList[MaxPersons
     return true;
 }
 
-bool AssignSeatByBoardinggroup(int boardingGroup, Person* passenger, Map map)
+bool AssignSeatByBoardinggroup(int BoardingGroup, Person* _Passenger, Map _PlaneMap)
 {
-	for (int y = 0; y < map.Height; y++)
+	for (int y = 0; y < _PlaneMap.Height; y++)
 	{
-		for (int x = 0; x < map.Width; x++)
+		for (int x = 0; x < _PlaneMap.Width; x++)
 		{
-			if (MapLocationGet(&map,x,y)->BoardingGroup == boardingGroup && MapLocationGet(&map, x, y)->IsTaken == 0)
+			Location* MomentLoc = MapLocationGet(&_PlaneMap, x, y);
+			if (MomentLoc->BoardingGroup == BoardingGroup && MomentLoc->IsTaken == 0)
 			{
-				passenger->Target = MapLocationGet(&map, x, y)->Point;
-				MapLocationGet(&map, x, y)->IsTaken = 1;
+				_Passenger->Target = MomentLoc->Point;
+				MomentLoc->IsTaken = 1;
 				return true;
 			}
 		}
@@ -86,68 +87,3 @@ bool AssignSeatByBoardinggroup(int boardingGroup, Person* passenger, Map map)
 
 	return false;
 }
-
-Point Random_GetTargetLocation(Person _PersonList[MaxPersons], int Index) {
-	Point NewTarget = { 0, 0 };
-	bool FoundAvailable = true;
-	while (FoundAvailable)
-	{
-		NewTarget = SetPoint(GetRandomNumberRanged(0, MaxSeatsPrRow - 1), GetRandomNumberRanged(1, MaxRows - 2));
-
-		FoundAvailable = false;
-		for (int i = 0; i < Index + 1; i++)
-		{
-			if (BaseFieldData[NewTarget.Y][NewTarget.X] != SeatChar)
-			{
-				FoundAvailable = true;
-				break;
-			}
-			else
-			{
-				if (i != Index)
-				{
-					if (IsPointEqual(_PersonList[i].Target, NewTarget))
-					{
-						FoundAvailable = true;
-						break;
-					}
-				}
-			}
-		}
-	}
-
-	return NewTarget;
-}
-
-
-
-void SortPointsAccordingToMethod(Point Points[], FILE* methodFile) {    
-    /* Qsort with comp based on filecontents */
-
-    /*
-        Look through file, find number of boarding groups
-        Allocate 1 int for each boarding group
-        Count how many seats for each group
-        Go through the seats and assign them to passengers from start to end
-        Free array
-    */
-
-    /*
-    Generate map from file, then pass map to this function
-    */
-
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-

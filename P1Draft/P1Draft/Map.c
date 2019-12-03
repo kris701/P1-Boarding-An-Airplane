@@ -1,45 +1,57 @@
 #include "Map.h"
 
-bool ReadMapFromFile(Map* map, FILE* file) {
-    _FreeMap(map);
-    map->Width  = GetSeatsPerLine(file);
-    map->Height = GetNumberOfLinesInFile(file); 
-	map->DoorCount = GetNumberOfDoorsInBoardingMethod(file);
-    
-    if (_AllocateMap(map) == false) {
+bool ReadMapFromFile(Map* _PlaneMap, FILE* _File) 
+{
+    FreeMap(_PlaneMap);
+    _PlaneMap->Width  = GetSeatsPerLine(_File);
+    _PlaneMap->Height = GetNumberOfLinesInFile(_File); 
+
+    if (AllocateMap(_PlaneMap) == false) 
+	{
         return false;
     }
 
-    int bufferLength = GetNumberOfCharsForLongestLineInFile(file);
+    int bufferLength = GetNumberOfCharsForLongestLineInFile(_File);
     char* buffer = calloc(bufferLength, sizeof(char));
-    if (buffer == NULL) {
+    if (buffer == NULL) 
+	{
         fprintf(stderr, "Failed to allocate %d bytes for filebuffer while reading map\n", bufferLength);
         return false;
     }
 
-    long int initialFileCursorLocation = ftell(file);
-    fseek(file, 0, SEEK_SET);
+    long int initialFileCursorLocation = ftell(_File);
+    fseek(_File, 0, SEEK_SET);
 
     int x=0, y=0, doorIndex=0;
-    while (fgets(buffer, bufferLength, file) != NULL) { // One iteration per line, until NULL is returned at EOF
+    while (fgets(buffer, bufferLength, _File) != NULL)  // One iteration per line, until NULL is returned at EOF
+	{
         char field[32];
 		int bufferOffset = 0;
 		int tmpInt;
-        while (sscanf_s(buffer+bufferOffset, "%[^,]", field, 32) == 1) { // One iteration per field of data in a line
-			bufferOffset += strlen(field)+1; // +Comma
-			if (bufferOffset > strlen(buffer)) break;
-            switch (field[0]) { // Special characters will typically just be the first character of the field.
+
+        while (sscanf_s(buffer+bufferOffset, "%[^,]", field, 32) == 1) // One iteration per field of data in a line
+		{
+			field[31] = '\0';
+			bufferOffset += strlen(field) + 1; // +Comma
+			if (bufferOffset > (int)strlen(buffer)) 
+				break;
+
+            switch (field[0])  // Special characters will typically just be the first character of the field.
+			{
                 case '|': 
-					MapLocationSetValue(map, x, y, BoardingGroup_Walkway);
+					MapLocationSetValue(_PlaneMap, x, y, BoardingGroup_Walkway);
 					x++;
 				break;
                 case 'D':
-					MapLocationSetValue(map, x, y, BoardingGroup_Door);
-					map->Doors[doorIndex].X = x;
-					map->Doors[doorIndex].Y = y;
+					MapLocationSetValue(_PlaneMap, x, y, BoardingGroup_Door);
+					_PlaneMap->Doors[doorIndex].X = x;
+					_PlaneMap->Doors[doorIndex].Y = y;
+					_PlaneMap->DoorCount++;
+					doorIndex++;
+					x++;
 				break;
                 case '-':
-					MapLocationSetValue(map, x, y, BoardingGroup_Padding);
+					MapLocationSetValue(_PlaneMap, x, y, BoardingGroup_Padding);
 					x++;
 				break;
 				case '\r': break;
@@ -50,15 +62,17 @@ bool ReadMapFromFile(Map* map, FILE* file) {
 				break;
 
                 default:
-                    if (sscanf_s(field, "%d", &tmpInt) == 1) {
-						MapLocationSetValue(map, x, y, tmpInt);
-						MapLocationGet(map, x, y)->IsTaken = 0;
-						map->NumberOfSeats++;
+                    if (sscanf_s(field, "%d", &tmpInt) == 1) 
+					{
+						MapLocationSetValue(_PlaneMap, x, y, tmpInt);
+						MapLocationGet(_PlaneMap, x, y)->IsTaken = 0;
+						_PlaneMap->NumberOfSeats++;
                         x++;
                     }
-                    else {
+                    else 
+					{
                         fprintf(stderr, "Unknown value '%s'\n", field);
-						MapLocationSetValue(map, x, y, BoardingGroup_Undefined);
+						MapLocationSetValue(_PlaneMap, x, y, BoardingGroup_Undefined);
                     }
                 break;
             }
@@ -69,132 +83,134 @@ bool ReadMapFromFile(Map* map, FILE* file) {
 
     free(buffer);
 
-    fseek(file, initialFileCursorLocation, SEEK_SET);
+    fseek(_File, initialFileCursorLocation, SEEK_SET);
     return true;
 }
 
-void MapLocationSetValue(Map* map, int x, int y, int value) {
-	MapLocationGet(map, x, y)->BoardingGroup = value;
+void MapLocationSetValue(Map* _PlaneMap, int _X, int _Y, int Value) 
+{
+	MapLocationGet(_PlaneMap, _X, _Y)->BoardingGroup = Value;
 }
 
-Location* MapLocationGet(Map* map, int x, int y) {
-	return &(map->Locations[y][x]);
-}
-
-bool _AllocateMap(Map* map) {
-	map->Locations = calloc(map->Height, sizeof(Location*));
-    if (map->Locations == NULL) {
-        fprintf(stderr, "Failed to allocate %d bytes for map width\n", (int)(map->Height * sizeof(Location*)));
+bool AllocateMap(Map* _PlaneMap) 
+{
+	_PlaneMap->Locations = calloc(_PlaneMap->Height, sizeof(Location*));
+    if (_PlaneMap->Locations == NULL) 
+	{
+        fprintf(stderr, "Failed to allocate %d bytes for map width\n", (int)(_PlaneMap->Height * sizeof(Location*)));
         return false;
     }
 
-    for (int y = 0; y < map->Height; y++) {
-        map->Locations[y] = calloc(map->Width, sizeof(Location));
-        if (map->Locations[y] == NULL) {
-            fprintf(stderr, "Failed to allocate %d bytes for map row %d\n", (int)(map->Width * sizeof(Location)), y);
+    for (int y = 0; y < _PlaneMap->Height; y++) 
+	{
+        _PlaneMap->Locations[y] = calloc(_PlaneMap->Width, sizeof(Location));
+
+        if (_PlaneMap->Locations[y] == NULL) 
+		{
+            fprintf(stderr, "Failed to allocate %d bytes for map row %d\n", (int)(_PlaneMap->Width * sizeof(Location)), y);
             return false;
         }
-		for (int x = 0; x < map->Width; x++) {
-			map->Locations[y][x].Point.X = x;
-			map->Locations[y][x].Point.Y = y;
+
+		for (int x = 0; x < _PlaneMap->Width; x++) 
+		{
+			_PlaneMap->Locations[y][x].Point.X = x;
+			_PlaneMap->Locations[y][x].Point.Y = y;
 		}
     }
 
-	map->Doors = calloc(map->DoorCount, sizeof(Point*));
+	_PlaneMap->Doors = calloc(_PlaneMap->DoorCount, sizeof(Point*));
 
     return true;
 }
 
-void _FreeMap(Map* map) {
-    if (map == NULL) return;
-	if (map->Locations != NULL) {
-		for (int i = 0; i < map->Width; i++) {
-			if (map->Locations != NULL) {
-				free(map->Locations[i]);
+void FreeMap(Map* _PlaneMap) 
+{
+    if (_PlaneMap == NULL) return;
+
+	if (_PlaneMap->Locations != NULL) 
+	{
+		for (int i = 0; i < _PlaneMap->Width; i++) 
+		{
+			if (_PlaneMap->Locations != NULL) 
+			{
+				free(_PlaneMap->Locations[i]);
 			}
 		}
-		free(map->Locations);
-		map->Width = 0;
-		map->Height = 0;
+		free(_PlaneMap->Locations);
+		_PlaneMap->Width = 0;
+		_PlaneMap->Height = 0;
 	}
 
-	if (map->Doors != NULL) {
-		free(map->Doors);
-		map->DoorCount = 0;
+	if (_PlaneMap->Doors != NULL) 
+	{
+		free(_PlaneMap->Doors);
+		_PlaneMap->DoorCount = 0;
 	}
 }
 
-int GetSeatsPerLine(FILE* file) {
+int GetSeatsPerLine(FILE* _File) 
+{
     int tmpWidth = 0, highestWidth = 0;
-    long int initialFileCursorLocation = ftell(file);
-    fseek(file, 0, SEEK_SET);
+    long int initialFileCursorLocation = ftell(_File);
+    fseek(_File, 0, SEEK_SET);
 
     char ch;
-    do {
-        ch = fgetc(file);
-        switch (fgetc(file)) {
-        case '\n':
-            highestWidth = max(tmpWidth, highestWidth);
-            tmpWidth = 0;
-            break;
-        case ',':
-            tmpWidth++;
-            break;
-        default:
-            break;
+	while (!feof(_File)) 
+	{
+        ch = fgetc(_File);
+        switch (ch)
+		{
+			case '\n':
+				highestWidth = max(tmpWidth, highestWidth);
+				tmpWidth = 0;
+				break;
+			case ',':
+				tmpWidth++;
+				break;
+			default:
+				break;
         }
-    } while (!feof(file));
+    }
 
-    fseek(file, initialFileCursorLocation, SEEK_SET);
+    fseek(_File, initialFileCursorLocation, SEEK_SET);
     return highestWidth;
 }
-int GetNumberOfCharsForLongestLineInFile(FILE* file) {
+int GetNumberOfCharsForLongestLineInFile(FILE* _File) 
+{
     // Goes through each line and finds the longest
     int tmpWidth = 0, highestWidth = 0;
-    long int initialFileCursorLocation = ftell(file);
-    fseek(file, 0, SEEK_SET);
+    long int initialFileCursorLocation = ftell(_File);
+    fseek(_File, 0, SEEK_SET);
 
     char ch;
-    do {
-        ch = fgetc(file);
+	while (!feof(_File)) 
+	{
+        ch = fgetc(_File);
         tmpWidth++;
-        if (ch == '\n') {
+        if (ch == '\n') 
+		{
             highestWidth = max(tmpWidth, highestWidth);
             tmpWidth = 0;
         }
-    } while (ch != EOF);
+    }
 
-    fseek(file, initialFileCursorLocation, SEEK_SET);
+    fseek(_File, initialFileCursorLocation, SEEK_SET);
     return highestWidth + 1; // Null-byte
 }
 
-int GetNumberOfLinesInFile(FILE* file) {
+int GetNumberOfLinesInFile(FILE* _File) 
+{
     int lines = 1; // Begins at line 1, if �ne \n is occured, then there are 2 lines
-    long int initialFileCursorLocation = ftell(file);
-    fseek(file, 0, SEEK_SET);
+    long int initialFileCursorLocation = ftell(_File);
+    fseek(_File, 0, SEEK_SET);
 
     char ch;
-    do {
-        ch = fgetc(file);
+	while (!feof(_File)) 
+	{
+        ch = fgetc(_File);
         if (ch == '\n') lines++;
-    } while (ch != EOF);
+    }
 
-    fseek(file, initialFileCursorLocation, SEEK_SET);
+    fseek(_File, initialFileCursorLocation, SEEK_SET);
     return lines;
-}
-int GetNumberOfDoorsInBoardingMethod(FILE* file) {
-	long int initialFileCursorLocation = ftell(file);
-	fseek(file, 0, SEEK_SET);
-
-	int numberOfDoors = 0;
-	char ch1=fgetc(file), ch2;
-	while (ch2 = fgetc(file) != EOF) {
-		if (ch1 == ',' && ch2 == 'D') {
-			numberOfDoors++;
-		}
-		ch1 = ch2;
-	}
-
-	fseek(file, initialFileCursorLocation, SEEK_SET);
-	return numberOfDoors;
 }

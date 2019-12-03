@@ -20,5 +20,11 @@ Point SetPoint(int X, int Y)
 
 int GetRandomNumberRanged(int _Min, int _Max)
 {
+	if (_Min == _Max)
+		return _Min;
 	return rand() % (_Max + 1 - _Min) + _Min;
+}
+
+Location* MapLocationGet(Map* map, int x, int y) {
+	return &(map->Locations[y][x]);
 }
