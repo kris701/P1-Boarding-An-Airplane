@@ -20,11 +20,13 @@ typedef struct _map {
     int Width;
     int Height;
     Point* Doors;
+	int DoorCount;
+	int NumberOfSeats;
 } Map;
 
 bool ReadMapFromFile(Map* map, FILE* file);
-bool AllocateMapPoints(Map* map);
-void FreeMapPoints(Map* map);
+bool _AllocateMap(Map* map);
+void _FreeMap(Map* map);
 int GetSeatsPerLine(FILE* file);
 int GetNumberOfCharsForLongestLineInFile(FILE* file);
 int GetNumberOfLinesInFile(FILE* file);

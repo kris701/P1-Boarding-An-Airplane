@@ -1,11 +1,12 @@
 #include "Map.h"
 
 bool ReadMapFromFile(Map* map, FILE* file) {
-    FreeMapPoints(map);
+    _FreeMap(map);
     map->Width  = GetSeatsPerLine(file);
     map->Height = GetNumberOfLinesInFile(file); 
+	
     
-    if (AllocateMapPoints(map) == false) {
+    if (_AllocateMap(map) == false) {
         return false;
     }
 
@@ -76,7 +77,7 @@ Location* MapLocationGet(Map* map, int x, int y) {
 	return &(map->Locations[x][y]);
 }
 
-bool AllocateMapPoints(Map* map) {
+bool _AllocateMap(Map* map) {
 	map->Locations = calloc(map->Width, sizeof(Location*));
     if (map->Locations == NULL) {
         fprintf(stderr, "Failed to allocate %d bytes for map width\n", (int)(map->Width * sizeof(Location*)));
@@ -94,19 +95,29 @@ bool AllocateMapPoints(Map* map) {
             return false;
         }
     }
+
+	map->Doors = calloc(map->DoorCount, sizeof(Point*));
+
     return true;
 }
 
-void FreeMapPoints(Map* map) {
+void _FreeMap(Map* map) {
     if (map == NULL) return;
-    if (map->Locations == NULL) return;
+	if (map->Locations != NULL) {
+		for (int i = 0; i < map->Width; i++) {
+			if (map->Locations != NULL) {
+				free(map->Locations[i]);
+			}
+		}
+		free(map->Locations);
+		map->Width = 0;
+		map->Height = 0;
+	}
 
-    for (int i = 0; i < map->Width; i++) {
-        if (map->Locations != NULL) {
-			free(map->Locations[i]);
-        }
-    }
-    free(map->Locations);
+	if (map->Doors != NULL) {
+		free(map->Doors);
+		map->DoorCount = 0;
+	}
 }
 
 int GetSeatsPerLine(FILE* file) {
@@ -166,4 +177,19 @@ int GetNumberOfLinesInFile(FILE* file) {
 
     fseek(file, initialFileCursorLocation, SEEK_SET);
     return lines;
+}
+int GetNumberOfDoorsInBoardingMethod(FILE* file) {
+	long int initialFileCursorLocation = ftell(file);
+	fseek(file, 0, SEEK_SET);
+
+	int numberOfDoors = 0;
+	char ch1, ch2;
+	while (ch2 = fgetc(file) != EOF) {
+
+	}
+
+
+
+	fseek(file, initialFileCursorLocation, SEEK_SET);
+	return numberOfDoors;
 }
