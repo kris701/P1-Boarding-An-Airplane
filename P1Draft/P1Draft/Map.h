@@ -7,6 +7,7 @@
 typedef struct _seat {
     Point Point;
     int BoardingGroup;
+	bool IsTaken;
 } Seat;
 
 typedef struct _map {

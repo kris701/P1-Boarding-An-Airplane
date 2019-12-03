@@ -16,6 +16,12 @@ int main()
 	Person PassengerList[MaxPersons];
 	Person *PassengerLocationMatrix[MaxRows][MaxSeatsPrRow];
 	clock_t TotalWatchStart, TotalWatchEnd, WatchStart, WatchEnd;
+	Map Map;
+
+	FILE* fp;
+	fopen_s(fp, "asd", "r");
+
+	ReadMapFromFile(&Map, fp);
 
 	while (UpdateGraphics != 'y' && UpdateGraphics != 'n')
 	{
@@ -50,7 +56,7 @@ int main()
 			memset(PassengerLocationMatrix, NULL, sizeof PassengerLocationMatrix);
 
 			// Replace this later:
-			GeneratePassengers(MaxPersons, PassengerList, MI_Random, Def);
+			GeneratePassengers(MaxPersons, PassengerList, Map);
 
 			WatchStart = clock();
 

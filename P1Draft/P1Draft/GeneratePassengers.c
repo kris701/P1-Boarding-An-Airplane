@@ -1,13 +1,14 @@
 #include "GeneratePassengers.h"
 
-void GeneratePassengers(int Count, Person _PersonList[MaxPersons], MethodIndex Index, MethodDefinition _MDef)
+void GeneratePassengers(int Count, Person _PersonList[MaxPersons], Map map)
 {
 	srand(time(NULL));
 
     for (int i = 0; i < Count; i++) {
         GeneratePassenger(&(_PersonList[i]));
-        AssignPassengerToAvailableSeat(_PersonList, i);
     }
+
+	AssignPassengersToAvailableSeat(Count, _PersonList, map);
 
 	//switch (Index)
 	//{
@@ -49,9 +50,24 @@ int GenerateWalkSpeed(const Person* Passenger) {
     return GetRandomNumberRanged(1, 2);
 }
 
-bool AssignPassengerToAvailableSeat(Person _PassengerList[MaxPersons], int index) {
-    _PassengerList[index].Target = Random_GetTargetLocation(_PassengerList, index);
+bool AssignPassengersToAvailableSeat(int Count, Person _PassengerList[MaxPersons], Map map) {
+	int boardingGroup = 1;
+	for (int i = 0; i < Count; i++)
+	{
+		
+	}
     return true;
+}
+
+bool AssignSeatByBoardinggroup(int boardingGroup, Person passenger, Map map)
+{
+	for (int j = 0; j < map.Height; j++)
+	{
+		for (int k = 0; k < map.Width; k++)
+		{
+
+		}
+	}
 }
 
 Point Random_GetTargetLocation(Person _PersonList[MaxPersons], int Index) {
