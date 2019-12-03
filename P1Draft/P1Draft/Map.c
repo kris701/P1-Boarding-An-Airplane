@@ -83,10 +83,14 @@ bool AllocateMapPoints(Map* map) {
         return false;
     }
 
-    for (int i = 0; i < map->Width; i++) {
-        map->Locations[i] = calloc(map->Height, sizeof(Location));
-        if (map->Locations[i] == NULL) {
-            fprintf(stderr, "Failed to allocate %d bytes for map row %d\n", (int)(map->Height * sizeof(Location)), i);
+    for (int x = 0; x < map->Width; x++) {
+        map->Locations[x] = calloc(map->Height, sizeof(Location));
+		for (int y = 0; y < map->Height; y++) {
+			map->Locations[x][y].Point.X = x;
+			map->Locations[x][y].Point.Y = y;
+		}
+        if (map->Locations[x] == NULL) {
+            fprintf(stderr, "Failed to allocate %d bytes for map row %d\n", (int)(map->Height * sizeof(Location)), x);
             return false;
         }
     }
