@@ -9,18 +9,15 @@ int main()
 	int AvrStepsTaken = 0;
 	int StepsTaken = 0;
 
-	// Dette bliver erstatet snart:
-	MethodDefinition Def = { 0, MaxSeatsPrRow, 0, MaxRows, 0, 3, { Line, 1, 0, 0 }, 0, 1, { Line, 1, 0, 0 }, 1, 1, { Line, 1, 0, 0 } };
-
 	Person PassengerList[MaxPersons];
 	Person *PassengerLocationMatrix[MaxRows][MaxSeatsPrRow];
 	clock_t TotalWatchStart, TotalWatchEnd, WatchStart, WatchEnd;
 	Map Map;
 
-	FILE* fp;
-	fopen_s(fp, "asd", "r");
+	FILE* MapFile;
+	fopen_s(&MapFile, "asd", "r");
 
-	ReadMapFromFile(&Map, fp);
+	ReadMapFromFile(&Map, MapFile);
 
 	while (UpdateGraphics != 'y' && UpdateGraphics != 'n')
 	{
@@ -38,13 +35,13 @@ int main()
 		scanf_s(" %d", &RunsToDo);
 	}
 
-	FILE* fp;
-	fopen_s(&fp, "output.csv", "w+");
+	FILE* OutputFile;
+	fopen_s(&OutputFile, "output.csv", "w+");
 	
-	if (fp != NULL)
+	if (OutputFile != NULL)
 	{
 		if (SaveToFile == 'y')
-			fprintf(fp, "RunNumber;RunTime;WalkingSpeed;OrgLuggageCount;StartingDoorID;StepsTaken\n");
+			fprintf(OutputFile, "Iterations;\n");
 
 		TotalWatchStart = clock();
 
@@ -72,30 +69,22 @@ int main()
 				Sleep(1000);
 			}
 
+			if (SaveToFile == 'y')
+				fprintf(OutputFile, "%d;\n", StepsTaken);
+
 			AvrStepsTaken += StepsTaken;
 			StepsTaken = 0;
-
-			if (SaveToFile == 'y')
-				SaveRunDataToFile(fp, PassengerList, RunTime, i);
 		}
 
 		TotalWatchEnd = clock();
 
-		fclose(fp);
+		fclose(OutputFile);
 
 		printf("\n Finished! Took %d ms and an avr of %d iterations pr run\n", (int)((((double)TotalWatchEnd - (double)TotalWatchStart) / CLOCKS_PER_SEC) * 1000), (AvrStepsTaken / RunsToDo));
 	}
 	system("pause");
 
 	return 0;
-}
-
-void SaveRunDataToFile(FILE* _fp, Person _PassengerList[MaxPersons], int _RunTime, int RunNumber)
-{
-	for (int i = 1; i < MaxPersons; i++)
-	{
-		fprintf(_fp, "%d;%d;%d;%d;%d;%d\n", RunNumber, _RunTime, _PassengerList[i].WalkingSpeed, _PassengerList[i].OrgLuggageCount, _PassengerList[i].StartingDoorID, _PassengerList[i].StepsTaken);
-	}
 }
 
 void RunSim(Person _PassengerList[MaxPersons], Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], bool UpdateVisuals, int* _StepsTaken)
