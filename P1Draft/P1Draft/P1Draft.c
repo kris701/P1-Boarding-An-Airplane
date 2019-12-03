@@ -5,7 +5,6 @@ int main()
 	char UpdateGraphics = ' ';
 	char SaveToFile = ' ';
 	int RunsToDo = 0;
-	bool AllSeated = false;
 	int RunTime = 0;
 	int AvrStepsTaken = 0;
 	int StepsTaken = 0;
@@ -159,8 +158,8 @@ void PassengerMovement(Person* _Passenger, Person *_PassengerLocationMatrix[MaxR
 			{
 				if (_Passenger->IsBackingUp)
 				{
-					_PassengerLocationMatrix[_Passenger->Target.Y][_Passenger->Target.X] = _Passenger;
 					_PassengerLocationMatrix[_Passenger->CurrentPos.Y][_Passenger->CurrentPos.X] = NULL;
+					_PassengerLocationMatrix[_Passenger->Target.Y][_Passenger->Target.X] = _Passenger;
 					_Passenger->CurrentPos = _Passenger->Target;
 					_Passenger->IsBackingUp = false;
 					_Passenger->IsSeated = true;
@@ -283,17 +282,6 @@ Point PredictedPoint(Point CurrentPoint, Point TargetPoint)
 		else
 			NewPoint = SetPoint(CurrentPoint.X, CurrentPoint.Y - 1);
 	}
-	return NewPoint;
-}
-
-Point PredictedPointInvX(Point _CurrentPos, XAxis TargX, XAxis DoorX)
-{
-	Point NewPoint = { _CurrentPos.X, _CurrentPos.Y };
-	if (TargX > DoorX)
-		NewPoint.X -= 1;
-	else
-		NewPoint.X += 1;
-
 	return NewPoint;
 }
 

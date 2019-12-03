@@ -22,15 +22,26 @@ bool ReadMapFromFile(Map* map, FILE* file) {
     int x=0, y=0;
     while (fgets(buffer, bufferLength, file) != NULL) { // One iteration per line, until NULL is returned at EOF
         char field[32];
+		int tmpInt;
         while (sscanf_s(buffer, "%[^,]", field, 32) == 1) { // One iteration per field of data in a line
-            switch (field[0]) {
-                case '|':  break;
-                case '\r': break;
-                case '\0': break;
-                case '-': x++; break;
+            switch (field[0]) { // Special characters will typically just be the first character of the field.
+                case '|': 
+					MapLocationSetValue(map, x, y, BoardingGroup_Walkway);
+					x++;
+				break;
+                case '\D':
+					MapLocationSetValue(map, x, y, BoardingGroup_Door);
+				break;
+                case '-':
+					MapLocationSetValue(map, x, y, BoardingGroup_Walkway);
+					x++;
+				break;
+				case '\r': break;
+				case '\0': break;
 
                 default:
-                    if (sscanf_s(field, "%d", &(map->Seats[x][y].BoardingGroup)) == 1) {
+                    if (sscanf_s(field, "%d", &tmpInt) == 1) {
+						MapLocationSetValue(map, x, y, tmpInt);
                         x++;
                     }
                     else {
@@ -48,17 +59,25 @@ bool ReadMapFromFile(Map* map, FILE* file) {
     return true;
 }
 
+void MapLocationSetValue(Map* map, int x, int y, int value) {
+	map->Locations[x][y].BoardingGroup = value;
+}
+
+int MapLocationGetValue(Map* map, int x, int y) {
+	return map->Locations[x][y].BoardingGroup;
+}
+
 bool AllocateMapPoints(Map* map) {
-	map->Seats = calloc(map->Width, sizeof(Seat*));
-    if (map->Seats == NULL) {
-        fprintf(stderr, "Failed to allocate %d bytes for map width\n", (int)(map->Width * sizeof(Seat*)));
+	map->Locations = calloc(map->Width, sizeof(Location*));
+    if (map->Locations == NULL) {
+        fprintf(stderr, "Failed to allocate %d bytes for map width\n", (int)(map->Width * sizeof(Location*)));
         return false;
     }
 
     for (int i = 0; i < map->Width; i++) {
-        map->Seats[i] = calloc(map->Height, sizeof(Seat));
-        if (map->Seats[i] == NULL) {
-            fprintf(stderr, "Failed to allocate %d bytes for map row %d\n", (int)(map->Height * sizeof(Seat)), i);
+        map->Locations[i] = calloc(map->Height, sizeof(Location));
+        if (map->Locations[i] == NULL) {
+            fprintf(stderr, "Failed to allocate %d bytes for map row %d\n", (int)(map->Height * sizeof(Location)), i);
             return false;
         }
     }
@@ -67,14 +86,14 @@ bool AllocateMapPoints(Map* map) {
 
 void FreeMapPoints(Map* map) {
     if (map == NULL) return;
-    if (map->Seats == NULL) return;
+    if (map->Locations == NULL) return;
 
     for (int i = 0; i < map->Width; i++) {
-        if (map->Seats != NULL) {
-			free(map->Seats[i]);
+        if (map->Locations != NULL) {
+			free(map->Locations[i]);
         }
     }
-    free(map->Seats);
+    free(map->Locations);
 }
 
 int GetSeatsPerLine(FILE* file) {

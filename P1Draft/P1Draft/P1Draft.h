@@ -14,7 +14,6 @@
 void PrintField(Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], const char _BaseFieldData[MaxRows][MaxSeatsPrRow]);
 bool IsAnyOnPoint(Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], Person *_Person);
 Point PredictedPoint(Point CurrentPoint, Point TargetPoint);
-Point PredictedPointInvX(Point CurrentPos, XAxis TargX, XAxis DoorX);
 void SendRowBack(Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], Person *_Person);
 void PassengerMovement(Person* _Passenger, Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow]);
 void SaveRunDataToFile(FILE* _fp, Person _PassengerList[MaxPersons], int RunTime, int RunNumber);

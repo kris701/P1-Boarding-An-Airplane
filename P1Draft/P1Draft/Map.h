@@ -4,14 +4,19 @@
 #include <stdlib.h>
 #include "StructsAndEnums.h"
 
-typedef struct _seat {
+enum BoardingGroup {
+	BoardingGroup_Door = -1,
+	BoardingGroup_Walkway = 0
+};
+
+typedef struct _location {
     Point Point;
     int BoardingGroup;
 	bool IsTaken;
 } Seat;
 
 typedef struct _map {
-    Seat** Seats;
+    Location** Locations;
     int Width;
     int Height;
     Point* Doors;
@@ -23,3 +28,5 @@ void FreeMapPoints(Map* map);
 int GetSeatsPerLine(FILE* file);
 int GetNumberOfCharsForLongestLineInFile(FILE* file);
 int GetNumberOfLinesInFile(FILE* file);
+void MapLocationSetValue(Map* map, int x, int y, int value);
+int MapLocationGetValue(Map* map, int x, int y);
