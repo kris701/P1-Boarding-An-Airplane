@@ -4,7 +4,7 @@ bool ReadMapFromFile(Map* map, FILE* file) {
     _FreeMap(map);
     map->Width  = GetSeatsPerLine(file);
     map->Height = GetNumberOfLinesInFile(file); 
-	
+	map->DoorCount = GetNumberOfDoorsInBoardingMethod(file);
     
     if (_AllocateMap(map) == false) {
         return false;
@@ -20,7 +20,7 @@ bool ReadMapFromFile(Map* map, FILE* file) {
     long int initialFileCursorLocation = ftell(file);
     fseek(file, 0, SEEK_SET);
 
-    int x=0, y=0;
+    int x=0, y=0, doorIndex=0;
     while (fgets(buffer, bufferLength, file) != NULL) { // One iteration per line, until NULL is returned at EOF
         char field[32];
 		int bufferOffset = 0;
@@ -35,6 +35,8 @@ bool ReadMapFromFile(Map* map, FILE* file) {
 				break;
                 case '\D':
 					MapLocationSetValue(map, x, y, BoardingGroup_Door);
+					map->Doors[doorIndex].X = x;
+					map->Doors[doorIndex].Y = y;
 				break;
                 case '-':
 					MapLocationSetValue(map, x, y, BoardingGroup_Walkway);
@@ -51,6 +53,7 @@ bool ReadMapFromFile(Map* map, FILE* file) {
                     if (sscanf_s(field, "%d", &tmpInt) == 1) {
 						MapLocationSetValue(map, x, y, tmpInt);
 						MapLocationGet(map, x, y)->IsTaken = 0;
+						map->NumberOfSeats++;
                         x++;
                     }
                     else {
@@ -183,12 +186,13 @@ int GetNumberOfDoorsInBoardingMethod(FILE* file) {
 	fseek(file, 0, SEEK_SET);
 
 	int numberOfDoors = 0;
-	char ch1, ch2;
+	char ch1=fgetc(file), ch2;
 	while (ch2 = fgetc(file) != EOF) {
-
+		if (ch1 == ',' && ch2 == 'D') {
+			numberOfDoors++;
+		}
+		ch1 = ch2;
 	}
-
-
 
 	fseek(file, initialFileCursorLocation, SEEK_SET);
 	return numberOfDoors;
