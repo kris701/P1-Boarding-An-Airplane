@@ -34,7 +34,7 @@ bool ReadMapFromFile(Map* map, FILE* file) {
                         x++;
                     }
                     else {
-                        fprintf(stderr, "Unknown value '%s'", field);
+                        fprintf(stderr, "Unknown value '%s'\n", field);
                     }
                 break;
             }
