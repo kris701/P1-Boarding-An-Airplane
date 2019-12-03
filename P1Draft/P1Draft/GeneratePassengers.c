@@ -26,8 +26,7 @@ void GeneratePassenger(Person* Passenger) {
     Passenger->IsSeated = false;
     Passenger->PersonCharacter = 'P';
 
-    Passenger->OrgLuggageCount = GenerateLuggage(Passenger);
-    Passenger->LuggageCount = Passenger->OrgLuggageCount;
+    Passenger->LuggageCount = GenerateLuggage(Passenger);
 
     Passenger->IsBackingUp = false;
     Passenger->ShuffleDelay = 0;

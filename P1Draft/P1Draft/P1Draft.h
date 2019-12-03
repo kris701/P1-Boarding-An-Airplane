@@ -16,7 +16,6 @@ bool IsAnyOnPoint(Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], Pers
 Point PredictedPoint(Point CurrentPoint, Point TargetPoint);
 void SendRowBack(Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], Person *_Person);
 void PassengerMovement(Person* _Passenger, Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow]);
-void SaveRunDataToFile(FILE* _fp, Person _PassengerList[MaxPersons], int RunTime, int RunNumber);
 void RunSim(Person _PassengerList[MaxPersons], Person *_PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], bool UpdateVisuals, int* _StepsTaken);
 int BackupWaitSteps(int _TargetSeat, int _InnerBlockingSeat, int ExtraPenalty);
 bool IsInDelayAction(Person* _Person);
