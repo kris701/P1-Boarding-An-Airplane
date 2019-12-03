@@ -42,6 +42,7 @@ bool ReadMapFromFile(Map* map, FILE* file) {
                 default:
                     if (sscanf_s(field, "%d", &tmpInt) == 1) {
 						MapLocationSetValue(map, x, y, tmpInt);
+						map->Locations[y][x].IsTaken = 0;
                         x++;
                     }
                     else {

@@ -53,20 +53,30 @@ bool AssignPassengersToAvailableSeat(int Count, Person _PassengerList[MaxPersons
 	int boardingGroup = 1;
 	for (int i = 0; i < Count; i++)
 	{
-		
+		while (!AssignSeatByBoardinggroup(boardingGroup, &_PassengerList[i], map))
+		{
+			boardingGroup++;
+		}
 	}
     return true;
 }
 
-bool AssignSeatByBoardinggroup(int boardingGroup, Person passenger, Map map)
+bool AssignSeatByBoardinggroup(int boardingGroup, Person* passenger, Map map)
 {
-	for (int j = 0; j < map.Height; j++)
+	for (int y = 0; y < map.Height; y++)
 	{
-		for (int k = 0; k < map.Width; k++)
+		for (int x = 0; x < map.Width; x++)
 		{
-
+			if (map.Locations[y][x].BoardingGroup == boardingGroup && map.Locations[y][x].IsTaken == 0)
+			{
+				passenger->Target = map.Locations[y][x].Point;
+				map.Locations[y][x].IsTaken = 1;
+				return true;
+			}
 		}
 	}
+
+	return false;
 }
 
 Point Random_GetTargetLocation(Person _PersonList[MaxPersons], int Index) {
