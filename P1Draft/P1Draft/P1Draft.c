@@ -15,7 +15,7 @@ int main()
 	Person PassengerList[MaxPersons];
 	Person *PassengerLocationMatrix[MaxRows][MaxSeatsPrRow];
 	clock_t TotalWatchStart, TotalWatchEnd, WatchStart, WatchEnd;
-	Map Map;
+	Map Map = { 0 };
 
 	FILE* mapfp;
 	fopen_s(&mapfp, "backtofront.txt", "r");

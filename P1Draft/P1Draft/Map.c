@@ -22,8 +22,10 @@ bool ReadMapFromFile(Map* map, FILE* file) {
     int x=0, y=0;
     while (fgets(buffer, bufferLength, file) != NULL) { // One iteration per line, until NULL is returned at EOF
         char field[32];
+		int bufferOffset = 0;
 		int tmpInt;
-        while (sscanf_s(buffer, "%[^,]", field, 32) == 1) { // One iteration per field of data in a line
+        while (sscanf_s(buffer+bufferOffset, "%[^,]", field, 32) == 1) { // One iteration per field of data in a line
+			bufferOffset += strlen(field)+1; // +Comma
             switch (field[0]) { // Special characters will typically just be the first character of the field.
                 case '|': 
 					MapLocationSetValue(map, x, y, BoardingGroup_Walkway);
@@ -42,7 +44,7 @@ bool ReadMapFromFile(Map* map, FILE* file) {
                 default:
                     if (sscanf_s(field, "%d", &tmpInt) == 1) {
 						MapLocationSetValue(map, x, y, tmpInt);
-						map->Locations[y][x].IsTaken = 0;
+						MapLocationGet(map, x, y)->IsTaken = 0;
                         x++;
                     }
                     else {
@@ -52,6 +54,7 @@ bool ReadMapFromFile(Map* map, FILE* file) {
             }
         }
         y++;
+		x = 0;
     }
 
     free(buffer);
@@ -61,11 +64,11 @@ bool ReadMapFromFile(Map* map, FILE* file) {
 }
 
 void MapLocationSetValue(Map* map, int x, int y, int value) {
-	map->Locations[x][y].BoardingGroup = value;
+	MapLocationGet(map, x, y)->BoardingGroup = value;
 }
 
-int MapLocationGetValue(Map* map, int x, int y) {
-	return map->Locations[x][y].BoardingGroup;
+Location* MapLocationGet(Map* map, int x, int y) {
+	return &(map->Locations[x][y]);
 }
 
 bool AllocateMapPoints(Map* map) {

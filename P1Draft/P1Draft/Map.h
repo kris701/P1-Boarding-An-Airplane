@@ -29,4 +29,4 @@ int GetSeatsPerLine(FILE* file);
 int GetNumberOfCharsForLongestLineInFile(FILE* file);
 int GetNumberOfLinesInFile(FILE* file);
 void MapLocationSetValue(Map* map, int x, int y, int value);
-int MapLocationGetValue(Map* map, int x, int y);
+Location* MapLocationGet(Map* map, int x, int y);
