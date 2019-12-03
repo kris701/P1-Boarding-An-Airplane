@@ -17,10 +17,10 @@ int main()
 	clock_t TotalWatchStart, TotalWatchEnd, WatchStart, WatchEnd;
 	Map Map;
 
-	FILE* fp;
-	fopen_s(fp, "asd", "r");
+	FILE* mapfp;
+	fopen_s(&mapfp, "backtofront.txt", "r");
 
-	ReadMapFromFile(&Map, fp);
+	ReadMapFromFile(&Map, mapfp);
 
 	while (UpdateGraphics != 'y' && UpdateGraphics != 'n')
 	{

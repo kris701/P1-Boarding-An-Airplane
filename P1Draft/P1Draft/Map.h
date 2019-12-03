@@ -13,7 +13,7 @@ typedef struct _location {
     Point Point;
     int BoardingGroup;
 	bool IsTaken;
-} Seat;
+} Location;
 
 typedef struct _map {
     Location** Locations;

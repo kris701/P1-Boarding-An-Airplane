@@ -18,6 +18,6 @@ int GenerateLuggage(const Person* Passenger);
 int GetStartingDoorID(const Person* Passenger);
 int GenerateWalkSpeed(const Person* Passenger);
 bool AssignPassengersToAvailableSeat(int Count, Person _PassengerList[MaxPersons], Map map);
-bool AssignSeatByBoardinggroup(int boardingGroup, Person passenger, Map map);
+bool AssignSeatByBoardinggroup(int boardingGroup, Person* passenger, Map map);
 Point Random_GetTargetLocation(Person _PersonList[MaxPersons], int Index);
 
