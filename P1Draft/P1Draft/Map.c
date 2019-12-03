@@ -49,15 +49,16 @@ bool ReadMapFromFile(Map* map, FILE* file) {
 }
 
 bool AllocateMapPoints(Map* map) {
+	map->Seats = calloc(map->Width, sizeof(Seat*));
     if (map->Seats == NULL) {
         fprintf(stderr, "Failed to allocate %d bytes for map width\n", (int)(map->Width * sizeof(Seat*)));
         return false;
     }
 
     for (int i = 0; i < map->Width; i++) {
-        map->Seats[i] = calloc(map->Height, sizeof(Point));
+        map->Seats[i] = calloc(map->Height, sizeof(Seat));
         if (map->Seats[i] == NULL) {
-            fprintf(stderr, "Failed to allocate %d bytes for map row %d\n", (int)(map->Height * sizeof(Point)), i);
+            fprintf(stderr, "Failed to allocate %d bytes for map row %d\n", (int)(map->Height * sizeof(Seat)), i);
             return false;
         }
     }
