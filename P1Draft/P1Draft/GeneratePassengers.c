@@ -8,6 +8,14 @@ void GeneratePassengers(int Count, Person _PersonList[MaxPersons], Map map)
         GeneratePassenger(&(_PersonList[i]));
     }
 
+	for (int y = 0; y < map.Height; y++)
+	{
+		for (int x = 0; x < map.Width; x++)
+		{
+			MapLocationGet(&map, x, y)->IsTaken = false;
+		}
+	}
+
 	AssignPassengersToAvailableSeat(Count, _PersonList, map);
 
 	//switch (Index)

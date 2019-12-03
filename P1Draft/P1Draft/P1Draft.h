@@ -11,12 +11,12 @@
 
 #define MaxRuns 10000000
 
-void PrintField(Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], const char _BaseFieldData[MaxRows][MaxSeatsPrRow]);
-bool IsAnyOnPoint(Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], Person *_Person);
+void PrintField(Person** _PassengerLocationMatrix[], Map _PlaneMap);
+bool IsAnyOnPoint(Person** _PassengerLocationMatrix[], Person *_Person);
 Point PredictedPoint(Point CurrentPoint, Point TargetPoint);
-void SendRowBack(Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], Person *_Person);
-void PassengerMovement(Person* _Passenger, Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow]);
-void RunSim(Person _PassengerList[MaxPersons], Person *_PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], bool UpdateVisuals, int* _StepsTaken);
+void SendRowBack(Person** _PassengerLocationMatrix[], Person *_Person);
+void PassengerMovement(Person* _Passenger, Person** _PassengerLocationMatrix[]);
+void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool UpdateVisuals, int* _StepsTaken, Map _PlaneMap);
 int BackupWaitSteps(int _TargetSeat, int _InnerBlockingSeat, int ExtraPenalty);
 bool IsInDelayAction(Person* _Person);
 

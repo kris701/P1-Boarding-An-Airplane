@@ -3,7 +3,7 @@
 
 #include "StructsAndEnums.h"
 
-#define MaxPersons 146
+#define MaxPersons 188
 #define MaxSeatsPrRow 7
 #define MaxRows 28
 // a, b, c, d, e, f, g, h, i...
@@ -49,8 +49,8 @@ static const char BaseFieldData[MaxRows][MaxSeatsPrRow] = {
 };
 
 static const Point Doors[2] = {
-	{Col_d,27},
-	{Col_d,0}
+	{Col_e,25},
+	{Col_e,0}
 };
 
 static const BaseSimulationRules BSR = { 0, 5 };
