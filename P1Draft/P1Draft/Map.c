@@ -77,26 +77,26 @@ void MapLocationSetValue(Map* map, int x, int y, int value) {
 }
 
 Location* MapLocationGet(Map* map, int x, int y) {
-	return &(map->Locations[x][y]);
+	return &(map->Locations[y][x]);
 }
 
 bool _AllocateMap(Map* map) {
-	map->Locations = calloc(map->Width, sizeof(Location*));
+	map->Locations = calloc(map->Height, sizeof(Location*));
     if (map->Locations == NULL) {
-        fprintf(stderr, "Failed to allocate %d bytes for map width\n", (int)(map->Width * sizeof(Location*)));
+        fprintf(stderr, "Failed to allocate %d bytes for map width\n", (int)(map->Height * sizeof(Location*)));
         return false;
     }
 
-    for (int x = 0; x < map->Width; x++) {
-        map->Locations[x] = calloc(map->Height, sizeof(Location));
-		for (int y = 0; y < map->Height; y++) {
-			map->Locations[x][y].Point.X = x;
-			map->Locations[x][y].Point.Y = y;
-		}
-        if (map->Locations[x] == NULL) {
-            fprintf(stderr, "Failed to allocate %d bytes for map row %d\n", (int)(map->Height * sizeof(Location)), x);
+    for (int y = 0; y < map->Height; y++) {
+        map->Locations[y] = calloc(map->Width, sizeof(Location));
+        if (map->Locations[y] == NULL) {
+            fprintf(stderr, "Failed to allocate %d bytes for map row %d\n", (int)(map->Width * sizeof(Location)), y);
             return false;
         }
+		for (int x = 0; x < map->Width; x++) {
+			map->Locations[y][x].Point.X = x;
+			map->Locations[y][x].Point.Y = y;
+		}
     }
 
 	map->Doors = calloc(map->DoorCount, sizeof(Point*));
