@@ -1,76 +1,77 @@
-#ifndef STRUCTSANDENUMS_HEADER
-#define STRUCTSANDENUMS_HEADER
+#pragma once
 
 #include <stdbool.h>
 
-enum XAxis { Col_a, Col_b, Col_c, Col_d, Col_e, Col_f, Col_g, Col_h, Col_i, Col_j, Col_k, Col_l, Col_m, Col_n, Col_o, Col_p, Col_q, Col_r, Col_s, Col_t};
-typedef enum XAxis XAxis;
-enum MethodIndex { MI_Random };
-typedef enum MethodIndex MethodIndex;
-enum FunctionType { Line, Exp };
-typedef enum FunctionType FunctionType;
+typedef enum _XAxis {
+	Col_a, Col_b, Col_c, Col_d, 
+	Col_e, Col_f, Col_g, Col_h, 
+	Col_i, Col_j, Col_k, Col_l, 
+	Col_m, Col_n, Col_o, Col_p, 
+	Col_q, Col_r, Col_s, Col_t,
+	Col_u, Col_v, Col_w, Col_x,
+	Col_y, Col_z
+} XAxis;
 
-struct Point
+typedef enum _BoardingGroup {
+	BoardingGroup_Padding = -3,
+	BoardingGroup_Walkway = -2,
+	BoardingGroup_Door = -1,
+	BoardingGroup_Undefined = 0
+} BoardingGroup;
+
+typedef struct _Point
 {
-	enum XAxis X;
+	XAxis X;
 	int Y;
-};
-typedef struct Point Point;
+} Point;
 
-struct Person
+typedef struct _Person
 {
 	int WalkingSpeed;
-	struct Point CurrentPos;
-	struct Point Target;
+	Point CurrentPos;
+	Point Target;
 	bool IsSeated;
 	int StartingDoorID;
 	char PersonCharacter;
 	int LuggageCount;
-	int OrgLuggageCount;
 	bool IsBackingUp;
 	int ShuffleDelay;
 	int CrossDelay;
 	int StepsTaken;
 	bool MovedLastTurn;
-	struct Point NextMove;
-};
-typedef struct Person Person;
+	Point NextMove;
+	int BoardingGroup;
+} Person;
 
-struct PassengerFunctionDefinition
+typedef struct _ValueStatistic
 {
-	enum FunctionType Type;
-	double a;
-	double b;
-	double c;
-};
-typedef struct PassengerFunctionDefinition FunctionDefinition;
+	int Value;
+	int Possibility;
+} ValueStatistic;
 
-struct PassengerMethodDefinition
-{
-	int FromY;
-	int ToY;
-	enum XAxis FromX;
-	enum XAxis ToX;
-
-	int MinLuggage;
-	int MaxLuggage;
-	struct PassengerFunctionDefinition LuggageFunction;
-
-	int MinDoorChoice;
-	int MaxDoorChoice;
-	struct PassengerFunctionDefinition DoorFunction;
-
-	int MinWalkSpeed;
-	int MaxWalkSpeed;
-	struct PassengerFunctionDefinition WalkSpeedFunction;
-};
-typedef struct PassengerMethodDefinition MethodDefinition;
-
-struct BaseSimulationRules
+typedef struct _BasicSimulationRules
 {
 	int ShuffleDelay;
 	int CrossDelay;
-};
-typedef struct BaseSimulationRules BaseSimulationRules;
+	ValueStatistic* LuggageGenerationValues;
+	int LuggageGenerationValuesLength;
+	ValueStatistic* WalkingspeedGenerationValues;
+	int WalkingspeedGenerationValuesLength;
+	char BoardingMethodFile[128];
+} BasicSimulationRules;
 
-#endif
+typedef struct _Location {
+	Point Point;
+	int BoardingGroup;
+	bool IsTaken;
+} Location;
+
+typedef struct _Map {
+	Location** Locations;
+	int Width;
+	int Height;
+	Point* Doors;
+	int DoorCount;
+	int NumberOfSeats;
+	int LongestDigit;
+} Map;

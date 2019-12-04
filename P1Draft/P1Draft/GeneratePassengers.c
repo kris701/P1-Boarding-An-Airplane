@@ -1,32 +1,35 @@
 #include "GeneratePassengers.h"
 
-void GeneratePassengers(int Count, Person _PersonList[MaxPersons], MethodIndex Index, MethodDefinition _MDef)
+void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
-	srand(time(NULL));
-
     for (int i = 0; i < Count; i++) {
-        GeneratePassenger(&(_PersonList[i]));
-        AssignPassengerToAvailableSeat(_PersonList, i);
+        GeneratePassenger(&(_PersonList[i]), _PlaneMap, _BaseRules);
     }
 
-	//switch (Index)
-	//{
-	//    case MI_Random:
-	//	    Method_Random(Count, _PersonList, _MDef);
-	//	    break;
-	//}
+	for (int y = 0; y < _PlaneMap.Height; y++)
+	{
+		for (int x = 0; x < _PlaneMap.Width; x++)
+		{
+			GetMapLocation(&_PlaneMap, x, y)->IsTaken = false;
+		}
+	}
+
+	AssignPassengersToAvailableSeat(Count, _PersonList, _PlaneMap);
+
+	ScramblePassengers(_PersonList, Count);
+
+	AssignPassengerToNearestDoor(Count, _PersonList, _PlaneMap);
 }
 
-void GeneratePassenger(Person* Passenger) {  
-    Passenger->WalkingSpeed = GenerateWalkSpeed(Passenger);
+void GeneratePassenger(Person* Passenger, Map _PlaneMap, BasicSimulationRules _BaseRules) {
+    Passenger->WalkingSpeed = GenerateWalkSpeed(_BaseRules);
 
-    Passenger->StartingDoorID = GetStartingDoorID(Passenger);
-    Passenger->CurrentPos = Doors[Passenger->StartingDoorID];
+    Passenger->StartingDoorID = 0;
+	Passenger->CurrentPos = SetPoint(0,0);
     Passenger->IsSeated = false;
     Passenger->PersonCharacter = 'P';
 
-    Passenger->OrgLuggageCount = GenerateLuggage(Passenger);
-    Passenger->LuggageCount = Passenger->OrgLuggageCount;
+    Passenger->LuggageCount = GenerateLuggage(_BaseRules);
 
     Passenger->IsBackingUp = false;
     Passenger->ShuffleDelay = 0;
@@ -37,84 +40,114 @@ void GeneratePassenger(Person* Passenger) {
 	Passenger->NextMove = SetPoint(0,0);
 }
 
-int GenerateLuggage(const Person* Passenger) {
-    return GetRandomNumberRanged(2, 6);
+int GenerateLuggage(BasicSimulationRules _BaseRules)
+{
+	int ChanceValue = GetRandomNumberRanged(1, 100);
+	int ChanceOffset = 0;
+	for (int i = 0; i < _BaseRules.LuggageGenerationValuesLength; i++)
+	{
+		if (ChanceValue <= (_BaseRules.LuggageGenerationValues[i].Possibility + ChanceOffset))
+			return _BaseRules.LuggageGenerationValues[i].Value;
+		ChanceOffset += _BaseRules.LuggageGenerationValues[i].Possibility;
+	}
+
+    return 0;
 }
 
-int GetStartingDoorID(const Person* Passenger) {
-    return GetRandomNumberRanged(0, 1);
+int GetStartingDoorID(Person* Passenger, Map _PlaneMap) 
+{
+	int MinLength = 9999;
+	int TargetIndex = 0;
+	for (int i = 0; i < _PlaneMap.DoorCount; i++)
+	{
+		if (abs(_PlaneMap.Doors[i].Y - Passenger->Target.Y) < MinLength)
+		{
+			MinLength = abs(_PlaneMap.Doors[i].Y - Passenger->Target.Y);
+			TargetIndex = i;
+		}
+	}
+	return TargetIndex;
 }
 
-int GenerateWalkSpeed(const Person* Passenger) {
-    return GetRandomNumberRanged(1, 2);
+int GenerateWalkSpeed(BasicSimulationRules _BaseRules)
+{
+	int ChanceValue = GetRandomNumberRanged(1, 100);
+	int ChanceOffset = 0;
+	for (int i = 0; i < _BaseRules.WalkingspeedGenerationValuesLength; i++)
+	{
+		if (ChanceValue <= (_BaseRules.WalkingspeedGenerationValues[i].Possibility + ChanceOffset))
+			return _BaseRules.WalkingspeedGenerationValues[i].Value;
+		ChanceOffset += _BaseRules.WalkingspeedGenerationValues[i].Possibility;
+	}
+
+	return 0;
 }
 
-bool AssignPassengerToAvailableSeat(Person _PassengerList[MaxPersons], int index) {
-    _PassengerList[index].Target = Random_GetTargetLocation(_PassengerList, index);
+void AssignPassengerToNearestDoor(int Count, Person _PassengerList[], Map _PlaneMap)
+{
+	for (int i = 0; i < Count; i++) {
+		_PassengerList[i].StartingDoorID = GetStartingDoorID(&_PassengerList[i], _PlaneMap);
+		_PassengerList[i].CurrentPos = _PlaneMap.Doors[_PassengerList[i].StartingDoorID];
+	}
+}
+
+bool AssignPassengersToAvailableSeat(int Count, Person _PassengerList[], Map _PlaneMap) {
+	int boardingGroup = 1;
+	for (int i = 0; i < Count; i++)
+	{
+		while (!AssignSeatByBoardinggroup(boardingGroup, &_PassengerList[i], _PlaneMap))
+		{
+			boardingGroup++;
+		}
+	}
     return true;
 }
 
-Point Random_GetTargetLocation(Person _PersonList[MaxPersons], int Index) {
-	Point NewTarget = { 0, 0 };
-	bool FoundAvailable = true;
-	while (FoundAvailable)
+bool AssignSeatByBoardinggroup(int BoardingGroup, Person* _Passenger, Map _PlaneMap)
+{
+	for (int y = 0; y < _PlaneMap.Height; y++)
 	{
-		NewTarget = SetPoint(GetRandomNumberRanged(0, MaxSeatsPrRow - 1), GetRandomNumberRanged(1, MaxRows - 2));
-
-		FoundAvailable = false;
-		for (int i = 0; i < Index + 1; i++)
+		for (int x = 0; x < _PlaneMap.Width; x++)
 		{
-			if (BaseFieldData[NewTarget.Y][NewTarget.X] != SeatChar)
+			Location* TempLoc = GetMapLocation(&_PlaneMap, x, y);
+			if (TempLoc->BoardingGroup == BoardingGroup && TempLoc->IsTaken == false)
 			{
-				FoundAvailable = true;
-				break;
-			}
-			else
-			{
-				if (i != Index)
-				{
-					if (IsPointEqual(_PersonList[i].Target, NewTarget))
-					{
-						FoundAvailable = true;
-						break;
-					}
-				}
+				_Passenger->Target = TempLoc->Point;
+				_Passenger->BoardingGroup = BoardingGroup;
+				TempLoc->IsTaken = true;
+				return true;
 			}
 		}
 	}
 
-	return NewTarget;
+	return false;
 }
 
+void ScramblePassengers(Person _PassengerList[], int ArrayLength)
+{
+	int StartIndex = 0;
+	int EndIndex = 1;
 
+	while (StartIndex < ArrayLength)
+	{
+		if (_PassengerList[EndIndex].BoardingGroup != _PassengerList[StartIndex].BoardingGroup)
+		{
+			if (EndIndex - StartIndex > 1)
+			{
+				for (int i = StartIndex; i < EndIndex; i++)
+				{
+					int RandValue = GetRandomNumberRanged(StartIndex, EndIndex - 1);
+					while (RandValue == i)
+						RandValue = GetRandomNumberRanged(StartIndex, EndIndex - 1);
+					Person TmpPerson = _PassengerList[i];
+					_PassengerList[i] = _PassengerList[RandValue];
+					_PassengerList[RandValue] = TmpPerson;
+				}
+			}
 
-void SortPointsAccordingToMethod(Point Points[], FILE* methodFile) {    
-    /* Qsort with comp based on filecontents */
+			StartIndex = EndIndex;
+		}
 
-    /*
-        Look through file, find number of boarding groups
-        Allocate 1 int for each boarding group
-        Count how many seats for each group
-        Go through the seats and assign them to passengers from start to end
-        Free array
-    */
-
-    /*
-    Generate map from file, then pass map to this function
-    */
-
-
-
+		EndIndex++;
+	}
 }
-
-
-
-
-
-
-
-
-
-
-
-

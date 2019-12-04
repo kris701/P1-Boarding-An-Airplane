@@ -5,361 +5,119 @@ int main()
 	char UpdateGraphics = ' ';
 	char SaveToFile = ' ';
 	int RunsToDo = 0;
-	bool AllSeated = false;
 	int RunTime = 0;
 	int AvrStepsTaken = 0;
 	int StepsTaken = 0;
 
-	// Dette bliver erstatet snart:
-	MethodDefinition Def = { 0, MaxSeatsPrRow, 0, MaxRows, 0, 3, { Line, 1, 0, 0 }, 0, 1, { Line, 1, 0, 0 }, 1, 1, { Line, 1, 0, 0 } };
-
-	Person PassengerList[MaxPersons];
-	Person *PassengerLocationMatrix[MaxRows][MaxSeatsPrRow];
+	Person* PassengerList;
+	Person*** PassengerLocationMatrix;
 	clock_t TotalWatchStart, TotalWatchEnd, WatchStart, WatchEnd;
+	Map PlaneMap = { 0 };
+	BasicSimulationRules BaseRules = { 0 };
 
-	// These 3 while loops are getting input
-	while (UpdateGraphics != 'y' && UpdateGraphics != 'n')
-	{
-		printf("Update graphics? (y/n)\n");
-		scanf_s(" %c", &UpdateGraphics, 1);
-	}
-	while (SaveToFile != 'y' && SaveToFile != 'n')
-	{
-		printf("Save data to file? (y/n)\n");
-		scanf_s(" %c", &SaveToFile, 1);
-	}
-	while (RunsToDo <= 0 || RunsToDo > MaxRuns)
-	{
-		printf("How many runs?: \n");
-		scanf_s(" %d", &RunsToDo);
-	}
+	BaseRules = ReadBasicRulesConfigFile(BaseRules, "config.ini");
 
-	FILE* fp;
-	fopen_s(&fp, "output.csv", "w+");
-	
-	if (fp != NULL)
+	srand(time(NULL));
+
+	FILE* PlaneMapFile;
+	fopen_s(&PlaneMapFile, BaseRules.BoardingMethodFile, "r");
+
+	if (PlaneMapFile != NULL)
 	{
-		if (SaveToFile == 'y')
-			fprintf(fp, "RunNumber;RunTime;WalkingSpeed;OrgLuggageCount;StartingDoorID;StepsTaken\n");
+		printf("Using boarding method file: %s\n", BaseRules.BoardingMethodFile);
+		ReadMapFromFile(&PlaneMap, PlaneMapFile);
 
-		TotalWatchStart = clock();
+		PassengerList = calloc(PlaneMap.NumberOfSeats, sizeof(Person));
 
-		for (int i = 0; i < RunsToDo; i++)
+		PassengerLocationMatrix = calloc(PlaneMap.Height, sizeof(Person**));
+		for (int i = 0; i < PlaneMap.Height; i++) {
+			PassengerLocationMatrix[i] = calloc(PlaneMap.Width, sizeof(Person*));
+		}
+
+		// Gets input from user
+		while (UpdateGraphics != 'y' && UpdateGraphics != 'n')
 		{
-			RunTime = 0;
+			printf("Update graphics? (y/n)\n");
+			scanf_s(" %c", &UpdateGraphics, 1);
+		}
+		while (SaveToFile != 'y' && SaveToFile != 'n')
+		{
+			printf("Save data to file? (y/n)\n");
+			scanf_s(" %c", &SaveToFile, 1);
+		}
+		while (RunsToDo <= 0 || RunsToDo > MaxRuns)
+		{
+			printf("How many runs?: \n");
+			scanf_s(" %d", &RunsToDo);
 
-			memset(PassengerLocationMatrix, NULL, sizeof PassengerLocationMatrix);
+			while (getchar() != '\n');
+		}
 
-			// Replace this later:
-			GeneratePassengers(MaxPersons, PassengerList, MI_Random, Def);
+		FILE* OutputFile;
 
-			WatchStart = clock();
+		if (SaveToFile == 'y')
+			fopen_s(&OutputFile, "output.csv", "w+");
+		else
+			OutputFile = 1;
 
-			RunSim(PassengerList, PassengerLocationMatrix, UpdateGraphics == 'y', &StepsTaken);
+		if (OutputFile != NULL)
+		{
+			if (SaveToFile == 'y')
+				fprintf(OutputFile, "Iterations;\n");
 
-			WatchEnd = clock();
+			TotalWatchStart = clock();
 
-			RunTime = (int)((double)WatchEnd - (double)WatchStart);
-
-			if (UpdateGraphics == 'y')
+			for (int i = 0; i < RunsToDo; i++)
 			{
-				printf("All seated! Took: %d ticks and %d iterations\n", RunTime, StepsTaken);
+				RunTime = 0;
 
-				Sleep(1000);
+				for (int i = 0; i < PlaneMap.Height; i++) {
+					for (int j = 0; j < PlaneMap.Width; j++) {
+						memset(&PassengerLocationMatrix[i][j], NULL, sizeof(Person*));
+					}
+				}
+
+				GeneratePassengers(PlaneMap.NumberOfSeats, PassengerList, PlaneMap, BaseRules);
+
+				WatchStart = clock();
+
+				RunSim(PassengerList, PassengerLocationMatrix, UpdateGraphics == 'y', &StepsTaken, PlaneMap, BaseRules);
+
+				WatchEnd = clock();
+
+				RunTime = (int)((double)WatchEnd - (double)WatchStart);
+
+				if (UpdateGraphics == 'y')
+				{
+					printf("All seated! Took: %d ticks and %d iterations\n", RunTime, StepsTaken);
+
+					Sleep(1000);
+				}
+
+				if (SaveToFile == 'y')
+					fprintf(OutputFile, "%d;\n", StepsTaken);
+
+				AvrStepsTaken += StepsTaken;
+				StepsTaken = 0;
 			}
 
-			AvrStepsTaken += StepsTaken;
-			StepsTaken = 0;
+			TotalWatchEnd = clock();
 
 			if (SaveToFile == 'y')
-				SaveRunDataToFile(fp, PassengerList, RunTime, i);
+				fclose(OutputFile);
+
+			printf("\nFinished! Took %d ms and an avr of %d iterations pr run\n", (int)((((double)TotalWatchEnd - (double)TotalWatchStart) / CLOCKS_PER_SEC) * 1000), (AvrStepsTaken / RunsToDo));
+			if (SaveToFile == 'y')
+				printf("Using boarding method file: %s\n", BaseRules.BoardingMethodFile);
 		}
+		else
+			printf("Error making output file");
 
-		TotalWatchEnd = clock();
-
-		fclose(fp);
-
-		printf("\n Finished! Took %d ms and an avr of %d iterations pr run\n", (int)((((double)TotalWatchEnd - (double)TotalWatchStart) / CLOCKS_PER_SEC) * 1000), (AvrStepsTaken / RunsToDo));
+		free(PassengerList);
+		free(PassengerLocationMatrix);
 	}
-	system("pause");
+	else
+		printf("Error reading map file");
 
 	return 0;
-}
-
-// Function that saves data from the run to a file
-void SaveRunDataToFile(FILE* _fp, Person _PassengerList[MaxPersons], int _RunTime, int RunNumber)
-{
-	for (int i = 1; i < MaxPersons; i++)
-	{
-		fprintf(_fp, "%d;%d;%d;%d;%d;%d\n", RunNumber, _RunTime, _PassengerList[i].WalkingSpeed, _PassengerList[i].OrgLuggageCount, _PassengerList[i].StartingDoorID, _PassengerList[i].StepsTaken);
-	}
-}
-
-// Function that runs the simulation
-void RunSim(Person _PassengerList[MaxPersons], Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], bool UpdateVisuals, int* _StepsTaken)
-{
-	bool AllSeated = false;
-	clock_t OneSecWatchStart, OneSecWatchEnd;
-	int RPSCount = 0;
-	int ShowRPCCount = 0;
-
-	OneSecWatchStart = clock();
-
-	// While loop that runs when all aren't seated
-	while (!AllSeated)
-	{
-		AllSeated = true;
-		// For loop that goes through every passenger
-		for (int i = 0; i < MaxPersons; i++)
-		{
-			// If statement that checks if passenger isn't seated. If not it will move the passenger and go onto the next passenger
-			if (!_PassengerList[i].IsSeated)
-			{
-				AllSeated = false;
-
-				PassengerMovement(&_PassengerList[i], _PassengerLocationMatrix);
-
-				if (IsPointEqual(_PassengerList[i].CurrentPos, _PassengerList[i].Target) && !_PassengerList[i].IsBackingUp)
-				{
-					_PassengerList[i].IsSeated = true;
-				}
-			}
-		}
-
-		// If statement that prints airplane visuals if it gets input yes
-		if (UpdateVisuals)
-		{
-			PrintField(_PassengerLocationMatrix, BaseFieldData);
-			printf("RPS: %d", ShowRPCCount);
-
-			RPSCount++;
-
-			OneSecWatchEnd = clock();
-
-			if ((int)((((double)OneSecWatchEnd - (double)OneSecWatchStart) / CLOCKS_PER_SEC) * 1000) >= 1000)
-			{
-				OneSecWatchStart = clock();
-				ShowRPCCount = RPSCount;
-				RPSCount = 0;
-			}
-		}
-
-		(*_StepsTaken)++;
-	}
-}
-
-// Function that moves the passengers
-void PassengerMovement(Person* _Passenger, Person *_PassengerLocationMatrix[MaxRows][MaxSeatsPrRow])
-{
-	bool TookAStep = false;
-
-	// If statement that checks if passenger isn't in delay action
-	if (!IsInDelayAction(_Passenger))
-	{
-		// For loop that runs equal to the amount walkingspeed has been set to
-		for (int j = 0; j < _Passenger->WalkingSpeed; j++)
-		{
-			if (!IsPointEqual(_Passenger->CurrentPos, _Passenger->Target) || _Passenger->IsBackingUp)
-			{
-				if (_Passenger->IsBackingUp)
-				{
-					_PassengerLocationMatrix[_Passenger->Target.Y][_Passenger->Target.X] = _Passenger;
-					_PassengerLocationMatrix[_Passenger->CurrentPos.Y][_Passenger->CurrentPos.X] = NULL;
-					_Passenger->CurrentPos = _Passenger->Target;
-					_Passenger->IsBackingUp = false;
-					_Passenger->IsSeated = true;
-
-					TookAStep = true;
-				}
-				else
-				{
-					if (!IsAnyOnPoint(_PassengerLocationMatrix, _Passenger))
-					{
-						_PassengerLocationMatrix[_Passenger->NextMove.Y][_Passenger->NextMove.X] = _Passenger;
-						_PassengerLocationMatrix[_Passenger->CurrentPos.Y][_Passenger->CurrentPos.X] = NULL;
-						_Passenger->CurrentPos = _Passenger->NextMove;
-
-						TookAStep = true;
-					}
-					else
-						break;
-				}
-			}
-			else
-				break;
-		}
-	}
-
-	if (TookAStep)
-	{
-		_Passenger->StepsTaken++;
-	}
-}
-
-// Function for printing visual updates
-void PrintField(Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], const char _BaseFieldData[MaxRows][MaxSeatsPrRow])
-{
-	system("cls");
-
-	for (int i = 0; i < MaxRows; i++)
-	{
-		printf("| ");
-		for (int j = 0; j < MaxSeatsPrRow; j++)
-		{
-			if (_PassengerLocationMatrix[i][j] != NULL)
-				printf("%c ", _PassengerLocationMatrix[i][j]->PersonCharacter);
-			else
-				printf("%c ", _BaseFieldData[i][j]);
-		}
-		printf("|\n");
-	}
-}
-
-// Function to check if passenger is on point
-bool IsAnyOnPoint(Person *_PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], Person *_Person)
-{
-	Point NewPoint;
-
-	// If statement that checks if the passenger moved last turn to find out if there needs to be predicted a new point
-	if (_Person->MovedLastTurn)
-	{
-		NewPoint = PredictedPoint(_Person->CurrentPos, _Person->Target);
-		_Person->NextMove = NewPoint;
-		_Person->MovedLastTurn = false;
-	}
-	else
-		NewPoint = _Person->NextMove;
-
-	// If statement that checks if there is a passenger in the new point we just found. If there is it will find out where that passenger wants to move to
-	if (_PassengerLocationMatrix[NewPoint.Y][NewPoint.X] != NULL)
-	{
-		Person* OtherPerson = _PassengerLocationMatrix[NewPoint.Y][NewPoint.X];
-		Point SecondNewPoint;
-		if (OtherPerson->MovedLastTurn)
-		{
-			SecondNewPoint = PredictedPoint(OtherPerson->CurrentPos, OtherPerson->Target);
-			OtherPerson->NextMove = SecondNewPoint;
-			OtherPerson->MovedLastTurn = false;
-		}
-		else
-			SecondNewPoint = OtherPerson->NextMove;
-
-		// Shuffle dance
-		if (_Person->Target.Y == OtherPerson->Target.Y && _Person->CurrentPos.Y == _Person->Target.Y)
-		{
-			SendRowBack(_PassengerLocationMatrix, _Person);
-
-			return true;
-		}
-
-		// Cross
-		if (IsPointEqual(SecondNewPoint, _Person->CurrentPos))
-		{
-			OtherPerson->CurrentPos = SecondNewPoint;
-			OtherPerson->CrossDelay = BSR.CrossDelay;
-			OtherPerson->MovedLastTurn = true;
-			_PassengerLocationMatrix[SecondNewPoint.Y][SecondNewPoint.X] = OtherPerson;
-
-			_Person->CurrentPos = NewPoint;
-			_Person->CrossDelay = BSR.CrossDelay;
-			_Person->MovedLastTurn = true;
-			_PassengerLocationMatrix[NewPoint.Y][NewPoint.X] = _Person;
-
-			return true;
-		}
-
-		return true;
-	}
-
-	_Person->MovedLastTurn = true;
-
-	return false;
-}
-
-// Function that predicts the next move for a passenger
-Point PredictedPoint(Point CurrentPoint, Point TargetPoint)
-{
-	Point NewPoint = { CurrentPoint.X, CurrentPoint.Y };
-	if (NewPoint.Y == TargetPoint.Y) {
-		if (TargetPoint.X > CurrentPoint.X)
-			NewPoint = SetPoint(CurrentPoint.X + 1, CurrentPoint.Y);
-		else
-			NewPoint = SetPoint(CurrentPoint.X - 1, CurrentPoint.Y);
-	}
-	else
-	{
-		if (TargetPoint.Y > NewPoint.Y)
-			NewPoint = SetPoint(CurrentPoint.X, CurrentPoint.Y + 1);
-		else
-			NewPoint = SetPoint(CurrentPoint.X, CurrentPoint.Y - 1);
-	}
-	return NewPoint;
-}
-
-// Function that does shuffle dance
-void SendRowBack(Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], Person *_Person)
-{
-	int CurrentXPosition = _Person->Target.X;
-	int DistanceToTargetSeat = abs(_Person->Target.X - Doors[_Person->StartingDoorID].X);
-	int InnerMostSeat = -1;
-
-	// While loop that runs while current x position are not equal to a passengers starting door id
-	while (CurrentXPosition != Doors[_Person->StartingDoorID].X)
-	{
-		if (_PassengerLocationMatrix[_Person->CurrentPos.Y][CurrentXPosition] != NULL)
-		{
-			Person* MomentPerson = _PassengerLocationMatrix[_Person->CurrentPos.Y][CurrentXPosition];
-			if (InnerMostSeat == -1)
-				InnerMostSeat = abs(MomentPerson->Target.X - Doors[_Person->StartingDoorID].X);
-
-			MomentPerson->IsBackingUp = true;
-			MomentPerson->ShuffleDelay = BackupWaitSteps(DistanceToTargetSeat, InnerMostSeat, BSR.ShuffleDelay);
-			MomentPerson->MovedLastTurn = true;
-		}
-
-		if (_Person->Target.X > Doors[_Person->StartingDoorID].X)
-			CurrentXPosition--;
-		else
-			CurrentXPosition++;
-	}
-
-	_Person->IsBackingUp = true;
-	_Person->ShuffleDelay = BackupWaitSteps(DistanceToTargetSeat, InnerMostSeat, BSR.ShuffleDelay);
-	_Person->MovedLastTurn = true;
-}
-
-// Function that calculates how many steps it will take for a passenger to shuffle dance
-int BackupWaitSteps(int TargetSeat, int InnerBlockingSeat, int ExtraPenalty)
-{
-	return TargetSeat + InnerBlockingSeat + 2 + ExtraPenalty;
-}
-
-// Function that checks if a passenger is in delay action
-bool IsInDelayAction(Person* _Person)
-{
-	if (_Person->LuggageCount > 0)
-	{
-		if (_Person->CurrentPos.Y == _Person->Target.Y && _Person->CurrentPos.X == Doors[_Person->StartingDoorID].X)
-		{
-			_Person->LuggageCount--;
-
-			return true;
-		}
-	}
-
-	if (_Person->ShuffleDelay > 0)
-	{
-		_Person->ShuffleDelay--;
-
-		return true;
-	}
-
-	if (_Person->CrossDelay > 0)
-	{
-		_Person->CrossDelay--;
-
-		return true;
-	}
-
-	return false;
 }

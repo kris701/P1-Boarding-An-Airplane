@@ -26,6 +26,7 @@ typedef struct PlaneInformation {
 	int SeatsPerRow;
 	int FirstClassSeatsPerRow;
 	int BoardingGroupRowCount;
+	int UpperDoor, LowerDoor;
 } PlaneInformation;
 
 typedef struct BoardingInfo {
@@ -42,6 +43,7 @@ int OpenConfigFile(BoardingInfo* _BI, FILE* _FP);
 void ReadConfigFile(BoardingInfo* _BI, FILE* _FP);
 FILE* SetBoardingMethod(BoardingInfo* _BI, FILE* _FP, int _Index);
 BoardingInfo ResetBI(BoardingInfo _BI);
+void CreateDoorRow(BoardingInfo* _BI, FILE* _FP);
 int CreateFirstClassRows(BoardingInfo* _BI, FILE* _FP);
 void CreatePeasentClassRows(BoardingInfo* _BI, FILE* _FP);
 void GetSeatNumber(BoardingInfo* _BI, int _SeatIndex, char _SeatString[]);

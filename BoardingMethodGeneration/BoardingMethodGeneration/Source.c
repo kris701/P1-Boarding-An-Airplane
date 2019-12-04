@@ -2,7 +2,7 @@
 
 int main(void) {
 	FILE* FP = NULL;
-	BoardingInfo BI = { {0, 0, 0, 0, 0}, BMWilma, 1, 0, 0, 0 };
+	BoardingInfo BI = { {0, 0, 0, 0, 0, 0, 0}, BMWilma, 1, 0, 0, 0 };
 
 	if (!OpenConfigFile(&BI, FP))
 		return 0;
@@ -16,10 +16,14 @@ int main(void) {
 	for (int i = 0; i < 7; i++) {
 		FP = SetBoardingMethod(&BI, FP, i);
 		BI = ResetBI(BI);
+		if (BI.PlaneInfo.UpperDoor)
+			CreateDoorRow(&BI, FP);
 		BI.PeasentClassBoardingGroupOffset = CreateFirstClassRows(&BI, FP);
 		BI.BoardingGroupRowCounter = 0;
 		BI.SeatCounter = 0;
 		CreatePeasentClassRows(&BI, FP);
+		if (BI.PlaneInfo.LowerDoor)
+			CreateDoorRow(&BI, FP);
 		fclose(FP);
 	}
 
@@ -38,14 +42,14 @@ int OpenConfigFile(BoardingInfo* _BI, FILE* _FP) {
 }
 
 void ReadConfigFile(BoardingInfo* _BI, FILE* _FP) {
-	char str[128];
+	char str[258];
 	char* substring = "";
 	char* delimiter = "=";
-	for (int i = 0; i < 7; i++) {
+	for (int i = 0; i < 13; i++) {
 		// If there is text, which should really always be the case
-		if (fgets(str, 128, _FP) != NULL) {
+		if (fgets(str, 258, _FP) != NULL) {
 			// If the line isn't a comment
-			if (str[0] != ';') {
+			if (str[0] != ';' && str[0]!='\n') {
 				if (strstr(str, "first_class_rows")) {
 					substring = strchr(str, '=') + 1;
 					_BI->PlaneInfo.FirstClassRows = atoi(substring);
@@ -62,6 +66,16 @@ void ReadConfigFile(BoardingInfo* _BI, FILE* _FP) {
 				else if (strstr(str, "boarding_group_size")) {
 					substring = strchr(str, '=') + 1;
 					_BI->PlaneInfo.BoardingGroupRowCount = atoi(substring);
+				}
+				else if (strstr(str, "upper_door")) {
+                    printf("wefoinwe\n");
+					substring = strchr(str, '=') + 1;
+					_BI->PlaneInfo.UpperDoor = atoi(substring);
+				}
+				else if (strstr(str, "lower_door")) {
+                    printf("qebfouwb\n");
+					substring = strchr(str, '=') + 1;
+					_BI->PlaneInfo.LowerDoor = atoi(substring);
 				}
 			}
 		}
@@ -114,10 +128,20 @@ BoardingInfo ResetBI(BoardingInfo _BI) {
 	return _BI;
 }
 
+void CreateDoorRow(BoardingInfo* _BI, FILE* _FP) {
+	for (int i = 0; i < _BI->PlaneInfo.SeatsPerRow; i++) {
+		if (i == _BI->PlaneInfo.SeatsPerRow / 2)
+			fputs("D,", _FP);
+		fputs("-,", _FP);
+	}
+	fputs("\n", _FP);
+}
+
 int CreateFirstClassRows(BoardingInfo* _BI, FILE* _FP) {
 	int seats = _BI->PlaneInfo.SeatsPerRow / 2, offset = seats % 2;
 	char SeatString[10] = { '\0' };
 	_BI->CurrentClass = CFirst;
+
 	for (int j = 0; j < _BI->PlaneInfo.FirstClassRows; j++) {
 		for (int i = 1; i <= seats / 2 + seats % 2; i++) {
 			GetSeatNumber(_BI, i, SeatString);
