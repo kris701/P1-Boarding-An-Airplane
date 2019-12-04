@@ -48,6 +48,8 @@ int main()
 		{
 			printf("How many runs?: \n");
 			scanf_s(" %d", &RunsToDo);
+
+			while (getchar() != '\n');
 		}
 
 		FILE* OutputFile;

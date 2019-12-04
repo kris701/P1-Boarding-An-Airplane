@@ -16,6 +16,8 @@ void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap, BasicSim
 
 	AssignPassengersToAvailableSeat(Count, _PersonList, _PlaneMap);
 
+	ScramblePassengers(_PersonList, Count);
+
 	AssignPassengerToNearestDoor(Count, _PersonList, _PlaneMap);
 }
 
@@ -111,6 +113,7 @@ bool AssignSeatByBoardinggroup(int BoardingGroup, Person* _Passenger, Map _Plane
 			if (TempLoc->BoardingGroup == BoardingGroup && TempLoc->IsTaken == false)
 			{
 				_Passenger->Target = TempLoc->Point;
+				_Passenger->BoardingGroup = BoardingGroup;
 				TempLoc->IsTaken = true;
 				return true;
 			}
@@ -118,4 +121,33 @@ bool AssignSeatByBoardinggroup(int BoardingGroup, Person* _Passenger, Map _Plane
 	}
 
 	return false;
+}
+
+void ScramblePassengers(Person _PassengerList[], int ArrayLength)
+{
+	int StartIndex = 0;
+	int EndIndex = 1;
+
+	while (StartIndex < ArrayLength)
+	{
+		if (_PassengerList[EndIndex].BoardingGroup != _PassengerList[StartIndex].BoardingGroup)
+		{
+			if (EndIndex - StartIndex > 1)
+			{
+				for (int i = StartIndex; i < EndIndex; i++)
+				{
+					int RandValue = GetRandomNumberRanged(StartIndex, EndIndex - 1);
+					while (RandValue == i)
+						RandValue = GetRandomNumberRanged(StartIndex, EndIndex - 1);
+					Person TmpPerson = _PassengerList[i];
+					_PassengerList[i] = _PassengerList[RandValue];
+					_PassengerList[RandValue] = TmpPerson;
+				}
+			}
+
+			StartIndex = EndIndex;
+		}
+
+		EndIndex++;
+	}
 }

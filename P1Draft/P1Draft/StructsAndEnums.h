@@ -40,6 +40,7 @@ typedef struct _Person
 	int StepsTaken;
 	bool MovedLastTurn;
 	Point NextMove;
+	int BoardingGroup;
 } Person;
 
 typedef struct _ValueStatistic
