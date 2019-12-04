@@ -25,7 +25,7 @@ int GetRandomNumberRanged(int _Min, int _Max)
 	return rand() % (_Max + 1 - _Min) + _Min;
 }
 
-Location* MapLocationGet(Map* map, int x, int y) {
+Location* GetMapLocation(Map* map, int x, int y) {
 	return &(map->Locations[y][x]);
 }
 

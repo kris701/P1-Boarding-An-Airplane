@@ -21,19 +21,26 @@ BasicSimulationRules ReadBasicRulesConfigFile(BasicSimulationRules _BaseRules, c
 		{
 			fgets(Buffer, BufferLength, BSRFile);
 
-			if (strstr(Buffer, "CrossDelay "))
+			if (strstr(Buffer, "MapName"))
+			{
+				SubStringBuffer = strchr(Buffer, '=') + 1;
+				SubStringBuffer[strlen(SubStringBuffer) - 1] = 0;
+				strcpy_s(_BaseRules.BoardingMethodFile, 128, SubStringBuffer);
+				continue;
+			}
+			if (strstr(Buffer, "CrossDelay"))
 			{
 				SubStringBuffer = strchr(Buffer, '=') + 1;
 				_BaseRules.CrossDelay = atoi(SubStringBuffer);
 				continue;
 			}
-			if (strstr(Buffer, "ShuffleDelay "))
+			if (strstr(Buffer, "ShuffleDelay"))
 			{
 				SubStringBuffer = strchr(Buffer, '=') + 1;
 				_BaseRules.ShuffleDelay = atoi(SubStringBuffer);
 				continue;
 			}
-			if (strstr(Buffer, "LuggageGen "))
+			if (strstr(Buffer, "LuggageGen"))
 			{
 				SubStringBuffer = strchr(Buffer, '=') + 1;
 
@@ -49,7 +56,7 @@ BasicSimulationRules ReadBasicRulesConfigFile(BasicSimulationRules _BaseRules, c
 				}
 				continue;
 			}
-			if (strstr(Buffer, "WalkspeedGen "))
+			if (strstr(Buffer, "WalkspeedGen"))
 			{
 				SubStringBuffer = strchr(Buffer, '=') + 1;
 

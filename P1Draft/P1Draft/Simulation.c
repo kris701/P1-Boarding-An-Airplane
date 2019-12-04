@@ -106,7 +106,7 @@ void PrintField(Person** _PassengerLocationMatrix[], Map _PlaneMap)
 				printf("%-*c", _PlaneMap.LongestDigit, _PassengerLocationMatrix[y][x]->PersonCharacter);
 			else
 			{
-				Location tmpLocation = *MapLocationGet(&_PlaneMap, x, y);
+				Location tmpLocation = *GetMapLocation(&_PlaneMap, x, y);
 				switch (tmpLocation.BoardingGroup) {
 				case BoardingGroup_Door:      printf("%-*c", _PlaneMap.LongestDigit, 'D'); break;
 				case BoardingGroup_Walkway:   printf("%-*c", _PlaneMap.LongestDigit, '|'); break;

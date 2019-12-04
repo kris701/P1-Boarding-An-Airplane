@@ -56,6 +56,7 @@ typedef struct _BasicSimulationRules
 	int LuggageGenerationValuesLength;
 	ValueStatistic* WalkingspeedGenerationValues;
 	int WalkingspeedGenerationValuesLength;
+	char BoardingMethodFile[128];
 } BasicSimulationRules;
 
 typedef struct _Location {

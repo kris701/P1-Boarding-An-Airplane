@@ -66,7 +66,7 @@ bool ReadMapFromFile(Map* _PlaneMap, FILE* _File)
                     if (sscanf_s(field, "%d", &tmpInt) == 1) 
 					{
 						MapLocationSetValue(_PlaneMap, x, y, tmpInt);
-						MapLocationGet(_PlaneMap, x, y)->IsTaken = 0;
+						GetMapLocation(_PlaneMap, x, y)->IsTaken = 0;
 						_PlaneMap->NumberOfSeats++;
                         x++;
                     }
@@ -90,7 +90,7 @@ bool ReadMapFromFile(Map* _PlaneMap, FILE* _File)
 
 void MapLocationSetValue(Map* _PlaneMap, int _X, int _Y, int Value) 
 {
-	MapLocationGet(_PlaneMap, _X, _Y)->BoardingGroup = Value;
+	GetMapLocation(_PlaneMap, _X, _Y)->BoardingGroup = Value;
 }
 
 bool AllocateMap(Map* _PlaneMap) 

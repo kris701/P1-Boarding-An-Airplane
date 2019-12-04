@@ -10,7 +10,7 @@ void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap, BasicSim
 	{
 		for (int x = 0; x < _PlaneMap.Width; x++)
 		{
-			MapLocationGet(&_PlaneMap, x, y)->IsTaken = false;
+			GetMapLocation(&_PlaneMap, x, y)->IsTaken = false;
 		}
 	}
 
@@ -107,7 +107,7 @@ bool AssignSeatByBoardinggroup(int BoardingGroup, Person* _Passenger, Map _Plane
 	{
 		for (int x = 0; x < _PlaneMap.Width; x++)
 		{
-			Location* MomentLoc = MapLocationGet(&_PlaneMap, x, y);
+			Location* MomentLoc = GetMapLocation(&_PlaneMap, x, y);
 			if (MomentLoc->BoardingGroup == BoardingGroup && MomentLoc->IsTaken == 0)
 			{
 				_Passenger->Target = MomentLoc->Point;

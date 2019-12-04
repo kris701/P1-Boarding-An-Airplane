@@ -20,12 +20,11 @@ int main()
 	srand(time(NULL));
 
 	FILE* PlaneMapFile;
-	char BoardingMethodFile[64] = { "steffenperfect.txt" };
-	fopen_s(&PlaneMapFile, BoardingMethodFile, "r");
+	fopen_s(&PlaneMapFile, BaseRules.BoardingMethodFile, "r");
 
 	if (PlaneMapFile != NULL)
 	{
-		printf("Using boarding method file: %s\n", BoardingMethodFile);
+		printf("Using boarding method file: %s\n", BaseRules.BoardingMethodFile);
 		ReadMapFromFile(&PlaneMap, PlaneMapFile);
 
 		PassengerList = calloc(PlaneMap.NumberOfSeats, sizeof(Person));
@@ -106,7 +105,7 @@ int main()
 
 			printf("\nFinished! Took %d ms and an avr of %d iterations pr run\n", (int)((((double)TotalWatchEnd - (double)TotalWatchStart) / CLOCKS_PER_SEC) * 1000), (AvrStepsTaken / RunsToDo));
 			if (SaveToFile == 'y')
-				printf("Using boarding method file: %s\n", BoardingMethodFile);
+				printf("Using boarding method file: %s\n", BaseRules.BoardingMethodFile);
 		}
 		else
 			printf("Error making output file");
