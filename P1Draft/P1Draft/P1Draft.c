@@ -337,14 +337,14 @@ void PrintField(Person* *_PassengerLocationMatrix[], Map _PlaneMap)
 				printf(" %c  ", _PassengerLocationMatrix[y][x]->PersonCharacter);
 			else
 			{
-				Location MomentLoc = *MapLocationGet(&_PlaneMap, x, y);
-				switch (MomentLoc.BoardingGroup) {
+				Location tmpLocation = *MapLocationGet(&_PlaneMap, x, y);
+				switch (tmpLocation.BoardingGroup) {
 					case BoardingGroup_Door:      printf(" D  "); break;
 					case BoardingGroup_Walkway:   printf(" |  "); break;
 					case BoardingGroup_Padding:   printf("    "); break;
 					case BoardingGroup_Undefined: printf(" U  "); break;
 					default:
-						printf("%-3d ", MomentLoc.BoardingGroup);
+						printf("%-3d ", tmpLocation.BoardingGroup);
 					break;
 				}
 			}
