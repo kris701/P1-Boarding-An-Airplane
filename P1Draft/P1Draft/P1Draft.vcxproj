@@ -164,12 +164,16 @@
     <ClCompile Include="GeneratePassengers.c" />
     <ClCompile Include="P1Draft.c" />
     <ClCompile Include="Map.c" />
+    <ClCompile Include="ReadSimulationConfig.c" />
+    <ClCompile Include="Simulation.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasicCalls.h" />
     <ClInclude Include="GeneratePassengers.h" />
     <ClInclude Include="Map.h" />
     <ClInclude Include="P1Draft.h" />
+    <ClInclude Include="ReadSimulationConfig.h" />
+    <ClInclude Include="Simulation.h" />
     <ClInclude Include="StructsAndEnums.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
