@@ -68,12 +68,10 @@ void ReadConfigFile(BoardingInfo* _BI, FILE* _FP) {
 					_BI->PlaneInfo.BoardingGroupRowCount = atoi(substring);
 				}
 				else if (strstr(str, "upper_door")) {
-                    printf("wefoinwe\n");
 					substring = strchr(str, '=') + 1;
 					_BI->PlaneInfo.UpperDoor = atoi(substring);
 				}
 				else if (strstr(str, "lower_door")) {
-                    printf("qebfouwb\n");
 					substring = strchr(str, '=') + 1;
 					_BI->PlaneInfo.LowerDoor = atoi(substring);
 				}
@@ -85,31 +83,31 @@ void ReadConfigFile(BoardingInfo* _BI, FILE* _FP) {
 FILE* SetBoardingMethod(BoardingInfo* _BI, FILE* _FP, int _Index) {
 	switch ((BoardingMethods)_Index) {
 	case BMRandom:
-		fopen_s(&_FP, "random.txt", "w");
+		fopen_s(&_FP, "Methods/random.txt", "w");
 		_BI->BoardingMethod = BMRandom;
 		break;
 	case BMWilma:
-		fopen_s(&_FP, "wilma.txt", "w");
+		fopen_s(&_FP, "Methods/wilma.txt", "w");
 		_BI->BoardingMethod = BMWilma;
 		break;
 	case BMFrontToBack:
-		fopen_s(&_FP, "fronttoback.txt", "w");
+		fopen_s(&_FP, "Methods/fronttoback.txt", "w");
 		_BI->BoardingMethod = BMFrontToBack;
 		break;
 	case BMBackToFront:
-		fopen_s(&_FP, "backtofront.txt", "w");
+		fopen_s(&_FP, "Methods/backtofront.txt", "w");
 		_BI->BoardingMethod = BMBackToFront;
 		break;
 	case BMSteffenModified:
-		fopen_s(&_FP, "steffenmodified.txt", "w");
+		fopen_s(&_FP, "Methods/steffenmodified.txt", "w");
 		_BI->BoardingMethod = BMSteffenModified;
 		break;
 	case BMJanModified:
-		fopen_s(&_FP, "janmodified.txt", "w");
+		fopen_s(&_FP, "Methods/janmodified.txt", "w");
 		_BI->BoardingMethod = BMJanModified;
 		break;
 	case BMSteffenPerfect:
-		fopen_s(&_FP, "steffenperfect.txt", "w");
+		fopen_s(&_FP, "Methods/steffenperfect.txt", "w");
 		_BI->BoardingMethod = BMSteffenPerfect;
 		break;
 	default:
