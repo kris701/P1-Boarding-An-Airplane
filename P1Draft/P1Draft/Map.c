@@ -6,7 +6,7 @@ bool ReadMapFromFile(Map* _PlaneMap, FILE* _File)
     _PlaneMap->Width  = GetSeatsPerLine(_File);
     _PlaneMap->Height = GetNumberOfLinesInFile(_File); 
 	_PlaneMap->DoorCount = GetNumberOfDoorsInBoardingMethod(_File);
-	_PlaneMap->HugestDigit = GetBiggestDigitLengthwise(_File);
+	_PlaneMap->LongestDigit = GetLongestDigitInFile(_File);
 
     if (AllocateMap(_PlaneMap) == false) 
 	{
@@ -196,7 +196,8 @@ int GetNumberOfDoorsInBoardingMethod(FILE* _File) {
 	return numberOfDoors;
 }
 
-int GetBiggestDigitLengthwise(FILE* _File) {
+int GetLongestDigitInFile(FILE* _File) 
+{
 	long int initialFileCursorLocation = ftell(_File);
 	fseek(_File, 0, SEEK_SET);
 
@@ -206,7 +207,8 @@ int GetBiggestDigitLengthwise(FILE* _File) {
 	while (!feof(_File))
 	{
 		tempChar = fgetc(_File);
-		if (tempChar == ',') {
+		if (tempChar == ',') 
+		{
 			if (DigitCharCounter > HugestDigit)
 				HugestDigit = DigitCharCounter;
 			DigitCharCounter = 0;
