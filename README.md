@@ -4,14 +4,13 @@ This is a university project, that simulates the boarding of passengers onto an 
 The boarding method generator creates several files, which represents the different boarding methods. A config file is used to decide how many rows, seats per row and doors there should be in the plane. The files are then used by the simulation to create the plane map.
 The simulation itself takes the input of the boarding method, a config file for the different static values used in the simulation, e.g. walking speed, luggage count etc. In the program you can choose whether you want to generate an output file for the simulation, which saves the time used by every run as well as the average time used by all runs.
 
-Output file: P1Draft/P1Draft/output.csv
+**Output file:** P1Draft/P1Draft/output.csv
 
-Boarding method config file: BoardingMethodGeneration/BoardingMethodGeneration/config.ini
+**Boarding method config file:** BoardingMethodGeneration/BoardingMethodGeneration/config.ini
 
-Simulation config file: P1Draft/P1Draft/config.ini
+**Simulation config file:** P1Draft/P1Draft/config.ini
 
-
-Boarding method config file:
+**Boarding method config file description:**
 
 first_class_rows - Amount of rows that are first class (boarded first)
 
@@ -22,9 +21,8 @@ upper_door - Boolean for whether the upper door should be there. 1: True  0: Fal
 
 lower_door - Boolean for whether the lower door should be there. 1: True  0: False
 
+**Simulation config file description:**
 
-
-Simulation config file:
 MapName - Name of the text file used for the simulation, e.g. steffenperfect.txt  This file contains the order passengers are boarded in, and is used to generate the map used by the simulation
 
 CrossDelay - Integer used to determine how long it should take for passengers to cross eachother on the aisle
