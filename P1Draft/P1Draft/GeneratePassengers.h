@@ -18,3 +18,4 @@ int GenerateWalkSpeed(BasicSimulationRules _BaseRules);
 bool AssignPassengersToAvailableSeat(int Count, Person _PassengerList[], Map _PlaneMap);
 bool AssignSeatByBoardinggroup(int BoardingGroup, Person* _Passenger, Map _PlaneMap);
 void AssignPassengerToNearestDoor(int Count, Person _PassengerList[], Map _PlaneMap);
+void ScramblePassengersInEachBoardingGroup(Person passengers[], int passengerLength, Map* map);

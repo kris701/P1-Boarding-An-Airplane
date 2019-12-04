@@ -28,6 +28,9 @@ int GetRandomNumberRanged(int _Min, int _Max)
 Location* GetMapLocation(Map* map, int x, int y) {
 	return &(map->Locations[y][x]);
 }
+Location* GetMapLocationFromPoint(Map* map, Point point) {
+	return GetMapLocation(map, point.X, point.Y);
+}
 
 int GetNumberOfCharsForLongestLineInFile(FILE* _File)
 {
@@ -67,4 +70,23 @@ int GetNumberOfLinesInFile(FILE* _File)
 
 	fseek(_File, initialFileCursorLocation, SEEK_SET);
 	return lines;
+}
+
+void ScrambleArray(void* arrayPtr, size_t arrayLength, size_t objectSize) {
+	int timesToSwitchElements = arrayLength;
+	for (int i = 0; i < timesToSwitchElements; i++) {
+		SwitchObjectsInMemory(
+			(void*)(((int)arrayPtr + (rand() % arrayLength))*objectSize),
+			(void*)(((int)arrayPtr + (rand() % arrayLength))*objectSize),
+			objectSize
+		);
+	}
+}
+
+void SwitchObjectsInMemory(void* object1, void* object2, size_t objectSize) {
+	for (size_t j = 0; j < objectSize; j++) {
+		char tmpByte = ((char*)object1)[j];
+		((char*)object2)[j] = ((char*)object1)[j];
+		((char*)object1)[j] = tmpByte;
+	}
 }
