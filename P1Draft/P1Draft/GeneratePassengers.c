@@ -15,7 +15,6 @@ void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap, BasicSim
 	}
 
 	AssignPassengersToAvailableSeat(Count, _PersonList, _PlaneMap);
-	ScramblePassengersInEachBoardingGroup(_PersonList, Count, &_PlaneMap);
 
 	ScramblePassengers(_PersonList, Count);
 
@@ -152,17 +151,3 @@ void ScramblePassengers(Person _PassengerList[], int ArrayLength)
 		EndIndex++;
 	}
 }
-
-void ScramblePassengersInEachBoardingGroup(Person passengers[], int passengerLength, Map* map) {
-	int currentBoardingGroup = 1;
-	int currentBoardingGroupStartIndex = 0;
-	for (int i = 0; i < passengerLength; i++) {
-		int tmpPassengerBoardingGroup = GetMapLocationFromPoint(map, passengers[i].Target)->BoardingGroup;
-		if (tmpPassengerBoardingGroup != currentBoardingGroup) {
-			ScrambleArray(passengers + currentBoardingGroupStartIndex, (size_t)(currentBoardingGroupStartIndex - (i-1)), sizeof(Person));
-			currentBoardingGroup = tmpPassengerBoardingGroup;
-			currentBoardingGroupStartIndex = i;
-		}
-	}
-}
-

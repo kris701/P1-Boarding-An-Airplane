@@ -14,6 +14,3 @@ Location* GetMapLocation(Map* map, int x, int y);
 Location* GetMapLocationFromPoint(Map* map, Point point);
 int GetNumberOfCharsForLongestLineInFile(FILE* _File);
 int GetNumberOfLinesInFile(FILE* _File);
-
-void ScrambleArray(void* arrayPtr[], size_t arrayLength, size_t objectSize);
-void SwitchObjectsInMemory(void* object1, void* object2, size_t objectSize);
