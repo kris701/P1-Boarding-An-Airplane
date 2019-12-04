@@ -17,6 +17,7 @@ first_class_rows - Amount of rows that are first class (boarded first)
 seats_per_row - Amount of seats placed in one row (this number takes both rows on each side of the aisle into consideration, e.g. if you   have four seats on each side of the aisle, write 8 here)
 
 boarding_group_size - Amount of rows the generator considers as one boarding group for boarding methods front-to-back and back-to-front
+
 upper_door - Boolean for whether the upper door should be there. 1: True  0: False
 
 lower_door - Boolean for whether the lower door should be there. 1: True  0: False
