@@ -21,7 +21,7 @@ int main()
 	srand(time(NULL));
 
 	FILE* mapfp;
-	fopen_s(&mapfp, "steffenperfect.txt", "r");
+	fopen_s(&mapfp, "backtofront.txt", "r");
 
 	if (mapfp != NULL)
 	{
