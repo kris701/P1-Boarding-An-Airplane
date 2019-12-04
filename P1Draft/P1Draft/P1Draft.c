@@ -20,7 +20,7 @@ int main()
 	srand(time(NULL));
 
 	FILE* PlaneMapFile;
-	char BoardingMethodFile[64] = "steffenperfect.txt";
+	char BoardingMethodFile[64] = { "steffenperfect.txt" };
 	fopen_s(&PlaneMapFile, BoardingMethodFile, "r");
 
 	if (PlaneMapFile != NULL)
