@@ -1,5 +1,6 @@
 #include "Simulation.h"
 
+// Function that runs the simulation
 void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool UpdateVisuals, int* _StepsTaken, Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
 	bool AllSeated = false;
@@ -9,11 +10,14 @@ void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool U
 
 	OneSecWatchStart = clock();
 
+	// While loop that runs when all aren't seated
 	while (!AllSeated)
 	{
 		AllSeated = true;
+		// For loop that goes through every passenger
 		for (int i = 0; i < _PlaneMap.NumberOfSeats; i++)
 		{
+			// If statement that checks if passenger isn't seated. If not it will move the passenger and go onto the next passenger
 			if (!_PassengerList[i].IsSeated)
 			{
 				AllSeated = false;
@@ -27,6 +31,7 @@ void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool U
 			}
 		}
 
+		// If statement that prints airplane visuals if it gets input yes
 		if (UpdateVisuals)
 		{
 			PrintField(_PassengerLocationMatrix, _PlaneMap);
@@ -48,12 +53,15 @@ void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool U
 	}
 }
 
+// Function that moves the passengers
 void PassengerMovement(Person* _Passenger, Person** _PassengerLocationMatrix[], Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
 	bool TookAStep = false;
 
+	// If statement that checks if passenger isn't in delay action
 	if (!IsInDelayAction(_Passenger, _PlaneMap))
 	{
+		// For loop that runs equal to the amount walkingspeed has been set to
 		for (int j = 0; j < _Passenger->WalkingSpeed; j++)
 		{
 			if (!IsPointEqual(_Passenger->CurrentPos, _Passenger->Target) || _Passenger->IsBackingUp)
@@ -93,6 +101,7 @@ void PassengerMovement(Person* _Passenger, Person** _PassengerLocationMatrix[], 
 	}
 }
 
+// Function for printing visual updates
 void PrintField(Person** _PassengerLocationMatrix[], Map _PlaneMap)
 {
 	system("cls");
@@ -122,9 +131,12 @@ void PrintField(Person** _PassengerLocationMatrix[], Map _PlaneMap)
 	}
 }
 
+// Function to check if passenger is on point
 bool IsAnyOnPoint(Person** _PassengerLocationMatrix[], Person* _Person, Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
 	Point NewPoint;
+
+	// If statement that checks if the passenger moved last turn to find out if there needs to be predicted a new point
 	if (_Person->MovedLastTurn)
 	{
 		NewPoint = PredictedPoint(_Person->CurrentPos, _Person->Target);
@@ -134,6 +146,7 @@ bool IsAnyOnPoint(Person** _PassengerLocationMatrix[], Person* _Person, Map _Pla
 	else
 		NewPoint = _Person->NextMove;
 
+	// If statement that checks if there is a passenger in the new point we just found. If there is it will find out where that passenger wants to move to
 	if (_PassengerLocationMatrix[NewPoint.Y][NewPoint.X] != NULL)
 	{
 		Person* OtherPerson = _PassengerLocationMatrix[NewPoint.Y][NewPoint.X];
@@ -179,6 +192,7 @@ bool IsAnyOnPoint(Person** _PassengerLocationMatrix[], Person* _Person, Map _Pla
 	return false;
 }
 
+// Function that predicts the next move for a passenger
 Point PredictedPoint(Point CurrentPoint, Point TargetPoint)
 {
 	Point NewPoint = { CurrentPoint.X, CurrentPoint.Y };
@@ -198,11 +212,14 @@ Point PredictedPoint(Point CurrentPoint, Point TargetPoint)
 	return NewPoint;
 }
 
+// Function that does shuffle dance
 void SendRowBack(Person** _PassengerLocationMatrix[], Person* _Person, Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
 	int CurrentXPosition = _Person->Target.X;
 	int DistanceToTargetSeat = abs(_Person->Target.X - _PlaneMap.Doors[_Person->StartingDoorID].X);
 	int InnerMostSeat = -1;
+
+	// While loop that runs while current x position are not equal to a passengers starting door id
 	while (CurrentXPosition != _PlaneMap.Doors[_Person->StartingDoorID].X)
 	{
 		if (_PassengerLocationMatrix[_Person->CurrentPos.Y][CurrentXPosition] != NULL)
@@ -227,11 +244,13 @@ void SendRowBack(Person** _PassengerLocationMatrix[], Person* _Person, Map _Plan
 	_Person->MovedLastTurn = true;
 }
 
+// Function that calculates how many steps it will take for a passenger to shuffle dance
 int BackupWaitSteps(int TargetSeat, int InnerBlockingSeat, int ExtraPenalty)
 {
 	return TargetSeat + InnerBlockingSeat + 2 + ExtraPenalty;
 }
 
+// Function that checks if a passenger is in delay action
 bool IsInDelayAction(Person* _Person, Map _PlaneMap)
 {
 	if (_Person->LuggageCount > 0)
