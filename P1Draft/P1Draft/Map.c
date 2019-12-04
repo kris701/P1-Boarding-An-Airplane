@@ -5,6 +5,7 @@ bool ReadMapFromFile(Map* _PlaneMap, FILE* _File)
     FreeMap(_PlaneMap);
     _PlaneMap->Width  = GetSeatsPerLine(_File);
     _PlaneMap->Height = GetNumberOfLinesInFile(_File); 
+	_PlaneMap->DoorCount = GetNumberOfDoorsInBoardingMethod(_File);
 
     if (AllocateMap(_PlaneMap) == false) 
 	{
@@ -46,7 +47,6 @@ bool ReadMapFromFile(Map* _PlaneMap, FILE* _File)
 					MapLocationSetValue(_PlaneMap, x, y, BoardingGroup_Door);
 					_PlaneMap->Doors[doorIndex].X = x;
 					_PlaneMap->Doors[doorIndex].Y = y;
-					_PlaneMap->DoorCount++;
 					doorIndex++;
 					x++;
 				break;
@@ -213,4 +213,22 @@ int GetNumberOfLinesInFile(FILE* _File)
 
     fseek(_File, initialFileCursorLocation, SEEK_SET);
     return lines;
+}
+
+int GetNumberOfDoorsInBoardingMethod(FILE* _File) {
+	long int initialFileCursorLocation = ftell(_File);
+	fseek(_File, 0, SEEK_SET);
+
+	int numberOfDoors = 0;
+	char ch1 = fgetc(_File), ch2;
+	while (!feof(_File)) {
+		ch2 = fgetc(_File);
+		if (ch1 == ',' && ch2 == 'D') {
+			numberOfDoors++;
+		}
+		ch1 = ch2;
+	}
+
+	fseek(_File, initialFileCursorLocation, SEEK_SET);
+	return numberOfDoors;
 }

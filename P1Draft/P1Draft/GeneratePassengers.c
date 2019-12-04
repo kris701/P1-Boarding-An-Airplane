@@ -15,13 +15,6 @@ void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap)
 	}
 
 	AssignPassengersToAvailableSeat(Count, _PersonList, _PlaneMap);
-
-	//switch (Index)
-	//{
-	//    case MI_Random:
-	//	    Method_Random(Count, _PersonList, _MDef);
-	//	    break;
-	//}
 }
 
 void GeneratePassenger(Person* Passenger, Map _PlaneMap) {
