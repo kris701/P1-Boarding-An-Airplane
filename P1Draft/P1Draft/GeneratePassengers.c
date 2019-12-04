@@ -107,11 +107,11 @@ bool AssignSeatByBoardinggroup(int BoardingGroup, Person* _Passenger, Map _Plane
 	{
 		for (int x = 0; x < _PlaneMap.Width; x++)
 		{
-			Location* MomentLoc = GetMapLocation(&_PlaneMap, x, y);
-			if (MomentLoc->BoardingGroup == BoardingGroup && MomentLoc->IsTaken == 0)
+			Location* TempLoc = GetMapLocation(&_PlaneMap, x, y);
+			if (TempLoc->BoardingGroup == BoardingGroup && TempLoc->IsTaken == false)
 			{
-				_Passenger->Target = MomentLoc->Point;
-				MomentLoc->IsTaken = 1;
+				_Passenger->Target = TempLoc->Point;
+				TempLoc->IsTaken = true;
 				return true;
 			}
 		}
