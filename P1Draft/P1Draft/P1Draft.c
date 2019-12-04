@@ -102,7 +102,8 @@ int main()
 			if (SaveToFile == 'y')
 				fclose(OutputFile);
 
-			printf("\n Finished! Took %d ms and an avr of %d iterations pr run\n", (int)((((double)TotalWatchEnd - (double)TotalWatchStart) / CLOCKS_PER_SEC) * 1000), (AvrStepsTaken / RunsToDo));
+			printf("\nFinished! Took %d ms and an avr of %d iterations pr run\n", (int)((((double)TotalWatchEnd - (double)TotalWatchStart) / CLOCKS_PER_SEC) * 1000), (AvrStepsTaken / RunsToDo));
+			//printf("Using boarding method file: %s\n", BoardingMethod);
 		}
 		else
 			printf("Error making output file");
@@ -330,26 +331,17 @@ void PrintField(Person* *_PassengerLocationMatrix[], Map _PlaneMap)
 		for (int x = 0; x < _PlaneMap.Width; x++)
 		{
 			if (_PassengerLocationMatrix[y][x] != NULL)
-				printf("%c ", _PassengerLocationMatrix[y][x]->PersonCharacter);
+				printf(" %c  ", _PassengerLocationMatrix[y][x]->PersonCharacter);
 			else
 			{
 				Location MomentLoc = *MapLocationGet(&_PlaneMap, x, y);
-				switch (MomentLoc.BoardingGroup)
-				{
-				case BoardingGroup_Door:
-					printf("D ");
-					break;
-				case BoardingGroup_Walkway:
-					printf("| ");
-					break;
-				case BoardingGroup_Padding:
-					printf("  ");
-					break;
-				case BoardingGroup_Undefined:
-					printf("U ");
-					break;
-				default:
-					printf(". ");
+				switch (MomentLoc.BoardingGroup) {
+					case BoardingGroup_Door:      printf(" D  "); break;
+					case BoardingGroup_Walkway:   printf(" |  "); break;
+					case BoardingGroup_Padding:   printf("    "); break;
+					case BoardingGroup_Undefined: printf(" U  "); break;
+					default:
+						printf("%-3d ", MomentLoc.BoardingGroup);
 					break;
 				}
 			}
