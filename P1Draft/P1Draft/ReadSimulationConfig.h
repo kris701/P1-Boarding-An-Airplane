@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "StructsAndEnums.h"
+#include "BasicCalls.h"
 
 BasicSimulationRules ReadBasicRulesConfigFile(BasicSimulationRules _BaseRules, const char* FileName);
 int FindValueBetweenChars(char* SubStringBuffer[], char FromChar, char ToChar);
