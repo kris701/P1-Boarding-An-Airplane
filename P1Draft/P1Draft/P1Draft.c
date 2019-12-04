@@ -17,6 +17,7 @@ int main()
 	Person *PassengerLocationMatrix[MaxRows][MaxSeatsPrRow];
 	clock_t TotalWatchStart, TotalWatchEnd, WatchStart, WatchEnd;
 
+	// These 3 while loops are getting input
 	while (UpdateGraphics != 'y' && UpdateGraphics != 'n')
 	{
 		printf("Update graphics? (y/n)\n");
@@ -85,6 +86,7 @@ int main()
 	return 0;
 }
 
+// Function that saves data from the run to a file
 void SaveRunDataToFile(FILE* _fp, Person _PassengerList[MaxPersons], int _RunTime, int RunNumber)
 {
 	for (int i = 1; i < MaxPersons; i++)
@@ -93,6 +95,7 @@ void SaveRunDataToFile(FILE* _fp, Person _PassengerList[MaxPersons], int _RunTim
 	}
 }
 
+// Function that runs the simulation
 void RunSim(Person _PassengerList[MaxPersons], Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], bool UpdateVisuals, int* _StepsTaken)
 {
 	bool AllSeated = false;
@@ -102,11 +105,14 @@ void RunSim(Person _PassengerList[MaxPersons], Person* _PassengerLocationMatrix[
 
 	OneSecWatchStart = clock();
 
+	// While loop that runs when all aren't seated
 	while (!AllSeated)
 	{
 		AllSeated = true;
+		// For loop that goes through every passenger
 		for (int i = 0; i < MaxPersons; i++)
 		{
+			// If statement that checks if passenger isn't seated. If not it will move the passenger and go onto the next passenger
 			if (!_PassengerList[i].IsSeated)
 			{
 				AllSeated = false;
@@ -120,6 +126,7 @@ void RunSim(Person _PassengerList[MaxPersons], Person* _PassengerLocationMatrix[
 			}
 		}
 
+		// If statement that prints airplane visuals if it gets input yes
 		if (UpdateVisuals)
 		{
 			PrintField(_PassengerLocationMatrix, BaseFieldData);
@@ -141,12 +148,15 @@ void RunSim(Person _PassengerList[MaxPersons], Person* _PassengerLocationMatrix[
 	}
 }
 
+// Function that moves the passengers
 void PassengerMovement(Person* _Passenger, Person *_PassengerLocationMatrix[MaxRows][MaxSeatsPrRow])
 {
 	bool TookAStep = false;
 
+	// If statement that checks if passenger isn't in delay action
 	if (!IsInDelayAction(_Passenger))
 	{
+		// For loop that runs equal to the amount walkingspeed has been set to
 		for (int j = 0; j < _Passenger->WalkingSpeed; j++)
 		{
 			if (!IsPointEqual(_Passenger->CurrentPos, _Passenger->Target) || _Passenger->IsBackingUp)
@@ -186,6 +196,7 @@ void PassengerMovement(Person* _Passenger, Person *_PassengerLocationMatrix[MaxR
 	}
 }
 
+// Function for printing visual updates
 void PrintField(Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], const char _BaseFieldData[MaxRows][MaxSeatsPrRow])
 {
 	system("cls");
@@ -204,9 +215,12 @@ void PrintField(Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], const 
 	}
 }
 
+// Function to check if passenger is on point
 bool IsAnyOnPoint(Person *_PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], Person *_Person)
 {
 	Point NewPoint;
+
+	// If statement that checks if the passenger moved last turn to find out if there needs to be predicted a new point
 	if (_Person->MovedLastTurn)
 	{
 		NewPoint = PredictedPoint(_Person->CurrentPos, _Person->Target);
@@ -216,6 +230,7 @@ bool IsAnyOnPoint(Person *_PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], Pers
 	else
 		NewPoint = _Person->NextMove;
 
+	// If statement that checks if there is a passenger in the new point we just found. If there is it will find out where that passenger wants to move to
 	if (_PassengerLocationMatrix[NewPoint.Y][NewPoint.X] != NULL)
 	{
 		Person* OtherPerson = _PassengerLocationMatrix[NewPoint.Y][NewPoint.X];
@@ -261,6 +276,7 @@ bool IsAnyOnPoint(Person *_PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], Pers
 	return false;
 }
 
+// Function that predicts the next move for a passenger
 Point PredictedPoint(Point CurrentPoint, Point TargetPoint)
 {
 	Point NewPoint = { CurrentPoint.X, CurrentPoint.Y };
@@ -280,22 +296,14 @@ Point PredictedPoint(Point CurrentPoint, Point TargetPoint)
 	return NewPoint;
 }
 
-Point PredictedPointInvX(Point _CurrentPos, XAxis TargX, XAxis DoorX)
-{
-	Point NewPoint = { _CurrentPos.X, _CurrentPos.Y };
-	if (TargX > DoorX)
-		NewPoint.X -= 1;
-	else
-		NewPoint.X += 1;
-
-	return NewPoint;
-}
-
+// Function that does shuffle dance
 void SendRowBack(Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], Person *_Person)
 {
 	int CurrentXPosition = _Person->Target.X;
 	int DistanceToTargetSeat = abs(_Person->Target.X - Doors[_Person->StartingDoorID].X);
 	int InnerMostSeat = -1;
+
+	// While loop that runs while current x position are not equal to a passengers starting door id
 	while (CurrentXPosition != Doors[_Person->StartingDoorID].X)
 	{
 		if (_PassengerLocationMatrix[_Person->CurrentPos.Y][CurrentXPosition] != NULL)
@@ -320,11 +328,13 @@ void SendRowBack(Person* _PassengerLocationMatrix[MaxRows][MaxSeatsPrRow], Perso
 	_Person->MovedLastTurn = true;
 }
 
+// Function that calculates how many steps it will take for a passenger to shuffle dance
 int BackupWaitSteps(int TargetSeat, int InnerBlockingSeat, int ExtraPenalty)
 {
 	return TargetSeat + InnerBlockingSeat + 2 + ExtraPenalty;
 }
 
+// Function that checks if a passenger is in delay action
 bool IsInDelayAction(Person* _Person)
 {
 	if (_Person->LuggageCount > 0)
