@@ -42,14 +42,14 @@ int OpenConfigFile(BoardingInfo* _BI, FILE* _FP) {
 }
 
 void ReadConfigFile(BoardingInfo* _BI, FILE* _FP) {
-	char str[128];
+	char str[258];
 	char* substring = "";
 	char* delimiter = "=";
-	for (int i = 0; i < 7; i++) {
+	for (int i = 0; i < 13; i++) {
 		// If there is text, which should really always be the case
-		if (fgets(str, 128, _FP) != NULL) {
+		if (fgets(str, 258, _FP) != NULL) {
 			// If the line isn't a comment
-			if (str[0] != ';') {
+			if (str[0] != ';' && str[0]!='\n') {
 				if (strstr(str, "first_class_rows")) {
 					substring = strchr(str, '=') + 1;
 					_BI->PlaneInfo.FirstClassRows = atoi(substring);
@@ -68,10 +68,12 @@ void ReadConfigFile(BoardingInfo* _BI, FILE* _FP) {
 					_BI->PlaneInfo.BoardingGroupRowCount = atoi(substring);
 				}
 				else if (strstr(str, "upper_door")) {
+                    printf("wefoinwe\n");
 					substring = strchr(str, '=') + 1;
 					_BI->PlaneInfo.UpperDoor = atoi(substring);
 				}
 				else if (strstr(str, "lower_door")) {
+                    printf("qebfouwb\n");
 					substring = strchr(str, '=') + 1;
 					_BI->PlaneInfo.LowerDoor = atoi(substring);
 				}
