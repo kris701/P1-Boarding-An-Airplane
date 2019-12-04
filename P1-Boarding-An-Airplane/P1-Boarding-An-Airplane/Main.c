@@ -1,4 +1,4 @@
-#include "P1Draft.h"
+#include "Main.h"
 
 int main()
 {
@@ -34,7 +34,6 @@ int main()
 			PassengerLocationMatrix[i] = calloc(PlaneMap.Width, sizeof(Person*));
 		}
 
-		// Gets input from user
 		while (UpdateGraphics != 'y' && UpdateGraphics != 'n')
 		{
 			printf("Update graphics? (y/n)\n");
