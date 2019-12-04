@@ -14,4 +14,4 @@ int GetSeatsPerLine(FILE* _File);
 int GetNumberOfCharsForLongestLineInFile(FILE* _File);
 int GetNumberOfLinesInFile(FILE* _File);
 void MapLocationSetValue(Map* _PlaneMap, int _X, int _Y, int Value);
-int GetNumberOfDoorsInBoardingMethod(FILE* file);
+int GetNumberOfDoorsInBoardingMethod(FILE* _File);

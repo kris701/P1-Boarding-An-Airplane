@@ -215,29 +215,20 @@ int GetNumberOfLinesInFile(FILE* _File)
     return lines;
 }
 
-int GetNumberOfDoorsInBoardingMethod(FILE* file) {
-	long int initialFileCursorLocation = ftell(file);
-	fseek(file, 0, SEEK_SET);
-
-	/*int numberOfDoors = 0;
-	char ch1 = fgetc(file), ch2;
-	while (ch2 = fgetc(file) != EOF) {
-		if (ch1 == ',' && ch2 == 'D') {
-			numberOfDoors++;
-		}
-		ch1 = ch2;
-		fseek(file, 1, SEEK_CUR);
-	}*/
+int GetNumberOfDoorsInBoardingMethod(FILE* _File) {
+	long int initialFileCursorLocation = ftell(_File);
+	fseek(_File, 0, SEEK_SET);
 
 	int numberOfDoors = 0;
-	char ch1 = fgetc(file), ch2;
-	while ((ch2 = fgetc(file)) != EOF) {
+	char ch1 = fgetc(_File), ch2;
+	while (!feof(_File)) {
+		ch2 = fgetc(_File);
 		if (ch1 == ',' && ch2 == 'D') {
 			numberOfDoors++;
 		}
 		ch1 = ch2;
 	}
 
-	fseek(file, initialFileCursorLocation, SEEK_SET);
+	fseek(_File, initialFileCursorLocation, SEEK_SET);
 	return numberOfDoors;
 }
