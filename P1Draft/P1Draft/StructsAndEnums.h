@@ -71,4 +71,5 @@ typedef struct _Map {
 	Point* Doors;
 	int DoorCount;
 	int NumberOfSeats;
+	int HugestDigit;
 } Map;
