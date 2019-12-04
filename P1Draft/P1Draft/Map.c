@@ -181,13 +181,14 @@ int GetNumberOfDoorsInBoardingMethod(FILE* _File) {
 	fseek(_File, 0, SEEK_SET);
 
 	int numberOfDoors = 0;
-	char ch1 = fgetc(_File), ch2;
-	while (!feof(_File)) {
-		ch2 = fgetc(_File);
-		if (ch1 == ',' && ch2 == 'D') {
+	char ch1;
+	while (!feof(_File)) 
+	{
+		ch1 = fgetc(_File);
+		if (ch1 == 'D') 
+		{
 			numberOfDoors++;
 		}
-		ch1 = ch2;
 	}
 
 	fseek(_File, initialFileCursorLocation, SEEK_SET);
