@@ -66,7 +66,7 @@ bool ReadMapFromFile(Map* _PlaneMap, FILE* _File)
                     if (sscanf_s(field, "%d", &tmpInt) == 1) 
 					{
 						MapLocationSetValue(_PlaneMap, x, y, tmpInt);
-						GetMapLocation(_PlaneMap, x, y)->IsTaken = 0;
+						GetMapLocation(_PlaneMap, x, y)->IsTaken = false;
 						_PlaneMap->NumberOfSeats++;
                         x++;
                     }
