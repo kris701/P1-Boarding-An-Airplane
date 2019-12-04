@@ -13,19 +13,18 @@ int main()
 	Person*** PassengerLocationMatrix;
 	clock_t TotalWatchStart, TotalWatchEnd, WatchStart, WatchEnd;
 	Map PlaneMap = { 0 };
+	BasicSimulationRules BaseRules = { 0 };
 
-	// Momentary, read from file, maybe a config file
-	PlaneMap.SSR.CrossDelay = 0;
-	PlaneMap.SSR.ShuffleDelay = 5;
+	BaseRules = ReadBasicRulesConfigFile(BaseRules, "config.ini");
 
 	srand(time(NULL));
 
-	FILE* mapfp;
-	fopen_s(&mapfp, "steffenperfect.txt", "r");
+	FILE* PlaneMapFile;
+	fopen_s(&PlaneMapFile, "steffenperfect.txt", "r");
 
-	if (mapfp != NULL)
+	if (PlaneMapFile != NULL)
 	{
-		ReadMapFromFile(&PlaneMap, mapfp);
+		ReadMapFromFile(&PlaneMap, PlaneMapFile);
 
 		PassengerList = calloc(PlaneMap.NumberOfSeats, sizeof(Person));
 
@@ -74,11 +73,11 @@ int main()
 					}
 				}
 
-				GeneratePassengers(PlaneMap.NumberOfSeats, PassengerList, PlaneMap);
+				GeneratePassengers(PlaneMap.NumberOfSeats, PassengerList, PlaneMap, BaseRules);
 
 				WatchStart = clock();
 
-				RunSim(PassengerList, PassengerLocationMatrix, UpdateGraphics == 'y', &StepsTaken, PlaneMap);
+				RunSim(PassengerList, PassengerLocationMatrix, UpdateGraphics == 'y', &StepsTaken, PlaneMap, BaseRules);
 
 				WatchEnd = clock();
 
@@ -117,7 +116,7 @@ int main()
 	return 0;
 }
 
-void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool UpdateVisuals, int* _StepsTaken, Map _PlaneMap)
+void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool UpdateVisuals, int* _StepsTaken, Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
 	bool AllSeated = false;
 	clock_t OneSecWatchStart, OneSecWatchEnd;
@@ -135,7 +134,7 @@ void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool U
 			{
 				AllSeated = false;
 
-				PassengerMovement(&_PassengerList[i], _PassengerLocationMatrix, _PlaneMap);
+				PassengerMovement(&_PassengerList[i], _PassengerLocationMatrix, _PlaneMap, _BaseRules);
 
 				if (IsPointEqual(_PassengerList[i].CurrentPos, _PassengerList[i].Target) && !_PassengerList[i].IsBackingUp)
 				{
@@ -165,7 +164,118 @@ void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool U
 	}
 }
 
-void PassengerMovement(Person* _Passenger, Person** _PassengerLocationMatrix[], Map _PlaneMap)
+BasicSimulationRules ReadBasicRulesConfigFile(BasicSimulationRules _BaseRules, const char* FileName)
+{
+	FILE* BSRFile;
+	fopen_s(&BSRFile, FileName, "r");
+
+	if (BSRFile != NULL)
+	{
+		int BufferLength = GetNumberOfCharsForLongestLineInFile(BSRFile);
+		char* Buffer = calloc(BufferLength, sizeof(char));
+		char* SubStringBuffer = calloc(BufferLength, sizeof(char));
+
+		if (Buffer == NULL || BufferLength == 0)
+		{
+			printf("Error reading config file!");
+			return _BaseRules;
+		}
+
+		while (!feof(BSRFile))
+		{
+			fgets(Buffer, BufferLength, BSRFile);
+
+			if (strstr(Buffer, "CrossDelay "))
+			{
+				SubStringBuffer = strchr(Buffer, '=') + 1;
+				_BaseRules.CrossDelay = atoi(SubStringBuffer);
+				continue;
+			}
+			if (strstr(Buffer, "ShuffleDelay "))
+			{
+				SubStringBuffer = strchr(Buffer, '=') + 1;
+				_BaseRules.ShuffleDelay = atoi(SubStringBuffer);
+				continue;
+			}
+			if (strstr(Buffer, "LuggageGen "))
+			{
+				SubStringBuffer = strchr(Buffer, '=') + 1;
+				
+				int ItemCount = 0;
+				for (int i = 0; i < BufferLength; i++)
+				{
+					if (SubStringBuffer[i] == '[')
+						ItemCount++;
+				}
+
+				_BaseRules.LuggageGenerationValues = calloc(ItemCount, sizeof(ValueStatistic));
+				_BaseRules.LuggageGenerationValuesLength = ItemCount;
+
+				for (int i = 0; i < ItemCount; i++)
+				{
+					_BaseRules.LuggageGenerationValues[i].Value = FindValueBetweenChars(&SubStringBuffer, '[', ',');
+					_BaseRules.LuggageGenerationValues[i].Possibility = FindValueBetweenChars(&SubStringBuffer, ',', ']');
+				}
+				continue;
+			}
+			if (strstr(Buffer, "WalkspeedGen "))
+			{
+				SubStringBuffer = strchr(Buffer, '=') + 1;
+
+				int ItemCount = 0;
+				for (int i = 0; i < BufferLength; i++)
+				{
+					if (SubStringBuffer[i] == '[')
+						ItemCount++;
+				}
+
+				_BaseRules.WalkingspeedGenerationValues = calloc(ItemCount, sizeof(ValueStatistic));
+				_BaseRules.WalkingspeedGenerationValuesLength = ItemCount;
+
+				for (int i = 0; i < ItemCount; i++)
+				{
+					_BaseRules.WalkingspeedGenerationValues[i].Value = FindValueBetweenChars(&SubStringBuffer, '[', ',');
+					_BaseRules.WalkingspeedGenerationValues[i].Possibility = FindValueBetweenChars(&SubStringBuffer, ',', ']');
+				}
+
+				continue;
+			}
+		}
+
+		free(Buffer);
+	}
+	else
+	{
+		_BaseRules.CrossDelay = 0;
+		_BaseRules.ShuffleDelay = 0;
+		_BaseRules.LuggageGenerationValuesLength = 0;
+		_BaseRules.WalkingspeedGenerationValuesLength = 0;
+	}
+
+	return _BaseRules;
+}
+
+int FindValueBetweenChars(char* SubStringBuffer[], char FromChar, char ToChar)
+{
+	*SubStringBuffer = strchr(*SubStringBuffer, FromChar) + 1;
+	int IndexOffset = 0;
+	char NumVal[100] = { 0 };
+	for (int j = 0; j < 100; j++)
+	{
+		if ((*SubStringBuffer)[j] != ']')
+		{
+			NumVal[IndexOffset] = (*SubStringBuffer)[j];
+			IndexOffset++;
+		}
+		else
+			break;
+	}
+	*SubStringBuffer = strchr(*SubStringBuffer, ToChar);
+
+	return atoi(NumVal);
+}
+
+void PassengerMovement(Person* _Passenger, Person** _PassengerLocationMatrix[], Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
 	bool TookAStep = false;
 
@@ -187,7 +297,7 @@ void PassengerMovement(Person* _Passenger, Person** _PassengerLocationMatrix[], 
 				}
 				else
 				{
-					if (!IsAnyOnPoint(_PassengerLocationMatrix, _Passenger, _PlaneMap))
+					if (!IsAnyOnPoint(_PassengerLocationMatrix, _Passenger, _PlaneMap, _BaseRules))
 					{
 						_PassengerLocationMatrix[_Passenger->NextMove.Y][_Passenger->NextMove.X] = _Passenger;
 						_PassengerLocationMatrix[_Passenger->CurrentPos.Y][_Passenger->CurrentPos.X] = NULL;
@@ -248,7 +358,7 @@ void PrintField(Person* *_PassengerLocationMatrix[], Map _PlaneMap)
 	}
 }
 
-bool IsAnyOnPoint(Person* *_PassengerLocationMatrix[], Person *_Person, Map _PlaneMap)
+bool IsAnyOnPoint(Person* *_PassengerLocationMatrix[], Person *_Person, Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
 	Point NewPoint;
 	if (_Person->MovedLastTurn)
@@ -276,7 +386,7 @@ bool IsAnyOnPoint(Person* *_PassengerLocationMatrix[], Person *_Person, Map _Pla
 		// Shuffle dance
 		if (_Person->Target.Y == OtherPerson->Target.Y && _Person->CurrentPos.Y == _Person->Target.Y)
 		{
-			SendRowBack(_PassengerLocationMatrix, _Person, _PlaneMap);
+			SendRowBack(_PassengerLocationMatrix, _Person, _PlaneMap, _BaseRules);
 
 			return true;
 		}
@@ -285,12 +395,12 @@ bool IsAnyOnPoint(Person* *_PassengerLocationMatrix[], Person *_Person, Map _Pla
 		if (IsPointEqual(SecondNewPoint, _Person->CurrentPos))
 		{
 			OtherPerson->CurrentPos = SecondNewPoint;
-			OtherPerson->CrossDelay = _PlaneMap.SSR.CrossDelay;
+			OtherPerson->CrossDelay = _BaseRules.CrossDelay;
 			OtherPerson->MovedLastTurn = true;
 			_PassengerLocationMatrix[SecondNewPoint.Y][SecondNewPoint.X] = OtherPerson;
 
 			_Person->CurrentPos = NewPoint;
-			_Person->CrossDelay = _PlaneMap.SSR.CrossDelay;
+			_Person->CrossDelay = _BaseRules.CrossDelay;
 			_Person->MovedLastTurn = true;
 			_PassengerLocationMatrix[NewPoint.Y][NewPoint.X] = _Person;
 
@@ -324,7 +434,7 @@ Point PredictedPoint(Point CurrentPoint, Point TargetPoint)
 	return NewPoint;
 }
 
-void SendRowBack(Person* *_PassengerLocationMatrix[], Person *_Person, Map _PlaneMap)
+void SendRowBack(Person* *_PassengerLocationMatrix[], Person *_Person, Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
 	int CurrentXPosition = _Person->Target.X;
 	int DistanceToTargetSeat = abs(_Person->Target.X - _PlaneMap.Doors[_Person->StartingDoorID].X);
@@ -338,7 +448,7 @@ void SendRowBack(Person* *_PassengerLocationMatrix[], Person *_Person, Map _Plan
 				InnerMostSeat = abs(MomentPerson->Target.X - _PlaneMap.Doors[_Person->StartingDoorID].X);
 
 			MomentPerson->IsBackingUp = true;
-			MomentPerson->ShuffleDelay = BackupWaitSteps(DistanceToTargetSeat, InnerMostSeat, _PlaneMap.SSR.ShuffleDelay);
+			MomentPerson->ShuffleDelay = BackupWaitSteps(DistanceToTargetSeat, InnerMostSeat, _BaseRules.ShuffleDelay);
 			MomentPerson->MovedLastTurn = true;
 		}
 
@@ -349,7 +459,7 @@ void SendRowBack(Person* *_PassengerLocationMatrix[], Person *_Person, Map _Plan
 	}
 
 	_Person->IsBackingUp = true;
-	_Person->ShuffleDelay = BackupWaitSteps(DistanceToTargetSeat, InnerMostSeat, _PlaneMap.SSR.ShuffleDelay);
+	_Person->ShuffleDelay = BackupWaitSteps(DistanceToTargetSeat, InnerMostSeat, _BaseRules.ShuffleDelay);
 	_Person->MovedLastTurn = true;
 }
 

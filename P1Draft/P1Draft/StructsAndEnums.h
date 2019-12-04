@@ -42,11 +42,21 @@ typedef struct _Person
 	Point NextMove;
 } Person;
 
-typedef struct _BaseSimulationRules
+typedef struct _ValueStatistic
+{
+	int Value;
+	int Possibility;
+} ValueStatistic;
+
+typedef struct _BasicSimulationRules
 {
 	int ShuffleDelay;
 	int CrossDelay;
-} StaticSimulationRules;
+	ValueStatistic* LuggageGenerationValues;
+	int LuggageGenerationValuesLength;
+	ValueStatistic* WalkingspeedGenerationValues;
+	int WalkingspeedGenerationValuesLength;
+} BasicSimulationRules;
 
 typedef struct _Location {
 	Point Point;
@@ -61,5 +71,4 @@ typedef struct _Map {
 	Point* Doors;
 	int DoorCount;
 	int NumberOfSeats;
-	StaticSimulationRules SSR;
 } Map;

@@ -1,4 +1,4 @@
-#include "BasicCalls.h"
+﻿#include "BasicCalls.h"
 
 bool IsPointEqual(Point A, Point B)
 {
@@ -27,4 +27,44 @@ int GetRandomNumberRanged(int _Min, int _Max)
 
 Location* MapLocationGet(Map* map, int x, int y) {
 	return &(map->Locations[y][x]);
+}
+
+int GetNumberOfCharsForLongestLineInFile(FILE* _File)
+{
+	// Goes through each line and finds the longest
+	int tmpWidth = 0, highestWidth = 0;
+	long int initialFileCursorLocation = ftell(_File);
+	fseek(_File, 0, SEEK_SET);
+
+	char ch;
+	while (!feof(_File))
+	{
+		ch = fgetc(_File);
+		tmpWidth++;
+		if (ch == '\n')
+		{
+			highestWidth = max(tmpWidth, highestWidth);
+			tmpWidth = 0;
+		}
+	}
+
+	fseek(_File, initialFileCursorLocation, SEEK_SET);
+	return highestWidth + 1; // Null-byte
+}
+
+int GetNumberOfLinesInFile(FILE* _File)
+{
+	int lines = 1; // Begins at line 1, if one \n is occured, then there are 2 lines
+	long int initialFileCursorLocation = ftell(_File);
+	fseek(_File, 0, SEEK_SET);
+
+	char ch;
+	while (!feof(_File))
+	{
+		ch = fgetc(_File);
+		if (ch == '\n') lines++;
+	}
+
+	fseek(_File, initialFileCursorLocation, SEEK_SET);
+	return lines;
 }

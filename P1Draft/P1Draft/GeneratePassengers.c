@@ -1,9 +1,9 @@
 #include "GeneratePassengers.h"
 
-void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap)
+void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
     for (int i = 0; i < Count; i++) {
-        GeneratePassenger(&(_PersonList[i]), _PlaneMap);
+        GeneratePassenger(&(_PersonList[i]), _PlaneMap, _BaseRules);
     }
 
 	for (int y = 0; y < _PlaneMap.Height; y++)
@@ -15,17 +15,19 @@ void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap)
 	}
 
 	AssignPassengersToAvailableSeat(Count, _PersonList, _PlaneMap);
+
+	AssignPassengerToNearestDoor(Count, _PersonList, _PlaneMap);
 }
 
-void GeneratePassenger(Person* Passenger, Map _PlaneMap) {
-    Passenger->WalkingSpeed = GenerateWalkSpeed(Passenger);
+void GeneratePassenger(Person* Passenger, Map _PlaneMap, BasicSimulationRules _BaseRules) {
+    Passenger->WalkingSpeed = GenerateWalkSpeed(_BaseRules);
 
-    Passenger->StartingDoorID = GetStartingDoorID(Passenger, _PlaneMap);
-    Passenger->CurrentPos = _PlaneMap.Doors[Passenger->StartingDoorID];
+    Passenger->StartingDoorID = 0;
+	Passenger->CurrentPos = SetPoint(0,0);
     Passenger->IsSeated = false;
     Passenger->PersonCharacter = 'P';
 
-    Passenger->LuggageCount = GenerateLuggage(Passenger);
+    Passenger->LuggageCount = GenerateLuggage(_BaseRules);
 
     Passenger->IsBackingUp = false;
     Passenger->ShuffleDelay = 0;
@@ -36,18 +38,55 @@ void GeneratePassenger(Person* Passenger, Map _PlaneMap) {
 	Passenger->NextMove = SetPoint(0,0);
 }
 
-// Read these from config file instead? As well as the SSR.
-int GenerateLuggage(const Person* Passenger) {
-    return GetRandomNumberRanged(2, 6);
+int GenerateLuggage(BasicSimulationRules _BaseRules)
+{
+	int ChanceValue = GetRandomNumberRanged(1, 100);
+	int ChanceOffset = 0;
+	for (int i = 0; i < _BaseRules.LuggageGenerationValuesLength; i++)
+	{
+		if (ChanceValue <= (_BaseRules.LuggageGenerationValues[i].Possibility + ChanceOffset))
+			return _BaseRules.LuggageGenerationValues[i].Value;
+		ChanceOffset += _BaseRules.LuggageGenerationValues[i].Possibility;
+	}
+
+    return 0;
 }
 
-// Take the door closet? Or also make that configurable?
-int GetStartingDoorID(const Person* Passenger, Map _PlaneMap) {
-    return GetRandomNumberRanged(0, _PlaneMap.DoorCount - 1);
+int GetStartingDoorID(Person* Passenger, Map _PlaneMap) 
+{
+	int MinLength = 9999;
+	int TargetIndex = 0;
+	for (int i = 0; i < _PlaneMap.DoorCount; i++)
+	{
+		if (abs(_PlaneMap.Doors[i].Y - Passenger->Target.Y) < MinLength)
+		{
+			MinLength = abs(_PlaneMap.Doors[i].Y - Passenger->Target.Y);
+			TargetIndex = i;
+		}
+	}
+	return TargetIndex;
 }
 
-int GenerateWalkSpeed(const Person* Passenger) {
-    return GetRandomNumberRanged(1, 2);
+int GenerateWalkSpeed(BasicSimulationRules _BaseRules)
+{
+	int ChanceValue = GetRandomNumberRanged(1, 100);
+	int ChanceOffset = 0;
+	for (int i = 0; i < _BaseRules.WalkingspeedGenerationValuesLength; i++)
+	{
+		if (ChanceValue <= (_BaseRules.WalkingspeedGenerationValues[i].Possibility + ChanceOffset))
+			return _BaseRules.WalkingspeedGenerationValues[i].Value;
+		ChanceOffset += _BaseRules.WalkingspeedGenerationValues[i].Possibility;
+	}
+
+	return 0;
+}
+
+void AssignPassengerToNearestDoor(int Count, Person _PassengerList[], Map _PlaneMap)
+{
+	for (int i = 0; i < Count; i++) {
+		_PassengerList[i].StartingDoorID = GetStartingDoorID(&_PassengerList[i], _PlaneMap);
+		_PassengerList[i].CurrentPos = _PlaneMap.Doors[_PassengerList[i].StartingDoorID];
+	}
 }
 
 bool AssignPassengersToAvailableSeat(int Count, Person _PassengerList[], Map _PlaneMap) {
