@@ -21,7 +21,8 @@ int main()
 	srand(time(NULL));
 
 	FILE* mapfp;
-	fopen_s(&mapfp, "steffenperfect.txt", "r");
+	char BoardingMethod[32] = "steffenperfect.txt";
+	fopen_s(&mapfp, BoardingMethod, "r");
 
 	if (mapfp != NULL)
 	{
@@ -103,7 +104,8 @@ int main()
 			if (SaveToFile == 'y')
 				fclose(OutputFile);
 
-			printf("\n Finished! Took %d ms and an avr of %d iterations pr run\n", (int)((((double)TotalWatchEnd - (double)TotalWatchStart) / CLOCKS_PER_SEC) * 1000), (AvrStepsTaken / RunsToDo));
+			printf("\nFinished! Took %d ms and an avr of %d iterations pr run\n", (int)((((double)TotalWatchEnd - (double)TotalWatchStart) / CLOCKS_PER_SEC) * 1000), (AvrStepsTaken / RunsToDo));
+			printf("Using boarding method file: %s\n", BoardingMethod);
 		}
 		else
 			printf("Error making output file");
