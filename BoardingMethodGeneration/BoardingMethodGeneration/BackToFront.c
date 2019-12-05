@@ -1,5 +1,10 @@
 #include "BackToFront.h"
 
+void SetBackToFrontMethod(BoardingInfo* _BI) {
+	_BI->BoardingMethod.BoardingMethod = BMBackToFront;
+	_BI->BoardingMethod.FileName = "Methods/backtofront.txt";
+}
+
 int GetSeatForBackToFront(BoardingInfo* _BI, int _SeatIndex) {
 	int rowCount = ((_BI->CurrentClass == CFirst) ? _BI->PlaneInfo.FirstClassRows : _BI->PlaneInfo.PeasentClassRows);
 	return  (_BI->PeasentClassBoardingGroupOffset +

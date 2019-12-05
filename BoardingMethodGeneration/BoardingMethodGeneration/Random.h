@@ -2,5 +2,6 @@
 
 #include "GlobalVariableTypes.h"
 
-int GetSeatForRandom(BoardingInfo *_BI);
+void SetRandomMethod(BoardingInfo* _BI);
+int GetSeatForRandom(BoardingInfo *_BI, int _SeatIndex);
 int GetPeasentOffsetForRandom(BoardingInfo _BI);

@@ -1,5 +1,10 @@
 #include "SteffenModified.h"
 
+void SetSteffenModifiedMethod(BoardingInfo* _BI) {
+	_BI->BoardingMethod.BoardingMethod = BMSteffenModified;
+	_BI->BoardingMethod.FileName = "Methods/steffenmodified.txt";
+}
+
 int GetSeatForSteffenModified(BoardingInfo* _BI, int _SeatIndex) {
 	int rowCount = ((_BI->CurrentClass == CFirst) ? _BI->PlaneInfo.FirstClassRows : _BI->PlaneInfo.PeasentClassRows);
 	return  (_BI->PeasentClassBoardingGroupOffset +

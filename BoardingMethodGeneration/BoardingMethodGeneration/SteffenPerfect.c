@@ -1,5 +1,10 @@
 #include "SteffenPerfect.h"
 
+void SetSteffenperfectMethod(BoardingInfo* _BI) {
+	_BI->BoardingMethod.BoardingMethod = BMSteffenPerfect;
+	_BI->BoardingMethod.FileName = "Methods/steffenperfect.txt";
+}
+
 int GetSeatForSteffenPerfect(BoardingInfo* _BI, int _SeatIndex) {
 	int rowCount = ((_BI->CurrentClass == CFirst) ? _BI->PlaneInfo.FirstClassRows : _BI->PlaneInfo.PeasentClassRows);
 	int SeatsPerRow = ((_BI->CurrentClass == CFirst) ? _BI->PlaneInfo.FirstClassSeatsPerRow : _BI->PlaneInfo.SeatsPerRow);

@@ -1,5 +1,10 @@
 #include "JanModified.h"
 
+void SetJanModifiedMethod(BoardingInfo* _BI) {
+	_BI->BoardingMethod.BoardingMethod = BMJanModified;
+	_BI->BoardingMethod.FileName = "Methods/janmodified.txt";
+}
+
 // This was made by accident
 int GetSeatForJanModified(BoardingInfo* _BI, int _SeatIndex) {
 	int rowCount = ((_BI->CurrentClass == CFirst) ? _BI->PlaneInfo.FirstClassRows : _BI->PlaneInfo.PeasentClassRows);

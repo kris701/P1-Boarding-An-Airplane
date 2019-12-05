@@ -12,7 +12,6 @@ int main(void) {
 		return 0;
 	}
 
-
 	for (int i = 0; i < 7; i++) {
 		FP = SetBoardingMethod(&BI, FP, i);
 		BI = ResetBI(BI);
@@ -79,8 +78,6 @@ void ReadConfigFile(BoardingInfo* _BI, FILE* _FP) {
 		}
 	}
 }
-
-
 
 BoardingInfo ResetBI(BoardingInfo _BI) {
 	_BI.CurrentBoardingGroup = 1;

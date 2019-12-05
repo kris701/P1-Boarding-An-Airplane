@@ -1,4 +1,5 @@
 #pragma once
+#include "GlobalVariableTypes.h"
 
 typedef enum BoardingMethods {
 	BMRandom,
@@ -15,6 +16,11 @@ typedef enum Classes {
 	CPeasent
 } Classes;
 
+typedef struct BoardingMethod {
+	BoardingMethods BoardingMethod;
+	char* FileName;
+} BoardingMethod;
+
 typedef struct PlaneInformation {
 	int FirstClassRows;
 	int PeasentClassRows;
@@ -26,10 +32,11 @@ typedef struct PlaneInformation {
 
 typedef struct BoardingInfo {
 	PlaneInformation PlaneInfo;
-	BoardingMethods BoardingMethod;
+	BoardingMethod BoardingMethod;
 	int CurrentBoardingGroup;
 	int PeasentClassBoardingGroupOffset;
 	int BoardingGroupRowCounter;
 	int SeatCounter;
 	Classes CurrentClass;
 } BoardingInfo;
+

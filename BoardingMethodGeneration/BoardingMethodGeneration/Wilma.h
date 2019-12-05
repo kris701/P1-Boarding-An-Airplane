@@ -2,5 +2,6 @@
 
 #include "GlobalVariableTypes.h"
 
-int GetSeatForWilma(int _SeatIndex, BoardingInfo* _BI);
+void SetWilmaMethod(BoardingInfo* _BI);
+int GetSeatForWilma(BoardingInfo* _BI, int _SeatIndex);
 int GetPeasentOffsetForWilma(BoardingInfo _BI);

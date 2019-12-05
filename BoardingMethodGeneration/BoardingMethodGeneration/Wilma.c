@@ -1,6 +1,13 @@
 #include "Wilma.h"
 
-int GetSeatForWilma(int _SeatIndex, BoardingInfo *_BI) {
+void SetWilmaMethod(BoardingInfo* _BI) {
+	_BI->BoardingMethod.BoardingMethod = BMWilma;
+	_BI->BoardingMethod.FileName = "Methods/wilma.txt";
+}
+
+
+
+int GetSeatForWilma(BoardingInfo *_BI, int _SeatIndex) {
 	return _SeatIndex + _BI->PeasentClassBoardingGroupOffset;
 }
 
