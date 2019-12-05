@@ -13,15 +13,66 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Boarding Methods">
+      <UniqueIdentifier>{13ae1daa-cf46-4ace-ab12-bc1681158fe9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Boarding Methods">
+      <UniqueIdentifier>{b3610769-bea0-476a-b963-2766478a7b71}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="BoardingMethods.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BackToFront.c">
+      <Filter>Source Files\Boarding Methods</Filter>
+    </ClCompile>
+    <ClCompile Include="FrontToBack.c">
+      <Filter>Source Files\Boarding Methods</Filter>
+    </ClCompile>
+    <ClCompile Include="SteffenModified.c">
+      <Filter>Source Files\Boarding Methods</Filter>
+    </ClCompile>
+    <ClCompile Include="JanModified.c">
+      <Filter>Source Files\Boarding Methods</Filter>
+    </ClCompile>
+    <ClCompile Include="SteffenPerfect.c">
+      <Filter>Source Files\Boarding Methods</Filter>
+    </ClCompile>
+    <ClCompile Include="Random.c">
+      <Filter>Source Files\Boarding Methods</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Header.h">
+    <ClInclude Include="Source.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BoardingMethods.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GlobalVariableTypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BackToFront.h">
+      <Filter>Header Files\Boarding Methods</Filter>
+    </ClInclude>
+    <ClInclude Include="FrontToBack.h">
+      <Filter>Header Files\Boarding Methods</Filter>
+    </ClInclude>
+    <ClInclude Include="SteffenModified.h">
+      <Filter>Header Files\Boarding Methods</Filter>
+    </ClInclude>
+    <ClInclude Include="JanModified.h">
+      <Filter>Header Files\Boarding Methods</Filter>
+    </ClInclude>
+    <ClInclude Include="SteffenPerfect.h">
+      <Filter>Header Files\Boarding Methods</Filter>
+    </ClInclude>
+    <ClInclude Include="Random.h">
+      <Filter>Header Files\Boarding Methods</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

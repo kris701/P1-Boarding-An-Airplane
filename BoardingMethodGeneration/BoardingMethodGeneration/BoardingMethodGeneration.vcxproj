@@ -124,10 +124,25 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BackToFront.c" />
+    <ClCompile Include="BoardingMethods.c" />
+    <ClCompile Include="FrontToBack.c" />
+    <ClCompile Include="JanModified.c" />
+    <ClCompile Include="Random.c" />
     <ClCompile Include="Source.c" />
+    <ClCompile Include="SteffenModified.c" />
+    <ClCompile Include="SteffenPerfect.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Header.h" />
+    <ClInclude Include="BackToFront.h" />
+    <ClInclude Include="BoardingMethods.h" />
+    <ClInclude Include="FrontToBack.h" />
+    <ClInclude Include="GlobalVariableTypes.h" />
+    <ClInclude Include="JanModified.h" />
+    <ClInclude Include="Random.h" />
+    <ClInclude Include="Source.h" />
+    <ClInclude Include="SteffenModified.h" />
+    <ClInclude Include="SteffenPerfect.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
