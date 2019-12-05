@@ -50,8 +50,6 @@ void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool U
 
 void PassengerMovement(Person* _Passenger, Person** _PassengerLocationMatrix[], Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
-	bool TookAStep = false;
-
 	if (!IsInDelayAction(_Passenger, _PlaneMap))
 	{
 		for (int j = 0; j < _Passenger->WalkingSpeed; j++)
@@ -65,8 +63,6 @@ void PassengerMovement(Person* _Passenger, Person** _PassengerLocationMatrix[], 
 					_Passenger->CurrentPos = _Passenger->Target;
 					_Passenger->IsBackingUp = false;
 					_Passenger->IsSeated = true;
-
-					TookAStep = true;
 				}
 				else
 				{
@@ -75,8 +71,6 @@ void PassengerMovement(Person* _Passenger, Person** _PassengerLocationMatrix[], 
 						_PassengerLocationMatrix[_Passenger->NextMove.Y][_Passenger->NextMove.X] = _Passenger;
 						_PassengerLocationMatrix[_Passenger->CurrentPos.Y][_Passenger->CurrentPos.X] = NULL;
 						_Passenger->CurrentPos = _Passenger->NextMove;
-
-						TookAStep = true;
 					}
 					else
 						break;
@@ -85,11 +79,6 @@ void PassengerMovement(Person* _Passenger, Person** _PassengerLocationMatrix[], 
 			else
 				break;
 		}
-	}
-
-	if (TookAStep)
-	{
-		_Passenger->StepsTaken++;
 	}
 }
 

@@ -34,7 +34,6 @@ void GeneratePassenger(Person* Passenger, Map _PlaneMap, BasicSimulationRules _B
     Passenger->IsBackingUp = false;
     Passenger->ShuffleDelay = 0;
     Passenger->CrossDelay = 0;
-    Passenger->StepsTaken = 0;
 
 	Passenger->MovedLastTurn = true;
 	Passenger->NextMove = SetPoint(0,0);

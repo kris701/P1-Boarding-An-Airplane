@@ -37,7 +37,6 @@ typedef struct _Person
 	bool IsBackingUp;
 	int ShuffleDelay;
 	int CrossDelay;
-	int StepsTaken;
 	bool MovedLastTurn;
 	Point NextMove;
 	int BoardingGroup;
