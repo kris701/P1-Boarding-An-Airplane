@@ -136,13 +136,13 @@
     <ClCompile Include="Simulation.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\a\P1-Boarding-An-Airplane\BasicCalls.h" />
-    <ClInclude Include="..\..\a\P1-Boarding-An-Airplane\GeneratePassengers.h" />
-    <ClInclude Include="..\..\a\P1-Boarding-An-Airplane\Main.h" />
-    <ClInclude Include="..\..\a\P1-Boarding-An-Airplane\Map.h" />
-    <ClInclude Include="..\..\a\P1-Boarding-An-Airplane\ReadSimulationConfig.h" />
-    <ClInclude Include="..\..\a\P1-Boarding-An-Airplane\Simulation.h" />
-    <ClInclude Include="..\..\a\P1-Boarding-An-Airplane\StructsAndEnums.h" />
+    <ClInclude Include="BasicCalls.h" />
+    <ClInclude Include="GeneratePassengers.h" />
+    <ClInclude Include="Main.h" />
+    <ClInclude Include="Map.h" />
+    <ClInclude Include="ReadSimulationConfig.h" />
+    <ClInclude Include="Simulation.h" />
+    <ClInclude Include="StructsAndEnums.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

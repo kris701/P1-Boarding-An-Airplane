@@ -35,25 +35,25 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\a\P1-Boarding-An-Airplane\BasicCalls.h">
+    <ClInclude Include="StructsAndEnums.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\a\P1-Boarding-An-Airplane\GeneratePassengers.h">
+    <ClInclude Include="Main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\a\P1-Boarding-An-Airplane\Main.h">
+    <ClInclude Include="Map.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\a\P1-Boarding-An-Airplane\Map.h">
+    <ClInclude Include="ReadSimulationConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\a\P1-Boarding-An-Airplane\ReadSimulationConfig.h">
+    <ClInclude Include="Simulation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\a\P1-Boarding-An-Airplane\Simulation.h">
+    <ClInclude Include="BasicCalls.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\a\P1-Boarding-An-Airplane\StructsAndEnums.h">
+    <ClInclude Include="GeneratePassengers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
