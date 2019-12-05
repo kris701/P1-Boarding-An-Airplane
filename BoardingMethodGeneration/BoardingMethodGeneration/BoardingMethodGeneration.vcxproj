@@ -132,6 +132,7 @@
     <ClCompile Include="Source.c" />
     <ClCompile Include="SteffenModified.c" />
     <ClCompile Include="SteffenPerfect.c" />
+    <ClCompile Include="Wilma.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackToFront.h" />
@@ -143,6 +144,7 @@
     <ClInclude Include="Source.h" />
     <ClInclude Include="SteffenModified.h" />
     <ClInclude Include="SteffenPerfect.h" />
+    <ClInclude Include="Wilma.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

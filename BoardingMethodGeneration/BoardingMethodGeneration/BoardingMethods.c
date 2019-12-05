@@ -74,25 +74,25 @@ int GetPeasentOffset(BoardingInfo _BI) {
 	// Thus offsetting peasent class by that amount
 	switch (_BI.BoardingMethod) {
 	case BMRandom:
-		return 1;
+		return GetPeasentOffsetForRandom(_BI);
 		break;
 	case BMWilma:
-		return (_BI.PlaneInfo.SeatsPerRow / 4 + (_BI.PlaneInfo.SeatsPerRow / 2) % 2);
+		return GetPeasentOffsetForWilma(_BI);
 		break;
 	case BMFrontToBack:
-		return (_BI.PlaneInfo.FirstClassRows / _BI.PlaneInfo.BoardingGroupRowCount) + ((_BI.PlaneInfo.FirstClassRows % _BI.PlaneInfo.BoardingGroupRowCount == 0) ? 0 : 1);
+		return GetPeasentOffsetForFrontToBack(_BI);
 		break;
 	case BMBackToFront:
-		return (_BI.PlaneInfo.FirstClassRows / _BI.PlaneInfo.BoardingGroupRowCount) + ((_BI.PlaneInfo.FirstClassRows % _BI.PlaneInfo.BoardingGroupRowCount == 0) ? 0 : 1);
+		return GetPeasentOffsetForBackToFront(_BI);
 		break;
 	case BMSteffenModified:
-		return (2 * _BI.PlaneInfo.FirstClassRows);
+		return GetPeasentOffsetForSteffenModified(_BI);
 		break;
 	case BMJanModified:
-		return (_BI.PlaneInfo.FirstClassRows * _BI.PlaneInfo.FirstClassSeatsPerRow);
+		return GetPeasentOffsetForJanModified(_BI);
 		break;
 	case BMSteffenPerfect:
-		return (_BI.PlaneInfo.FirstClassRows * _BI.PlaneInfo.FirstClassSeatsPerRow);
+		return GetPeasentOffsetForSteffenPerfect(_BI);
 		break;
 	default:
 		return 0;

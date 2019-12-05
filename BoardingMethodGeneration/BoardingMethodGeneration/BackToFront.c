@@ -10,3 +10,7 @@ int GetSeatForBackToFront(BoardingInfo* _BI, int _SeatIndex) {
 			// Divides by the boarding group size
 		(2 * _BI->PlaneInfo.BoardingGroupRowCount)));
 }
+
+int GetPeasentOffsetForBackToFront(BoardingInfo _BI) {
+	return (_BI.PlaneInfo.FirstClassRows / _BI.PlaneInfo.BoardingGroupRowCount) + ((_BI.PlaneInfo.FirstClassRows % _BI.PlaneInfo.BoardingGroupRowCount == 0) ? 0 : 1);
+}

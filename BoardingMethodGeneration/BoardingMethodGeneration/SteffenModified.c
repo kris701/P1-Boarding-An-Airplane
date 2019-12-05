@@ -16,3 +16,7 @@ int GetSeatForSteffenModified(BoardingInfo* _BI, int _SeatIndex) {
 		// Adds 1 to to 1/4 of the plane rows
 		((rowCount % 2 == 1) ? (((_BI->BoardingGroupRowCounter % 4 == 1) && (_BI->BoardingGroupRowCounter % 2 == 1)) ? 1 : 0) : 0));
 }
+
+int GetPeasentOffsetForSteffenModified(BoardingInfo _BI) {
+	return (2 * _BI.PlaneInfo.FirstClassRows);
+}

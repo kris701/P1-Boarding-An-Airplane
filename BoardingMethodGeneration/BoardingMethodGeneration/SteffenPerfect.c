@@ -21,3 +21,7 @@ int GetSeatForSteffenPerfect(BoardingInfo* _BI, int _SeatIndex) {
 		// Adds 1 to every second row of half the plane
 		((rowCount % 2 == 1) ? ((_BI->BoardingGroupRowCounter % 4 == 1) ? 1 : 0) : 0));
 }
+
+int GetPeasentOffsetForSteffenPerfect(BoardingInfo _BI) {
+	return (_BI.PlaneInfo.FirstClassRows * _BI.PlaneInfo.FirstClassSeatsPerRow);
+}

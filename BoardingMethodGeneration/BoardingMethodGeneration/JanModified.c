@@ -12,3 +12,7 @@ int GetSeatForJanModified(BoardingInfo* _BI, int _SeatIndex) {
 		// Subtracts 1 for each seat between this and the window for the specific row
 		((SeatsPerRow / 2) - _SeatIndex));
 }
+
+int GetPeasentOffsetForJanModified(BoardingInfo _BI) {
+	return (_BI.PlaneInfo.FirstClassRows * _BI.PlaneInfo.FirstClassSeatsPerRow);
+}
