@@ -8,7 +8,6 @@
 
 #include "StructsAndEnums.h"
 #include "BasicCalls.h"
-#include "Map.h"
 
 void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap, BasicSimulationRules _BaseRules);
 void GeneratePassenger(Person* Passenger, Map _PlaneMap, BasicSimulationRules _BaseRules);

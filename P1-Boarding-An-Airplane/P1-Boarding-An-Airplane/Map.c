@@ -34,7 +34,7 @@ bool ReadMapFromFile(Map* _PlaneMap, FILE* _File)
         while (sscanf_s(buffer+bufferOffset, "%[^,]", field, 32) == 1) // One iteration per field of data in a line
 		{
 			field[31] = '\0';
-			bufferOffset += strlen(field) + 1; // +Comma
+			bufferOffset += (int)strlen(field) + 1; // +Comma
 			if (bufferOffset > (int)strlen(buffer)) 
 				break;
 
