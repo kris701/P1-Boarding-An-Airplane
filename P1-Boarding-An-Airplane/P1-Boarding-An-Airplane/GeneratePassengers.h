@@ -12,7 +12,7 @@
 void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap, BasicSimulationRules _BaseRules);
 void GeneratePassenger(Person* Passenger, Map _PlaneMap, BasicSimulationRules _BaseRules);
 int GenerateLuggage(BasicSimulationRules _BaseRules);
-int GetStartingDoorID(Person* Passenger, Map _PlaneMap);
+int GetNearestStartingDoorID(Person* Passenger, Map _PlaneMap);
 int GenerateWalkSpeed(BasicSimulationRules _BaseRules);
 bool AssignPassengersToAvailableSeat(int Count, Person _PassengerList[], Map _PlaneMap);
 bool AssignSeatByBoardinggroup(int BoardingGroup, Person* _Passenger, Map _PlaneMap);

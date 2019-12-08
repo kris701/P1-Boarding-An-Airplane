@@ -53,7 +53,7 @@ int GenerateLuggage(BasicSimulationRules _BaseRules)
     return 0;
 }
 
-int GetStartingDoorID(Person* Passenger, Map _PlaneMap) 
+int GetNearestStartingDoorID(Person* Passenger, Map _PlaneMap) 
 {
 	int MinLength = 9999;
 	int TargetIndex = 0;
@@ -85,7 +85,7 @@ int GenerateWalkSpeed(BasicSimulationRules _BaseRules)
 void AssignPassengerToNearestDoor(int Count, Person _PassengerList[], Map _PlaneMap)
 {
 	for (int i = 0; i < Count; i++) {
-		_PassengerList[i].StartingDoorID = GetStartingDoorID(&_PassengerList[i], _PlaneMap);
+		_PassengerList[i].StartingDoorID = GetNearestStartingDoorID(&_PassengerList[i], _PlaneMap);
 		_PassengerList[i].CurrentPos = _PlaneMap.Doors[_PassengerList[i].StartingDoorID];
 	}
 }
