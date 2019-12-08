@@ -52,19 +52,19 @@ void PassengerMovement(Person* _Passenger, Person** _PassengerLocationMatrix[], 
 {
 	if (!IsInDelayAction(_Passenger, _PlaneMap))
 	{
-		for (int j = 0; j < _Passenger->WalkingSpeed; j++)
+		if (_Passenger->IsBackingUp)
 		{
-			if (!IsPointEqual(_Passenger->CurrentPos, _Passenger->Target) || _Passenger->IsBackingUp)
+			_PassengerLocationMatrix[_Passenger->Target.Y][_Passenger->Target.X] = _Passenger;
+			_PassengerLocationMatrix[_Passenger->CurrentPos.Y][_Passenger->CurrentPos.X] = NULL;
+			_Passenger->CurrentPos = _Passenger->Target;
+			_Passenger->IsBackingUp = false;
+			_Passenger->IsSeated = true;
+		}
+		else
+		{
+			for (int j = 0; j < _Passenger->WalkingSpeed; j++)
 			{
-				if (_Passenger->IsBackingUp)
-				{
-					_PassengerLocationMatrix[_Passenger->CurrentPos.Y][_Passenger->CurrentPos.X] = NULL;
-					_PassengerLocationMatrix[_Passenger->Target.Y][_Passenger->Target.X] = _Passenger;
-					_Passenger->CurrentPos = _Passenger->Target;
-					_Passenger->IsBackingUp = false;
-					_Passenger->IsSeated = true;
-				}
-				else
+				if (!IsPointEqual(_Passenger->CurrentPos, _Passenger->Target))
 				{
 					if (!IsAnyOnPoint(_PassengerLocationMatrix, _Passenger, _PlaneMap, _BaseRules))
 					{
@@ -75,9 +75,9 @@ void PassengerMovement(Person* _Passenger, Person** _PassengerLocationMatrix[], 
 					else
 						break;
 				}
+				else
+					break;
 			}
-			else
-				break;
 		}
 	}
 }
@@ -194,9 +194,9 @@ void SendRowBack(Person** _PassengerLocationMatrix[], Person* _Person, Map _Plan
 	int InnerMostSeat = -1;
 	while (CurrentXPosition != _PlaneMap.Doors[_Person->StartingDoorID].X)
 	{
-		if (_PassengerLocationMatrix[_Person->CurrentPos.Y][CurrentXPosition] != NULL)
+		if (_PassengerLocationMatrix[_Person->Target.Y][CurrentXPosition] != NULL && CurrentXPosition != _Person->CurrentPos.X)
 		{
-			Person* MomentPerson = _PassengerLocationMatrix[_Person->CurrentPos.Y][CurrentXPosition];
+			Person* MomentPerson = _PassengerLocationMatrix[_Person->Target.Y][CurrentXPosition];
 			if (InnerMostSeat == -1)
 				InnerMostSeat = abs(MomentPerson->Target.X - _PlaneMap.Doors[_Person->StartingDoorID].X);
 
