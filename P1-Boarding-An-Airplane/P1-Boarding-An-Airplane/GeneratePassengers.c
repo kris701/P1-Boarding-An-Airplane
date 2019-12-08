@@ -22,7 +22,7 @@ void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap, BasicSim
 }
 
 void GeneratePassenger(Person* Passenger, Map _PlaneMap, BasicSimulationRules _BaseRules) {
-    Passenger->WalkingSpeed = GenerateWalkSpeed(_BaseRules);
+	Passenger->WalkingSpeed = GenerateWalkSpeed(_BaseRules);
 
     Passenger->StartingDoorID = 0;
 	Passenger->CurrentPos = SetPoint(0,0);
@@ -133,11 +133,9 @@ void ScramblePassengers(Person _PassengerList[], int ArrayLength)
 		{
 			if (EndIndex - StartIndex > 1)
 			{
-				for (int i = StartIndex; i < EndIndex; i++)
+				for (int i = StartIndex; i < EndIndex - 1; i++)
 				{
-					int RandValue = GetRandomNumberRanged(StartIndex, EndIndex - 1);
-					while (RandValue == i)
-						RandValue = GetRandomNumberRanged(StartIndex, EndIndex - 1);
+					int RandValue = GetRandomNumberRanged(i + 1, EndIndex - 1);
 					Person TmpPerson = _PassengerList[i];
 					_PassengerList[i] = _PassengerList[RandValue];
 					_PassengerList[RandValue] = TmpPerson;
