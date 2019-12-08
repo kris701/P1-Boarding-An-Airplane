@@ -1,6 +1,6 @@
 #include "Simulation.h"
 
-void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool UpdateVisuals, int* _StepsTaken, Map _PlaneMap, BasicSimulationRules _BaseRules)
+void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool ShouldUpdateVisuals, int* _StepsTaken, Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
 	bool AllSeated = false;
 	clock_t OneSecWatchStart, OneSecWatchEnd;
@@ -12,10 +12,8 @@ void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool U
 	while (!AllSeated)
 	{
 		AllSeated = true;
-		for (int i = 0; i < _PlaneMap.NumberOfSeats; i++)
-		{
-			if (!_PassengerList[i].IsSeated)
-			{
+		for (int i = 0; i < _PlaneMap.NumberOfSeats; i++) {
+			if (_PassengerList[i].IsSeated == false) {
 				AllSeated = false;
 
 				PassengerMovement(&_PassengerList[i], _PassengerLocationMatrix, _PlaneMap, _BaseRules);
@@ -27,24 +25,33 @@ void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool U
 			}
 		}
 
-		if (UpdateVisuals)
+		if (ShouldUpdateVisuals)
 		{
-			PrintField(_PassengerLocationMatrix, _PlaneMap);
-			printf("RPS: %d", ShowRPCCount);
-
-			RPSCount++;
-
-			OneSecWatchEnd = clock();
-
-			if ((int)((((double)OneSecWatchEnd - (double)OneSecWatchStart) / CLOCKS_PER_SEC) * 1000) >= 1000)
-			{
-				OneSecWatchStart = clock();
-				ShowRPCCount = RPSCount;
-				RPSCount = 0;
-			}
+			UpdateVisuals(_PassengerLocationMatrix, _PlaneMap, &ShowRPCCount, &RPSCount, &OneSecWatchStart, &OneSecWatchEnd);
 		}
 
 		(*_StepsTaken)++;
+	}
+	PrintField(_PassengerLocationMatrix, _PlaneMap);
+	if (DebugVerifySeats(_PassengerLocationMatrix, _PlaneMap) == false) {
+		
+		fprintf(stderr, "Something went wrong, not everyone is seated.");
+	}
+}
+
+void UpdateVisuals(Person** _PassengerLocationMatrix[], Map _PlaneMap, int* ShowRPCCount, int* RPSCount, int* OneSecWatchStart, int* OneSecWatchEnd) {
+	PrintField(_PassengerLocationMatrix, _PlaneMap);
+	printf("RPS: %d", *ShowRPCCount);
+
+	(*RPSCount)++;
+
+	*OneSecWatchEnd = clock();
+
+	if ((int)((((double)(*OneSecWatchEnd) - (double)(*OneSecWatchStart)) / CLOCKS_PER_SEC) * 1000) >= 1000)
+	{
+		(*OneSecWatchStart) = clock();
+		*ShowRPCCount = RPSCount;
+		*RPSCount = 0;
 	}
 }
 
@@ -81,6 +88,34 @@ void PassengerMovement(Person* _Passenger, Person** _PassengerLocationMatrix[], 
 		}
 	}
 }
+
+
+/* PrintField has been able to show incorrect seating, so that is used to attempt to catch the bug. */
+bool DebugVerifySeats(Person** _PassengerLocationMatrix[], Map _PlaneMap) {
+	bool seatedCorrect = true;
+
+	for (int y = 0; y < _PlaneMap.Height - 1; y++) {
+		for (int x = 0; x < _PlaneMap.Width; x++) {
+			if (_PassengerLocationMatrix[y][x] != NULL);
+				//printf("%-*c", _PlaneMap.LongestDigit, _PassengerLocationMatrix[y][x]->PersonCharacter);
+			else
+			{
+				Location tmpLocation = *GetMapLocation(&_PlaneMap, x, y);
+				switch (tmpLocation.BoardingGroup) {
+				case BoardingGroup_Door:      break;
+				case BoardingGroup_Walkway:   break;
+				case BoardingGroup_Padding:   break;
+				case BoardingGroup_Undefined: break;
+				default:
+					seatedCorrect = false;
+					break;
+				}
+			}
+		}
+	}
+	return seatedCorrect;
+}
+
 
 void PrintField(Person** _PassengerLocationMatrix[], Map _PlaneMap)
 {
