@@ -20,7 +20,17 @@ int main()
 	srand(time(NULL));
 
 	FILE* PlaneMapFile;
-	fopen_s(&PlaneMapFile, BaseRules.BoardingMethodFile, "r");
+	char* fileBaseDir = "BoardingMethods/";
+	int fileLocationlength = strlen(fileBaseDir) + strlen(BaseRules.BoardingMethodFile) + 1;
+	char* fileLocation = calloc(fileLocationlength, sizeof(char));
+	if (fileLocation == NULL) {
+		fprintf(stderr, "Failed to allocate %d bytes for fileLocation", (int)(fileLocationlength * sizeof(char)));
+		return;
+	}
+	strcat_s(fileLocation, fileLocationlength, fileBaseDir);
+	strcat_s(fileLocation, fileLocationlength, BaseRules.BoardingMethodFile);
+	fopen_s(&PlaneMapFile, fileLocation, "r");
+	free(fileLocation);
 
 	if (PlaneMapFile != NULL)
 	{
