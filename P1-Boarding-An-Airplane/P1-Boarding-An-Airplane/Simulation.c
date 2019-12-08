@@ -56,12 +56,11 @@ void PassengerMovement(Person* _Passenger, Person** _PassengerLocationMatrix[], 
 	{
 		if (_Passenger->IsBackingUp)
 		{
-			// Stop overwriting other passengers.
-			if (_PassengerLocationMatrix[_Passenger->Target.Y][_Passenger->Target.X] != NULL) {
-				return;
-			}
 			_PassengerLocationMatrix[_Passenger->Target.Y][_Passenger->Target.X] = _Passenger;
-			_PassengerLocationMatrix[_Passenger->CurrentPos.Y][_Passenger->CurrentPos.X] = NULL;
+
+			if (_PassengerLocationMatrix[_Passenger->CurrentPos.Y][_Passenger->CurrentPos.X] == _Passenger) 
+				_PassengerLocationMatrix[_Passenger->CurrentPos.Y][_Passenger->CurrentPos.X] = NULL;
+
 			_Passenger->CurrentPos = _Passenger->Target;
 			_Passenger->IsBackingUp = false;
 			_Passenger->IsSeated = true;
