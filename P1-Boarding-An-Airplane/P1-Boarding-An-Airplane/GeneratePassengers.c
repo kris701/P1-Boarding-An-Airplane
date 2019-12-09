@@ -22,7 +22,7 @@ void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap, BasicSim
 }
 
 void GeneratePassenger(Person* Passenger, Map _PlaneMap, BasicSimulationRules _BaseRules) {
-    Passenger->WalkingSpeed = GenerateWalkSpeed(_BaseRules);
+	Passenger->WalkingSpeed = GenerateWalkSpeed(_BaseRules);
 
     Passenger->StartingDoorID = 0;
 	Passenger->CurrentPos = SetPoint(0,0);
@@ -53,7 +53,7 @@ int GenerateLuggage(BasicSimulationRules _BaseRules)
     return 0;
 }
 
-int GetStartingDoorID(Person* Passenger, Map _PlaneMap) 
+int GetNearestStartingDoorID(Person* Passenger, Map _PlaneMap) 
 {
 	int MinLength = 9999;
 	int TargetIndex = 0;
@@ -85,7 +85,7 @@ int GenerateWalkSpeed(BasicSimulationRules _BaseRules)
 void AssignPassengerToNearestDoor(int Count, Person _PassengerList[], Map _PlaneMap)
 {
 	for (int i = 0; i < Count; i++) {
-		_PassengerList[i].StartingDoorID = GetStartingDoorID(&_PassengerList[i], _PlaneMap);
+		_PassengerList[i].StartingDoorID = GetNearestStartingDoorID(&_PassengerList[i], _PlaneMap);
 		_PassengerList[i].CurrentPos = _PlaneMap.Doors[_PassengerList[i].StartingDoorID];
 	}
 }
@@ -133,11 +133,9 @@ void ScramblePassengers(Person _PassengerList[], int ArrayLength)
 		{
 			if (EndIndex - StartIndex > 1)
 			{
-				for (int i = StartIndex; i < EndIndex; i++)
+				for (int i = StartIndex; i < EndIndex - 1; i++)
 				{
-					int RandValue = GetRandomNumberRanged(StartIndex, EndIndex - 1);
-					while (RandValue == i)
-						RandValue = GetRandomNumberRanged(StartIndex, EndIndex - 1);
+					int RandValue = GetRandomNumberRanged(i + 1, EndIndex - 1);
 					Person TmpPerson = _PassengerList[i];
 					_PassengerList[i] = _PassengerList[RandValue];
 					_PassengerList[RandValue] = TmpPerson;

@@ -1,6 +1,6 @@
 #include "Simulation.h"
 
-void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool UpdateVisuals, int* _StepsTaken, Map _PlaneMap, BasicSimulationRules _BaseRules)
+void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool ShouldUpdateVisuals, int* _StepsTaken, Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
 	bool AllSeated = false;
 	clock_t OneSecWatchStart, OneSecWatchEnd;
@@ -12,10 +12,8 @@ void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool U
 	while (!AllSeated)
 	{
 		AllSeated = true;
-		for (int i = 0; i < _PlaneMap.NumberOfSeats; i++)
-		{
-			if (!_PassengerList[i].IsSeated)
-			{
+		for (int i = 0; i < _PlaneMap.NumberOfSeats; i++) {
+			if (_PassengerList[i].IsSeated == false) {
 				AllSeated = false;
 
 				PassengerMovement(&_PassengerList[i], _PassengerLocationMatrix, _PlaneMap, _BaseRules);
@@ -27,24 +25,28 @@ void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool U
 			}
 		}
 
-		if (UpdateVisuals)
+		if (ShouldUpdateVisuals)
 		{
-			PrintField(_PassengerLocationMatrix, _PlaneMap);
-			printf("RPS: %d", ShowRPCCount);
-
-			RPSCount++;
-
-			OneSecWatchEnd = clock();
-
-			if ((int)((((double)OneSecWatchEnd - (double)OneSecWatchStart) / CLOCKS_PER_SEC) * 1000) >= 1000)
-			{
-				OneSecWatchStart = clock();
-				ShowRPCCount = RPSCount;
-				RPSCount = 0;
-			}
+			UpdateVisuals(_PassengerLocationMatrix, _PlaneMap, &ShowRPCCount, &RPSCount, &OneSecWatchStart, &OneSecWatchEnd);
 		}
 
 		(*_StepsTaken)++;
+	}
+}
+
+void UpdateVisuals(Person** _PassengerLocationMatrix[], Map _PlaneMap, int* ShowRPCCount, int* RPSCount, int* OneSecWatchStart, int* OneSecWatchEnd) {
+	PrintField(_PassengerLocationMatrix, _PlaneMap);
+	printf("RPS: %d", *ShowRPCCount);
+
+	(*RPSCount)++;
+
+	*OneSecWatchEnd = clock();
+
+	if ((int)((((double)(*OneSecWatchEnd) - (double)(*OneSecWatchStart)) / CLOCKS_PER_SEC) * 1000) >= 1000)
+	{
+		(*OneSecWatchStart) = clock();
+		*ShowRPCCount = *RPSCount;
+		*RPSCount = 0;
 	}
 }
 
@@ -52,19 +54,22 @@ void PassengerMovement(Person* _Passenger, Person** _PassengerLocationMatrix[], 
 {
 	if (!IsInDelayAction(_Passenger, _PlaneMap))
 	{
-		for (int j = 0; j < _Passenger->WalkingSpeed; j++)
+		if (_Passenger->IsBackingUp)
 		{
-			if (!IsPointEqual(_Passenger->CurrentPos, _Passenger->Target) || _Passenger->IsBackingUp)
+			_PassengerLocationMatrix[_Passenger->Target.Y][_Passenger->Target.X] = _Passenger;
+
+			if (_PassengerLocationMatrix[_Passenger->CurrentPos.Y][_Passenger->CurrentPos.X] == _Passenger) 
+				_PassengerLocationMatrix[_Passenger->CurrentPos.Y][_Passenger->CurrentPos.X] = NULL;
+
+			_Passenger->CurrentPos = _Passenger->Target;
+			_Passenger->IsBackingUp = false;
+			_Passenger->IsSeated = true;
+		}
+		else
+		{
+			for (int j = 0; j < _Passenger->WalkingSpeed; j++)
 			{
-				if (_Passenger->IsBackingUp)
-				{
-					_PassengerLocationMatrix[_Passenger->CurrentPos.Y][_Passenger->CurrentPos.X] = NULL;
-					_PassengerLocationMatrix[_Passenger->Target.Y][_Passenger->Target.X] = _Passenger;
-					_Passenger->CurrentPos = _Passenger->Target;
-					_Passenger->IsBackingUp = false;
-					_Passenger->IsSeated = true;
-				}
-				else
+				if (!IsPointEqual(_Passenger->CurrentPos, _Passenger->Target))
 				{
 					if (!IsAnyOnPoint(_PassengerLocationMatrix, _Passenger, _PlaneMap, _BaseRules))
 					{
@@ -75,9 +80,9 @@ void PassengerMovement(Person* _Passenger, Person** _PassengerLocationMatrix[], 
 					else
 						break;
 				}
+				else
+					break;
 			}
-			else
-				break;
 		}
 	}
 }
@@ -194,9 +199,9 @@ void SendRowBack(Person** _PassengerLocationMatrix[], Person* _Person, Map _Plan
 	int InnerMostSeat = -1;
 	while (CurrentXPosition != _PlaneMap.Doors[_Person->StartingDoorID].X)
 	{
-		if (_PassengerLocationMatrix[_Person->CurrentPos.Y][CurrentXPosition] != NULL)
+		if (_PassengerLocationMatrix[_Person->Target.Y][CurrentXPosition] != NULL && CurrentXPosition != _Person->CurrentPos.X)
 		{
-			Person* MomentPerson = _PassengerLocationMatrix[_Person->CurrentPos.Y][CurrentXPosition];
+			Person* MomentPerson = _PassengerLocationMatrix[_Person->Target.Y][CurrentXPosition];
 			if (InnerMostSeat == -1)
 				InnerMostSeat = abs(MomentPerson->Target.X - _PlaneMap.Doors[_Person->StartingDoorID].X);
 

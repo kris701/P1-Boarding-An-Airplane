@@ -70,9 +70,9 @@ int main()
 			{
 				RunTime = 0;
 
-				for (int i = 0; i < PlaneMap.Height; i++) {
-					for (int j = 0; j < PlaneMap.Width; j++) {
-						memset(&PassengerLocationMatrix[i][j], NULL, sizeof(Person*));
+				for (int j = 0; j < PlaneMap.Height; j++) {
+					for (int l = 0; l < PlaneMap.Width; l++) {
+						memset(&PassengerLocationMatrix[j][l], NULL, sizeof(Person*));
 					}
 				}
 
