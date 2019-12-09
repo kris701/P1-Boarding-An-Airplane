@@ -43,24 +43,24 @@ bool ReadMapFromFile(Map* _PlaneMap, FILE* _File)
                 case '|': 
 					MapLocationSetValue(_PlaneMap, x, y, BoardingGroup_Walkway);
 					x++;
-				break;
+					break;
                 case 'D':
 					MapLocationSetValue(_PlaneMap, x, y, BoardingGroup_Door);
 					_PlaneMap->Doors[doorIndex].X = x;
 					_PlaneMap->Doors[doorIndex].Y = y;
 					doorIndex++;
 					x++;
-				break;
+					break;
                 case '-':
 					MapLocationSetValue(_PlaneMap, x, y, BoardingGroup_Padding);
 					x++;
-				break;
+					break;
 				case '\r': break;
 				case '\0': break;
 				case '\n':
 					y++;
 					x = 0;
-				break;
+					break;
 
                 default:
                     if (sscanf_s(field, "%d", &tmpInt) == 1) 
@@ -75,7 +75,7 @@ bool ReadMapFromFile(Map* _PlaneMap, FILE* _File)
                         fprintf(stderr, "Unknown value '%s'\n", field);
 						MapLocationSetValue(_PlaneMap, x, y, BoardingGroup_Undefined);
                     }
-                break;
+					break;
             }
         }
         y++;
