@@ -9,6 +9,9 @@ int main()
 	Map PlaneMap = { 0 };
 	BasicSimulationRules BasicRules = { 0 };
 
+	bool RunAll = true;
+	int BoardingMethodCount = 0;
+
 	srand(time(NULL));
 
 	if (!ReadBasicRulesConfigFile(&BasicRules, "config.ini"))
@@ -16,6 +19,9 @@ int main()
 
 	if (!ReadMapFromFile(&PlaneMap, BasicRules))
 		return 0;
+
+	if (RunAll)
+		BoardingMethodCount = GetAllBoardingMethods();
 
 	printf("Using boarding method file: %s\n", BasicRules.BoardingMethodFile);
 
@@ -94,6 +100,14 @@ void RunAllSimulationsAndSaveToOutput(Person* _PassengerList, Person*** _Passeng
 	if (!FileExists(OutputFile))
 		return;
 
+	fprintf(OutputFile,"%s,%s,%s,%s", "boarding-method", "cross-delay", "seat-interference-delay", "assign-to-nearest-door");
+	for (int i = 0; i < _BasicRules.LuggageGenerationValuesLength; i++) {
+		fprintf(OutputFile, "%s-%d,%s-%d,", "luggage-count", i, "luggage-count-possibility", i);
+	}
+	for (int i = 0; i < _BasicRules.WalkingspeedGenerationValuesLength; i++) {
+		fprintf(OutputFile, "%s-%d,%s-%d,", "walk-speed", i, "walk-speed-possibility", i);
+	}
+	
 	fprintf(OutputFile, "Iterations;\n");
 
 	TotalWatchStart = clock();
@@ -127,6 +141,15 @@ int RunOneSimulationAndGetSteps(Person* _PassengerList, Person*** _PassengerLoca
 		Sleep(1000);
 	}
 
+	//Fix
+	fprintf(_OutputFile, "%s,%d,%d,%d", _BasicRules.BoardingMethodFile,_BasicRules.CrossDelay, _BasicRules.SeatInterferenceDelay, _BasicRules.AssignToNearestDoor);
+	for (int i = 0; i < _BasicRules.LuggageGenerationValuesLength; i++) {
+		fprintf(_OutputFile, "%d,%d,", _BasicRules.LuggageGenerationValues[i].Value, _BasicRules.LuggageGenerationValues[i].Possibility);
+	}
+	for (int i = 0; i < _BasicRules.WalkingspeedGenerationValuesLength; i++) {
+		fprintf(_OutputFile, "%d,%d,", _BasicRules.WalkingspeedGenerationValues[i].Value, _BasicRules.WalkingspeedGenerationValues[i].Possibility);
+	}
+	
 	fprintf(_OutputFile, "%d;\n", StepsTaken);
 
 	return StepsTaken;

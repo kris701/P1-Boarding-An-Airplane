@@ -58,6 +58,8 @@ typedef struct _BasicSimulationRules
 	int WalkingspeedGenerationValuesLength;
 	char BoardingMethodFile[128];
 	bool AssignToNearestDoor;
+	char** MultipleMaps;
+	int MultipleMapsLength;
 } BasicSimulationRules;
 
 typedef struct _Location {

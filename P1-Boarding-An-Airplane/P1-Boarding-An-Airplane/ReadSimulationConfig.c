@@ -28,6 +28,21 @@ bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* Fil
 				strcpy_s((*_BasicRules).BoardingMethodFile, 128, SubStringBuffer);
 				continue;
 			}
+			if (strstr(Buffer, "MultipleMaps"))
+			{
+				SubStringBuffer = strchr(Buffer, '=') + 1;
+
+				int ItemCount = GetItemCountInConfig(SubStringBuffer, BufferLength);
+
+				(*_BasicRules).MultipleMaps = calloc(ItemCount, sizeof(char[128]));
+				(*_BasicRules).MultipleMapsLength = ItemCount;
+
+				for (int i = 0; i < ItemCount; i++)
+				{
+					(*_BasicRules).MultipleMaps[i] = FindValueBetweenChars(&SubStringBuffer, '[', ']');
+				}
+				continue;
+			}
 			if (strstr(Buffer, "CrossDelay"))
 			{
 				SubStringBuffer = strchr(Buffer, '=') + 1;
@@ -120,6 +135,8 @@ int GetItemCountInConfig(char SubStringBuffer[], int _BufferLength)
 	{
 		if (SubStringBuffer[i] == '[')
 			ItemCount++;
+		else if (SubStringBuffer[i] == '\n')
+			break;
 	}
 	return ItemCount;
 }
