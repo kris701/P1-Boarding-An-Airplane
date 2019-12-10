@@ -14,3 +14,5 @@ int GetSeatsPerLine(FILE* _File);
 void MapLocationSetValue(Map* _PlaneMap, int _X, int _Y, int Value);
 int GetNumberOfDoorsInBoardingMethod(FILE* _File);
 int GetLongestDigitInFile(FILE* _File);
+void SetMapStaticValues(FILE* _MapFile, Map* _PlaneMap);
+void SetMapValuesFromFile(FILE* _MapFile, Map* _PlaneMap);
