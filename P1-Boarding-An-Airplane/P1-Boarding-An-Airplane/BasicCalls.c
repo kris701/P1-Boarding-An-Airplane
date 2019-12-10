@@ -1,5 +1,6 @@
 ﻿#include "BasicCalls.h"
 
+// A  function to check if two points are equal to find out if a passenger is in it's seat
 bool IsPointEqual(Point A, Point B)
 {
 	if (A.X == B.X)
@@ -12,12 +13,14 @@ bool IsPointEqual(Point A, Point B)
 	return false;
 }
 
+// A function to allocate a point to a struct
 Point SetPoint(int X, int Y)
 {
 	Point NewPoint = { X, Y };
 	return NewPoint;
 }
 
+// A function to get a random number
 int GetRandomNumberRanged(int _Min, int _Max)
 {
 	if (_Min == _Max)
@@ -25,13 +28,17 @@ int GetRandomNumberRanged(int _Min, int _Max)
 	return rand() % (_Max + 1 - _Min) + _Min;
 }
 
+// A function that finds which passenger is at a given x and y coordinat
 Location* GetMapLocation(Map* map, int x, int y) {
 	return &(map->Locations[y][x]);
 }
+
+// A function that uses function GetMapLocation to which passenger is at a given x and y coordinat from the struct Point
 Location* GetMapLocationFromPoint(Map* map, Point point) {
 	return GetMapLocation(map, point.X, point.Y);
 }
 
+// A function to finds longest line in file and how many chars it contain
 int GetNumberOfCharsForLongestLineInFile(FILE* _File)
 {
 	// Goes through each line and finds the longest
@@ -55,6 +62,7 @@ int GetNumberOfCharsForLongestLineInFile(FILE* _File)
 	return highestWidth + 1; // Null-byte
 }
 
+// A function to finde out how many lines the file contain
 int GetNumberOfLinesInFile(FILE* _File)
 {
 	int lines = 1; // Begins at line 1, if one \n is occured, then there are 2 lines
@@ -72,6 +80,7 @@ int GetNumberOfLinesInFile(FILE* _File)
 	return lines;
 }
 
+// A bool function to check if a file exist
 bool FileExists(FILE* _File)
 {
 	if (_File != NULL)
@@ -79,6 +88,7 @@ bool FileExists(FILE* _File)
 	return false;
 }
 
+// A function to open a file
 void DoOpenFile(FILE** _File, const char* _FileName, const char* _Parameter)
 {
 	fopen_s(&(*_File), _FileName, _Parameter);

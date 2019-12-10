@@ -12,31 +12,43 @@ int RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool Sh
 
 	while (!AllSeated)
 	{
-		AllSeated = true;
-		for (int i = 0; i < _PlaneMap.NumberOfSeats; i++) {
-			if (_PassengerList[i].IsSeated == false) {
-				AllSeated = false;
-
-				PassengerMovement(&_PassengerList[i], _PassengerLocationMatrix, _PlaneMap, _BaseRules);
-
-				if (IsPointEqual(_PassengerList[i].CurrentPos, _PassengerList[i].Target) && !_PassengerList[i].IsBackingUp)
-				{
-					_PassengerList[i].IsSeated = true;
-				}
-			}
-		}
+		AllSeated = MoveAllPassengersAndCheckIfSeated(_PassengerList, _PassengerLocationMatrix, _PlaneMap, _BaseRules);
 
 		if (ShouldUpdateVisuals)
-		{
 			UpdateVisuals(_PassengerLocationMatrix, _PlaneMap, &ShowRPCCount, &RPSCount, &OneSecWatchStart, &OneSecWatchEnd);
-		}
 
 		StepsTaken++;
 	}
+
 	return StepsTaken;
 }
 
-void UpdateVisuals(Person** _PassengerLocationMatrix[], Map _PlaneMap, int* ShowRPCCount, int* RPSCount, int* OneSecWatchStart, int* OneSecWatchEnd) {
+bool MoveAllPassengersAndCheckIfSeated(Person _PassengerList[], Person** _PassengerLocationMatrix[], Map _PlaneMap, BasicSimulationRules _BaseRules)
+{
+	bool AllSeated = true;
+	for (int i = 0; i < _PlaneMap.NumberOfSeats; i++)
+	{
+		if (_PassengerList[i].IsSeated == false)
+		{
+			AllSeated = false;
+
+			PassengerMovement(&_PassengerList[i], _PassengerLocationMatrix, _PlaneMap, _BaseRules);
+
+			_PassengerList[i].IsSeated = CanPassengerSit(_PassengerList[i]);
+		}
+	}
+	return AllSeated;
+}
+
+bool CanPassengerSit(Person _Person)
+{
+	if (IsPointEqual(_Person.CurrentPos, _Person.Target) && !_Person.IsBackingUp)
+		return true;
+	return false;
+}
+
+void UpdateVisuals(Person** _PassengerLocationMatrix[], Map _PlaneMap, int* ShowRPCCount, int* RPSCount, int* OneSecWatchStart, int* OneSecWatchEnd)
+{
 	PrintField(_PassengerLocationMatrix, _PlaneMap);
 	printf("RPS: %d", *ShowRPCCount);
 
@@ -58,35 +70,44 @@ void PassengerMovement(Person* _Passenger, Person** _PassengerLocationMatrix[], 
 	{
 		if (_Passenger->IsBackingUp)
 		{
-			_PassengerLocationMatrix[_Passenger->Target.Y][_Passenger->Target.X] = _Passenger;
+			TeleportPassengerToPoint(_Passenger, _PassengerLocationMatrix, _PlaneMap, _Passenger->Target);
 
-			if (_PassengerLocationMatrix[_Passenger->CurrentPos.Y][_Passenger->CurrentPos.X] == _Passenger) 
-				_PassengerLocationMatrix[_Passenger->CurrentPos.Y][_Passenger->CurrentPos.X] = NULL;
-
-			_Passenger->CurrentPos = _Passenger->Target;
 			_Passenger->IsBackingUp = false;
 			_Passenger->IsSeated = true;
 		}
 		else
 		{
-			for (int j = 0; j < _Passenger->WalkingSpeed; j++)
-			{
-				if (!IsPointEqual(_Passenger->CurrentPos, _Passenger->Target))
-				{
-					if (!IsAnyOnPoint(_PassengerLocationMatrix, _Passenger, _PlaneMap, _BaseRules))
-					{
-						_PassengerLocationMatrix[_Passenger->NextMove.Y][_Passenger->NextMove.X] = _Passenger;
-						_PassengerLocationMatrix[_Passenger->CurrentPos.Y][_Passenger->CurrentPos.X] = NULL;
-						_Passenger->CurrentPos = _Passenger->NextMove;
-					}
-					else
-						break;
-				}
-				else
-					break;
-			}
+			AttemptToMovePassengerOneStep(_Passenger, _PassengerLocationMatrix, _PlaneMap, _BaseRules);
 		}
 	}
+}
+
+void AttemptToMovePassengerOneStep(Person* _Passenger, Person** _PassengerLocationMatrix[], Map _PlaneMap, BasicSimulationRules _BaseRules)
+{
+	for (int j = 0; j < _Passenger->WalkingSpeed; j++)
+	{
+		if (!IsPointEqual(_Passenger->CurrentPos, _Passenger->Target))
+		{
+			if (!IsAnyOnPoint(_PassengerLocationMatrix, _Passenger, _PlaneMap, _BaseRules))
+			{
+				TeleportPassengerToPoint(_Passenger, _PassengerLocationMatrix, _PlaneMap, _Passenger->NextMove);
+			}
+			else
+				break;
+		}
+		else
+			break;
+	}
+}
+
+void TeleportPassengerToPoint(Person* _Passenger, Person** _PassengerLocationMatrix[], Map _PlaneMap, Point _TargetPoint)
+{
+	_PassengerLocationMatrix[_TargetPoint.Y][_TargetPoint.X] = _Passenger;
+
+	if (_PassengerLocationMatrix[_Passenger->CurrentPos.Y][_Passenger->CurrentPos.X] == _Passenger)
+		_PassengerLocationMatrix[_Passenger->CurrentPos.Y][_Passenger->CurrentPos.X] = NULL;
+
+	_Passenger->CurrentPos = _TargetPoint;
 }
 
 void PrintField(Person** _PassengerLocationMatrix[], Map _PlaneMap)
@@ -118,109 +139,123 @@ void PrintField(Person** _PassengerLocationMatrix[], Map _PlaneMap)
 	}
 }
 
-bool IsAnyOnPoint(Person** _PassengerLocationMatrix[], Person* _Person, Map _PlaneMap, BasicSimulationRules _BaseRules)
+bool IsAnyOnPoint(Person** _PassengerLocationMatrix[], Person* _Passenger, Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
-	Point NewPoint;
-	if (_Person->MovedLastTurn)
+	PerformPassengersNextMove(_Passenger);
+
+	if (IsAnyOnMatrix(_PassengerLocationMatrix, _Passenger->NextMove.X, _Passenger->NextMove.Y))
 	{
-		NewPoint = PredictedPoint(_Person->CurrentPos, _Person->Target);
-		_Person->NextMove = NewPoint;
-		_Person->MovedLastTurn = false;
-	}
-	else
-		NewPoint = _Person->NextMove;
+		Person* OtherPerson = _PassengerLocationMatrix[_Passenger->NextMove.Y][_Passenger->NextMove.X];
+		PerformPassengersNextMove(OtherPerson);
 
-	if (_PassengerLocationMatrix[NewPoint.Y][NewPoint.X] != NULL)
-	{
-		Person* OtherPerson = _PassengerLocationMatrix[NewPoint.Y][NewPoint.X];
-		Point SecondNewPoint;
-		if (OtherPerson->MovedLastTurn)
-		{
-			SecondNewPoint = PredictedPoint(OtherPerson->CurrentPos, OtherPerson->Target);
-			OtherPerson->NextMove = SecondNewPoint;
-			OtherPerson->MovedLastTurn = false;
-		}
-		else
-			SecondNewPoint = OtherPerson->NextMove;
-
-		// Shuffle dance
-		if (_Person->Target.Y == OtherPerson->Target.Y && _Person->CurrentPos.Y == _Person->Target.Y)
-		{
-			SendRowBack(_PassengerLocationMatrix, _Person, _PlaneMap, _BaseRules);
-
+		// Seat Interference
+		if (CheckForSeatInterferenceAndPerform(_Passenger, OtherPerson, _PassengerLocationMatrix, _PlaneMap, _BaseRules));
 			return true;
-		}
 
 		// Cross
-		if (IsPointEqual(SecondNewPoint, _Person->CurrentPos))
-		{
-			OtherPerson->CurrentPos = SecondNewPoint;
-			OtherPerson->CrossDelay = _BaseRules.CrossDelay;
-			OtherPerson->MovedLastTurn = true;
-			_PassengerLocationMatrix[SecondNewPoint.Y][SecondNewPoint.X] = OtherPerson;
-
-			_Person->CurrentPos = NewPoint;
-			_Person->CrossDelay = _BaseRules.CrossDelay;
-			_Person->MovedLastTurn = true;
-			_PassengerLocationMatrix[NewPoint.Y][NewPoint.X] = _Person;
-
-			return true;
-		}
+		CheckForCrossingAndPerform(_Passenger, OtherPerson, _PassengerLocationMatrix, _PlaneMap, _BaseRules);
 
 		return true;
 	}
 
-	_Person->MovedLastTurn = true;
+	_Passenger->MovedLastTurn = true;
 
 	return false;
 }
 
+void CheckForCrossingAndPerform(Person* _Person, Person* _OtherPerson, Person** _PassengerLocationMatrix[], Map _PlaneMap, BasicSimulationRules _BaseRules)
+{
+	if (IsPointEqual(_OtherPerson->NextMove, _Person->CurrentPos))
+	{
+		_OtherPerson->CurrentPos = _OtherPerson->NextMove;
+		_OtherPerson->CrossDelay = _BaseRules.CrossDelay;
+		_OtherPerson->MovedLastTurn = true;
+		_PassengerLocationMatrix[_OtherPerson->NextMove.Y][_OtherPerson->NextMove.X] = _OtherPerson;
+
+		_Person->CurrentPos = _Person->NextMove;
+		_Person->CrossDelay = _BaseRules.CrossDelay;
+		_Person->MovedLastTurn = true;
+		_PassengerLocationMatrix[_Person->NextMove.Y][_Person->NextMove.X] = _Person;
+	}
+}
+
+bool CheckForSeatInterferenceAndPerform(Person *_Person, Person *_OtherPerson, Person** _PassengerLocationMatrix[], Map _PlaneMap, BasicSimulationRules _BaseRules)
+{
+	if (_Person->Target.Y == _OtherPerson->Target.Y && _Person->CurrentPos.Y == _Person->Target.Y)
+	{
+		SendRowBack(_PassengerLocationMatrix, _Person, _PlaneMap, _BaseRules);
+
+		return true;
+	}
+	return false;
+}
+
+void PerformPassengersNextMove(Person *_Passenger)
+{
+	if (_Passenger->MovedLastTurn)
+	{
+		Point NewPoint = PredictedPoint(_Passenger->CurrentPos, _Passenger->Target);
+		_Passenger->NextMove = NewPoint;
+		_Passenger->MovedLastTurn = false;
+	}
+}
+
 Point PredictedPoint(Point CurrentPoint, Point TargetPoint)
 {
-	Point NewPoint = { CurrentPoint.X, CurrentPoint.Y };
-	if (NewPoint.Y == TargetPoint.Y) {
+	if (CurrentPoint.Y == TargetPoint.Y) 
+	{
 		if (TargetPoint.X > CurrentPoint.X)
-			NewPoint = SetPoint(CurrentPoint.X + 1, CurrentPoint.Y);
+			return SetPoint(CurrentPoint.X + 1, CurrentPoint.Y);
 		else
-			NewPoint = SetPoint(CurrentPoint.X - 1, CurrentPoint.Y);
+			return SetPoint(CurrentPoint.X - 1, CurrentPoint.Y);
 	}
 	else
 	{
-		if (TargetPoint.Y > NewPoint.Y)
-			NewPoint = SetPoint(CurrentPoint.X, CurrentPoint.Y + 1);
+		if (TargetPoint.Y > CurrentPoint.Y)
+			return SetPoint(CurrentPoint.X, CurrentPoint.Y + 1);
 		else
-			NewPoint = SetPoint(CurrentPoint.X, CurrentPoint.Y - 1);
+			return SetPoint(CurrentPoint.X, CurrentPoint.Y - 1);
 	}
-	return NewPoint;
+	return SetPoint(0, 0);
 }
 
-void SendRowBack(Person** _PassengerLocationMatrix[], Person* _Person, Map _PlaneMap, BasicSimulationRules _BaseRules)
+void SendRowBack(Person** _PassengerLocationMatrix[], Person* _Passenger, Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
-	int CurrentXPosition = _Person->Target.X;
-	int DistanceToTargetSeat = abs(_Person->Target.X - _PlaneMap.Doors[_Person->StartingDoorID].X);
+	int CurrentXPosition = _Passenger->Target.X;
+	int DistanceToTargetSeat = abs(_Passenger->Target.X - _PlaneMap.Doors[_Passenger->StartingDoorID].X);
 	int InnerMostSeat = -1;
-	while (CurrentXPosition != _PlaneMap.Doors[_Person->StartingDoorID].X)
+	while (CurrentXPosition != _PlaneMap.Doors[_Passenger->StartingDoorID].X)
 	{
-		if (_PassengerLocationMatrix[_Person->Target.Y][CurrentXPosition] != NULL && CurrentXPosition != _Person->CurrentPos.X)
+		if (IsAnyOnMatrix(_PassengerLocationMatrix, CurrentXPosition, _Passenger->Target.Y) && CurrentXPosition != _Passenger->CurrentPos.X)
 		{
-			Person* MomentPerson = _PassengerLocationMatrix[_Person->Target.Y][CurrentXPosition];
+			Person* MomentPerson = _PassengerLocationMatrix[_Passenger->Target.Y][CurrentXPosition];
 			if (InnerMostSeat == -1)
-				InnerMostSeat = abs(MomentPerson->Target.X - _PlaneMap.Doors[_Person->StartingDoorID].X);
+				InnerMostSeat = abs(MomentPerson->Target.X - _PlaneMap.Doors[_Passenger->StartingDoorID].X);
 
-			MomentPerson->IsBackingUp = true;
-			MomentPerson->SeatInterferenceDelay = BackupWaitSteps(DistanceToTargetSeat, InnerMostSeat, _BaseRules.SeatInterferenceDelay);
-			MomentPerson->MovedLastTurn = true;
+			SendPassengerBack(MomentPerson, DistanceToTargetSeat, InnerMostSeat, _BaseRules.SeatInterferenceDelay);
 		}
 
-		if (_Person->Target.X > _PlaneMap.Doors[_Person->StartingDoorID].X)
+		if (_Passenger->Target.X > _PlaneMap.Doors[_Passenger->StartingDoorID].X)
 			CurrentXPosition--;
 		else
 			CurrentXPosition++;
 	}
 
-	_Person->IsBackingUp = true;
-	_Person->SeatInterferenceDelay = BackupWaitSteps(DistanceToTargetSeat, InnerMostSeat, _BaseRules.SeatInterferenceDelay);
-	_Person->MovedLastTurn = true;
+	SendPassengerBack(_Passenger, DistanceToTargetSeat, InnerMostSeat, _BaseRules.SeatInterferenceDelay);
+}
+
+void SendPassengerBack(Person* _Passenger, int _DistanceToTargetSeat, int _InnerMostSeat, int _AdditionalDelay)
+{
+	_Passenger->IsBackingUp = true;
+	_Passenger->SeatInterferenceDelay = BackupWaitSteps(_DistanceToTargetSeat, _InnerMostSeat, _AdditionalDelay);
+	_Passenger->MovedLastTurn = true;
+}
+
+bool IsAnyOnMatrix(Person** _PassengerLocationMatrix[], int X, int Y)
+{
+	if (_PassengerLocationMatrix[Y][X] != NULL)
+		return true;
+	return false;
 }
 
 int BackupWaitSteps(int TargetSeat, int InnerBlockingSeat, int ExtraPenalty)
