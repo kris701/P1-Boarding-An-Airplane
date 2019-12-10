@@ -1,11 +1,12 @@
 #include "Simulation.h"
 
-void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool ShouldUpdateVisuals, int* _StepsTaken, Map _PlaneMap, BasicSimulationRules _BaseRules)
+int RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool ShouldUpdateVisuals, Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
 	bool AllSeated = false;
 	clock_t OneSecWatchStart, OneSecWatchEnd;
 	int RPSCount = 0;
 	int ShowRPCCount = 0;
+	int StepsTaken = 0;
 
 	OneSecWatchStart = clock();
 
@@ -30,8 +31,9 @@ void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool S
 			UpdateVisuals(_PassengerLocationMatrix, _PlaneMap, &ShowRPCCount, &RPSCount, &OneSecWatchStart, &OneSecWatchEnd);
 		}
 
-		(*_StepsTaken)++;
+		StepsTaken++;
 	}
+	return StepsTaken;
 }
 
 void UpdateVisuals(Person** _PassengerLocationMatrix[], Map _PlaneMap, int* ShowRPCCount, int* RPSCount, int* OneSecWatchStart, int* OneSecWatchEnd) {

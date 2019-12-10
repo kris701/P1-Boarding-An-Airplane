@@ -1,6 +1,6 @@
 #include "ReadSimulationConfig.h"
 
-BasicSimulationRules ReadBasicRulesConfigFile(BasicSimulationRules _BaseRules, const char* FileName)
+bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* FileName)
 {
 	FILE* BSRFile;
 	fopen_s(&BSRFile, FileName, "r");
@@ -14,7 +14,7 @@ BasicSimulationRules ReadBasicRulesConfigFile(BasicSimulationRules _BaseRules, c
 		if (Buffer == NULL || BufferLength == 0)
 		{
 			printf("Error reading config file!");
-			return _BaseRules;
+			return false;
 		}
 
 		while (!feof(BSRFile))
@@ -25,19 +25,19 @@ BasicSimulationRules ReadBasicRulesConfigFile(BasicSimulationRules _BaseRules, c
 			{
 				SubStringBuffer = strchr(Buffer, '=') + 1;
 				SubStringBuffer[strlen(SubStringBuffer) - 1] = 0;
-				strcpy_s(_BaseRules.BoardingMethodFile, 128, SubStringBuffer);
+				strcpy_s((*_BasicRules).BoardingMethodFile, 128, SubStringBuffer);
 				continue;
 			}
 			if (strstr(Buffer, "CrossDelay"))
 			{
 				SubStringBuffer = strchr(Buffer, '=') + 1;
-				_BaseRules.CrossDelay = atoi(SubStringBuffer);
+				(*_BasicRules).CrossDelay = atoi(SubStringBuffer);
 				continue;
 			}
 			if (strstr(Buffer, "ShuffleDelay"))
 			{
 				SubStringBuffer = strchr(Buffer, '=') + 1;
-				_BaseRules.ShuffleDelay = atoi(SubStringBuffer);
+				(*_BasicRules).ShuffleDelay = atoi(SubStringBuffer);
 				continue;
 			}
 			if (strstr(Buffer, "LuggageGen"))
@@ -46,13 +46,13 @@ BasicSimulationRules ReadBasicRulesConfigFile(BasicSimulationRules _BaseRules, c
 
 				int ItemCount = GetItemCountInConfig(SubStringBuffer, BufferLength);
 
-				_BaseRules.LuggageGenerationValues = calloc(ItemCount, sizeof(ValueStatistic));
-				_BaseRules.LuggageGenerationValuesLength = ItemCount;
+				(*_BasicRules).LuggageGenerationValues = calloc(ItemCount, sizeof(ValueStatistic));
+				(*_BasicRules).LuggageGenerationValuesLength = ItemCount;
 
 				for (int i = 0; i < ItemCount; i++)
 				{
-					_BaseRules.LuggageGenerationValues[i].Value = FindValueBetweenChars(&SubStringBuffer, '[', ',');
-					_BaseRules.LuggageGenerationValues[i].Possibility = FindValueBetweenChars(&SubStringBuffer, ',', ']');
+					(*_BasicRules).LuggageGenerationValues[i].Value = FindValueBetweenChars(&SubStringBuffer, '[', ',');
+					(*_BasicRules).LuggageGenerationValues[i].Possibility = FindValueBetweenChars(&SubStringBuffer, ',', ']');
 				}
 				continue;
 			}
@@ -62,13 +62,13 @@ BasicSimulationRules ReadBasicRulesConfigFile(BasicSimulationRules _BaseRules, c
 
 				int ItemCount = GetItemCountInConfig(SubStringBuffer, BufferLength);
 
-				_BaseRules.WalkingspeedGenerationValues = calloc(ItemCount, sizeof(ValueStatistic));
-				_BaseRules.WalkingspeedGenerationValuesLength = ItemCount;
+				(*_BasicRules).WalkingspeedGenerationValues = calloc(ItemCount, sizeof(ValueStatistic));
+				(*_BasicRules).WalkingspeedGenerationValuesLength = ItemCount;
 
 				for (int i = 0; i < ItemCount; i++)
 				{
-					_BaseRules.WalkingspeedGenerationValues[i].Value = FindValueBetweenChars(&SubStringBuffer, '[', ',');
-					_BaseRules.WalkingspeedGenerationValues[i].Possibility = FindValueBetweenChars(&SubStringBuffer, ',', ']');
+					(*_BasicRules).WalkingspeedGenerationValues[i].Value = FindValueBetweenChars(&SubStringBuffer, '[', ',');
+					(*_BasicRules).WalkingspeedGenerationValues[i].Possibility = FindValueBetweenChars(&SubStringBuffer, ',', ']');
 				}
 
 				continue;
@@ -79,13 +79,11 @@ BasicSimulationRules ReadBasicRulesConfigFile(BasicSimulationRules _BaseRules, c
 	}
 	else
 	{
-		_BaseRules.CrossDelay = 0;
-		_BaseRules.ShuffleDelay = 0;
-		_BaseRules.LuggageGenerationValuesLength = 0;
-		_BaseRules.WalkingspeedGenerationValuesLength = 0;
+		printf("Error reading config file!");
+		return false;
 	}
 
-	return _BaseRules;
+	return true;
 }
 
 int FindValueBetweenChars(char* SubStringBuffer[], char FromChar, char ToChar)

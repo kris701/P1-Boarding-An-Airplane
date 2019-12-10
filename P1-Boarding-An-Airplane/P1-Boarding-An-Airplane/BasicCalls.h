@@ -14,3 +14,5 @@ Location* GetMapLocation(Map* map, int x, int y);
 Location* GetMapLocationFromPoint(Map* map, Point point);
 int GetNumberOfCharsForLongestLineInFile(FILE* _File);
 int GetNumberOfLinesInFile(FILE* _File);
+bool FileExists(FILE* _File);
+void DoOpenFile(FILE** _File, const char* _FileName, const char* _Parameter);

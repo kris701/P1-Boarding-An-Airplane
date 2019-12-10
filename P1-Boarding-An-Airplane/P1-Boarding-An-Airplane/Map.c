@@ -1,19 +1,26 @@
 #include "Map.h"
 
-bool ReadMapFromFile(Map* _PlaneMap, FILE* _File) 
+bool ReadMapFromFile(Map* _PlaneMap, BasicSimulationRules _BasicRules) 
 {
+	FILE* MapFile;
+
+	DoOpenFile(&MapFile, _BasicRules.BoardingMethodFile, "r");
+
+	if (MapFile == NULL)
+		return false;
+
     FreeMap(_PlaneMap);
-    _PlaneMap->Width  = GetSeatsPerLine(_File);
-    _PlaneMap->Height = GetNumberOfLinesInFile(_File); 
-	_PlaneMap->DoorCount = GetNumberOfDoorsInBoardingMethod(_File);
-	_PlaneMap->LongestDigit = GetLongestDigitInFile(_File);
+    _PlaneMap->Width  = GetSeatsPerLine(MapFile);
+    _PlaneMap->Height = GetNumberOfLinesInFile(MapFile); 
+	_PlaneMap->DoorCount = GetNumberOfDoorsInBoardingMethod(MapFile);
+	_PlaneMap->LongestDigit = GetLongestDigitInFile(MapFile);
 
     if (AllocateMap(_PlaneMap) == false) 
 	{
         return false;
     }
 
-    int bufferLength = GetNumberOfCharsForLongestLineInFile(_File);
+    int bufferLength = GetNumberOfCharsForLongestLineInFile(MapFile);
     char* buffer = calloc(bufferLength, sizeof(char));
     if (buffer == NULL) 
 	{
@@ -21,11 +28,11 @@ bool ReadMapFromFile(Map* _PlaneMap, FILE* _File)
         return false;
     }
 
-    long int initialFileCursorLocation = ftell(_File);
-    fseek(_File, 0, SEEK_SET);
+    long int initialFileCursorLocation = ftell(MapFile);
+    fseek(MapFile, 0, SEEK_SET);
 
     int x=0, y=0, doorIndex=0;
-    while (fgets(buffer, bufferLength, _File) != NULL)  // One iteration per line, until NULL is returned at EOF
+    while (fgets(buffer, bufferLength, MapFile) != NULL)  // One iteration per line, until NULL is returned at EOF
 	{
         char field[32];
 		int bufferOffset = 0;
@@ -84,7 +91,7 @@ bool ReadMapFromFile(Map* _PlaneMap, FILE* _File)
 
     free(buffer);
 
-    fseek(_File, initialFileCursorLocation, SEEK_SET);
+    fseek(MapFile, initialFileCursorLocation, SEEK_SET);
     return true;
 }
 
