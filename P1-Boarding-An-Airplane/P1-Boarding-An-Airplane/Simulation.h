@@ -18,3 +18,12 @@ void SendRowBack(Person** _PassengerLocationMatrix[], Person* _Person, Map _Plan
 void PassengerMovement(Person* _Passenger, Person** _PassengerLocationMatrix[], Map _PlaneMap, BasicSimulationRules _BaseRules);
 int BackupWaitSteps(int _TargetSeat, int _InnerBlockingSeat, int ExtraPenalty);
 bool IsInDelayAction(Person* _Person, Map _PlaneMap);
+bool CanPassengerSit(Person _Person);
+bool MoveAllPassengersAndCheckIfSeated(Person _PassengerList[], Person** _PassengerLocationMatrix[], Map _PlaneMap, BasicSimulationRules _BaseRules);
+void TeleportPassengerToPoint(Person* _Passenger, Person** _PassengerLocationMatrix[], Map _PlaneMap, Point _TargetPoint);
+void AttemptToMovePassengerOneStep(Person* _Passenger, Person** _PassengerLocationMatrix[], Map _PlaneMap, BasicSimulationRules _BaseRules);
+void PerformPassengersNextMove(Person* _Passenger);
+void CheckForCrossingAndPerform(Person* _Person, Person* _OtherPerson, Person** _PassengerLocationMatrix[], Map _PlaneMap, BasicSimulationRules _BaseRules);
+bool CheckForSeatInterferenceAndPerform(Person* _Person, Person* _OtherPerson, Person** _PassengerLocationMatrix[], Map _PlaneMap, BasicSimulationRules _BaseRules);
+void SendPassengerBack(Person* _Passenger, int _DistanceToTargetSeat, int _InnerMostSeat, int _AdditionalDelay);
+bool IsAnyOnMatrix(Person** _PassengerLocationMatrix[], int X, int Y);

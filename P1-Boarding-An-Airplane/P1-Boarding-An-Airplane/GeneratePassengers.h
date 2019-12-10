@@ -10,7 +10,7 @@
 #include "BasicCalls.h"
 
 void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap, BasicSimulationRules _BaseRules);
-void GeneratePassenger(Person* Passenger, Map _PlaneMap, BasicSimulationRules _BaseRules);
+void InitialisePassenger(Person* Passenger, Map _PlaneMap, BasicSimulationRules _BaseRules);
 int GenerateLuggage(BasicSimulationRules _BaseRules);
 int GetNearestStartingDoorID(Person* Passenger, Map _PlaneMap);
 int GenerateWalkSpeed(BasicSimulationRules _BaseRules);
