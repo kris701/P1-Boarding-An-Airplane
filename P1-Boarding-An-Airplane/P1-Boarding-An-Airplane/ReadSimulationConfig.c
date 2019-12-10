@@ -34,12 +34,13 @@ bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* Fil
 
 				int ItemCount = GetItemCountInConfig(SubStringBuffer, BufferLength);
 
-				(*_BasicRules).MultipleMaps = calloc(ItemCount, sizeof(char[128]));
+				(*_BasicRules).MultipleMaps = calloc(ItemCount, sizeof(char*));
 				(*_BasicRules).MultipleMapsLength = ItemCount;
 
 				for (int i = 0; i < ItemCount; i++)
 				{
-					(*_BasicRules).MultipleMaps[i] = FindValueBetweenChars(&SubStringBuffer, '[', ']');
+					(*_BasicRules).MultipleMaps[i] = calloc(ItemCount, sizeof(char) * 128);
+					FindStrBetweenChars(&SubStringBuffer, &((*_BasicRules).MultipleMaps[i]), 128, '[', ']');
 				}
 				continue;
 			}
@@ -66,8 +67,8 @@ bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* Fil
 
 				for (int i = 0; i < ItemCount; i++)
 				{
-					(*_BasicRules).LuggageGenerationValues[i].Value = FindValueBetweenChars(&SubStringBuffer, '[', ',');
-					(*_BasicRules).LuggageGenerationValues[i].Possibility = FindValueBetweenChars(&SubStringBuffer, ',', ']');
+					(*_BasicRules).LuggageGenerationValues[i].Value = FindIntBetweenChars(&SubStringBuffer, '[', ',');
+					(*_BasicRules).LuggageGenerationValues[i].Possibility = FindIntBetweenChars(&SubStringBuffer, ',', ']');
 				}
 				continue;
 			}
@@ -82,8 +83,8 @@ bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* Fil
 
 				for (int i = 0; i < ItemCount; i++)
 				{
-					(*_BasicRules).WalkingspeedGenerationValues[i].Value = FindValueBetweenChars(&SubStringBuffer, '[', ',');
-					(*_BasicRules).WalkingspeedGenerationValues[i].Possibility = FindValueBetweenChars(&SubStringBuffer, ',', ']');
+					(*_BasicRules).WalkingspeedGenerationValues[i].Value = FindIntBetweenChars(&SubStringBuffer, '[', ',');
+					(*_BasicRules).WalkingspeedGenerationValues[i].Possibility = FindIntBetweenChars(&SubStringBuffer, ',', ']');
 				}
 
 				continue;
@@ -108,24 +109,31 @@ bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* Fil
 	return true;
 }
 
-int FindValueBetweenChars(char* SubStringBuffer[], char FromChar, char ToChar)
+int FindIntBetweenChars(char* SubStringBuffer[], char FromChar, char ToChar)
+{
+	char* NumVal = calloc(32, sizeof(char));
+
+	FindStrBetweenChars(SubStringBuffer, &NumVal, 32, FromChar, ToChar);
+
+	return atoi(NumVal);
+}
+
+void FindStrBetweenChars(char* SubStringBuffer[], char* Target[], int TargetLength, char FromChar, char ToChar)
 {
 	*SubStringBuffer = strchr(*SubStringBuffer, FromChar) + 1;
 	int IndexOffset = 0;
-	char NumVal[100] = { 0 };
-	for (int j = 0; j < 100; j++)
+
+	for (int j = 0; j < TargetLength; j++)
 	{
-		if ((*SubStringBuffer)[j] != ']')
+		if ((*SubStringBuffer)[j] != ToChar)
 		{
-			NumVal[IndexOffset] = (*SubStringBuffer)[j];
+			(*Target)[IndexOffset] = (*SubStringBuffer)[j];
 			IndexOffset++;
 		}
 		else
 			break;
 	}
 	*SubStringBuffer = strchr(*SubStringBuffer, ToChar);
-
-	return atoi(NumVal);
 }
 
 int GetItemCountInConfig(char SubStringBuffer[], int _BufferLength)

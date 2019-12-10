@@ -8,5 +8,6 @@
 #include "BasicCalls.h"
 
 bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* FileName);
-int FindValueBetweenChars(char* SubStringBuffer[], char FromChar, char ToChar);
+int FindIntBetweenChars(char* SubStringBuffer[], char FromChar, char ToChar);
 int GetItemCountInConfig(char SubStringBuffer[], int _BufferLength);
+void FindStrBetweenChars(char* SubStringBuffer[], char* Target[], int TargetLength, char FromChar, char ToChar);

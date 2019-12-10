@@ -20,8 +20,8 @@ int main()
 	if (!ReadMapFromFile(&PlaneMap, BasicRules))
 		return 0;
 
-	if (RunAll)
-		BoardingMethodCount = GetAllBoardingMethods();
+	//if (RunAll)
+	//	BoardingMethodCount = GetAllBoardingMethods();
 
 	printf("Using boarding method file: %s\n", BasicRules.BoardingMethodFile);
 
