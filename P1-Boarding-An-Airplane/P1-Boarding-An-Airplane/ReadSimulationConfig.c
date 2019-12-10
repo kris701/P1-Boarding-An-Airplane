@@ -34,10 +34,10 @@ bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* Fil
 				(*_BasicRules).CrossDelay = atoi(SubStringBuffer);
 				continue;
 			}
-			if (strstr(Buffer, "ShuffleDelay"))
+			if (strstr(Buffer, "SeatInterferenceDelay"))
 			{
 				SubStringBuffer = strchr(Buffer, '=') + 1;
-				(*_BasicRules).ShuffleDelay = atoi(SubStringBuffer);
+				(*_BasicRules).SeatInterferenceDelay = atoi(SubStringBuffer);
 				continue;
 			}
 			if (strstr(Buffer, "LuggageGen"))
@@ -71,6 +71,13 @@ bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* Fil
 					(*_BasicRules).WalkingspeedGenerationValues[i].Possibility = FindValueBetweenChars(&SubStringBuffer, ',', ']');
 				}
 
+				continue;
+			}
+			if (strstr(Buffer, "AssignToNearestDoor"))
+			{
+				SubStringBuffer = strchr(Buffer, '=') + 1;
+				if (strstr(SubStringBuffer, "true"))
+					(*_BasicRules).AssignToNearestDoor = true;
 				continue;
 			}
 		}

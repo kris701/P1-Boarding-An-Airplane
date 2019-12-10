@@ -208,7 +208,7 @@ void SendRowBack(Person** _PassengerLocationMatrix[], Person* _Person, Map _Plan
 				InnerMostSeat = abs(MomentPerson->Target.X - _PlaneMap.Doors[_Person->StartingDoorID].X);
 
 			MomentPerson->IsBackingUp = true;
-			MomentPerson->ShuffleDelay = BackupWaitSteps(DistanceToTargetSeat, InnerMostSeat, _BaseRules.ShuffleDelay);
+			MomentPerson->SeatInterferenceDelay = BackupWaitSteps(DistanceToTargetSeat, InnerMostSeat, _BaseRules.SeatInterferenceDelay);
 			MomentPerson->MovedLastTurn = true;
 		}
 
@@ -219,7 +219,7 @@ void SendRowBack(Person** _PassengerLocationMatrix[], Person* _Person, Map _Plan
 	}
 
 	_Person->IsBackingUp = true;
-	_Person->ShuffleDelay = BackupWaitSteps(DistanceToTargetSeat, InnerMostSeat, _BaseRules.ShuffleDelay);
+	_Person->SeatInterferenceDelay = BackupWaitSteps(DistanceToTargetSeat, InnerMostSeat, _BaseRules.SeatInterferenceDelay);
 	_Person->MovedLastTurn = true;
 }
 
@@ -240,9 +240,9 @@ bool IsInDelayAction(Person* _Person, Map _PlaneMap)
 		}
 	}
 
-	if (_Person->ShuffleDelay > 0)
+	if (_Person->SeatInterferenceDelay > 0)
 	{
-		_Person->ShuffleDelay--;
+		_Person->SeatInterferenceDelay--;
 
 		return true;
 	}
