@@ -1,11 +1,12 @@
 #include "Simulation.h"
 
-void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool ShouldUpdateVisuals, int* _StepsTaken, Map _PlaneMap, BasicSimulationRules _BaseRules)
+int RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool ShouldUpdateVisuals, Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
 	bool AllSeated = false;
 	clock_t OneSecWatchStart, OneSecWatchEnd;
 	int RPSCount = 0;
 	int ShowRPCCount = 0;
+	int StepsTaken = 0;
 
 	OneSecWatchStart = clock();
 
@@ -30,8 +31,9 @@ void RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool S
 			UpdateVisuals(_PassengerLocationMatrix, _PlaneMap, &ShowRPCCount, &RPSCount, &OneSecWatchStart, &OneSecWatchEnd);
 		}
 
-		(*_StepsTaken)++;
+		StepsTaken++;
 	}
+	return StepsTaken;
 }
 
 void UpdateVisuals(Person** _PassengerLocationMatrix[], Map _PlaneMap, int* ShowRPCCount, int* RPSCount, int* OneSecWatchStart, int* OneSecWatchEnd) {
@@ -206,7 +208,7 @@ void SendRowBack(Person** _PassengerLocationMatrix[], Person* _Person, Map _Plan
 				InnerMostSeat = abs(MomentPerson->Target.X - _PlaneMap.Doors[_Person->StartingDoorID].X);
 
 			MomentPerson->IsBackingUp = true;
-			MomentPerson->ShuffleDelay = BackupWaitSteps(DistanceToTargetSeat, InnerMostSeat, _BaseRules.ShuffleDelay);
+			MomentPerson->SeatInterferenceDelay = BackupWaitSteps(DistanceToTargetSeat, InnerMostSeat, _BaseRules.SeatInterferenceDelay);
 			MomentPerson->MovedLastTurn = true;
 		}
 
@@ -217,7 +219,7 @@ void SendRowBack(Person** _PassengerLocationMatrix[], Person* _Person, Map _Plan
 	}
 
 	_Person->IsBackingUp = true;
-	_Person->ShuffleDelay = BackupWaitSteps(DistanceToTargetSeat, InnerMostSeat, _BaseRules.ShuffleDelay);
+	_Person->SeatInterferenceDelay = BackupWaitSteps(DistanceToTargetSeat, InnerMostSeat, _BaseRules.SeatInterferenceDelay);
 	_Person->MovedLastTurn = true;
 }
 
@@ -238,9 +240,9 @@ bool IsInDelayAction(Person* _Person, Map _PlaneMap)
 		}
 	}
 
-	if (_Person->ShuffleDelay > 0)
+	if (_Person->SeatInterferenceDelay > 0)
 	{
-		_Person->ShuffleDelay--;
+		_Person->SeatInterferenceDelay--;
 
 		return true;
 	}

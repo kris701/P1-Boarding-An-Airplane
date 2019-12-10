@@ -71,3 +71,15 @@ int GetNumberOfLinesInFile(FILE* _File)
 	fseek(_File, initialFileCursorLocation, SEEK_SET);
 	return lines;
 }
+
+bool FileExists(FILE* _File)
+{
+	if (_File != NULL)
+		return true;
+	return false;
+}
+
+void DoOpenFile(FILE** _File, const char* _FileName, const char* _Parameter)
+{
+	fopen_s(&(*_File), _FileName, _Parameter);
+}

@@ -18,7 +18,7 @@ void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap, BasicSim
 
 	ScramblePassengers(_PersonList, Count);
 
-	AssignPassengerToNearestDoor(Count, _PersonList, _PlaneMap);
+	AssignPassengerToDoor(Count, _PersonList, _PlaneMap, _BaseRules);
 }
 
 void GeneratePassenger(Person* Passenger, Map _PlaneMap, BasicSimulationRules _BaseRules) {
@@ -32,7 +32,7 @@ void GeneratePassenger(Person* Passenger, Map _PlaneMap, BasicSimulationRules _B
     Passenger->LuggageCount = GenerateLuggage(_BaseRules);
 
     Passenger->IsBackingUp = false;
-    Passenger->ShuffleDelay = 0;
+    Passenger->SeatInterferenceDelay = 0;
     Passenger->CrossDelay = 0;
 
 	Passenger->MovedLastTurn = true;
@@ -82,10 +82,26 @@ int GenerateWalkSpeed(BasicSimulationRules _BaseRules)
 	return 0;
 }
 
+void AssignPassengerToDoor(int Count, Person _PassengerList[], Map _PlaneMap, BasicSimulationRules _BaseRules)
+{
+	if (_BaseRules.AssignToNearestDoor)
+		AssignPassengerToNearestDoor(Count, _PassengerList, _PlaneMap);
+	else
+		AssignPassengerToRandomDoor(Count, _PassengerList, _PlaneMap);
+}
+
 void AssignPassengerToNearestDoor(int Count, Person _PassengerList[], Map _PlaneMap)
 {
 	for (int i = 0; i < Count; i++) {
 		_PassengerList[i].StartingDoorID = GetNearestStartingDoorID(&_PassengerList[i], _PlaneMap);
+		_PassengerList[i].CurrentPos = _PlaneMap.Doors[_PassengerList[i].StartingDoorID];
+	}
+}
+
+void AssignPassengerToRandomDoor(int Count, Person _PassengerList[], Map _PlaneMap)
+{
+	for (int i = 0; i < Count; i++) {
+		_PassengerList[i].StartingDoorID = GetRandomNumberRanged(0, _PlaneMap.DoorCount - 1);
 		_PassengerList[i].CurrentPos = _PlaneMap.Doors[_PassengerList[i].StartingDoorID];
 	}
 }

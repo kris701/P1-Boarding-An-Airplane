@@ -7,6 +7,6 @@
 #include "StructsAndEnums.h"
 #include "BasicCalls.h"
 
-BasicSimulationRules ReadBasicRulesConfigFile(BasicSimulationRules _BaseRules, const char* FileName);
+bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* FileName);
 int FindValueBetweenChars(char* SubStringBuffer[], char FromChar, char ToChar);
 int GetItemCountInConfig(char SubStringBuffer[], int _BufferLength);
