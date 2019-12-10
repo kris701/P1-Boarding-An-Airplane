@@ -10,31 +10,48 @@ int main()
 	BasicSimulationRules BasicRules = { 0 };
 
 	bool RunAll = true;
-	int BoardingMethodCount = 0;
+	int BoardingMethodCount = 1;
 
 	srand(time(NULL));
 
 	if (!ReadBasicRulesConfigFile(&BasicRules, "config.ini"))
 		return 0;
 
-	if (!ReadMapFromFile(&PlaneMap, BasicRules))
-		return 0;
+	
 
-	//if (RunAll)
-	//	BoardingMethodCount = GetAllBoardingMethods();
-
-	printf("Using boarding method file: %s\n", BasicRules.BoardingMethodFile);
-
-	AllocatePassengerList(&PassengerList, PlaneMap);
-	AllocatePassengerLocationMatrix(&PassengerLocationMatrix, PlaneMap);
+	if (BasicRules.DoAllRuns)
+		BoardingMethodCount = BasicRules.MultipleMapsLength;
 
 	// 2 function used to get user input
 	UpdateGraphics = GetYNInput("Update Graphics?");
 	RunsToDo = GetIntInput("How many runs?", 0, MaxRuns);
 
-	RunAllSimulationsAndSaveToOutput(PassengerList, PassengerLocationMatrix, PlaneMap, BasicRules, UpdateGraphics, RunsToDo);
+	for (int i = 0; i < BoardingMethodCount; i++) {
+		if (BasicRules.DoAllRuns)
+			strncpy_s(BasicRules.BoardingMethodFile, 128, BasicRules.MultipleMaps[i], strlen(BasicRules.MultipleMaps[i]));
 
-	CleanupAllocations(PassengerList, PassengerLocationMatrix);
+		char* BoardingMethodString = calloc(64, sizeof(char));
+		strncpy_s(BoardingMethodString, 64, BasicRules.BoardingMethodFile + 16, strlen(BasicRules.BoardingMethodFile) - 20);
+		strcpy_s(BasicRules.BoardingMethodName, 128, BoardingMethodString);
+
+		PlaneMap.DoorCount = 0;
+		PlaneMap.Doors = 0;
+		PlaneMap.Height = 0;
+		PlaneMap.Locations = 0;
+		PlaneMap.LongestDigit = 0;
+		PlaneMap.NumberOfSeats = 0;
+		PlaneMap.Width = 0;
+		if (!ReadMapFromFile(&PlaneMap, BasicRules))
+			return 0;
+
+		AllocatePassengerList(&PassengerList, PlaneMap);
+		AllocatePassengerLocationMatrix(&PassengerLocationMatrix, PlaneMap);
+
+		RunAllSimulationsAndSaveToOutput(PassengerList, PassengerLocationMatrix, PlaneMap, BasicRules, UpdateGraphics, RunsToDo);
+
+		CleanupAllocations(PassengerList, PassengerLocationMatrix);
+		
+	}
 
 	return 0;
 }
@@ -100,8 +117,12 @@ void RunAllSimulationsAndSaveToOutput(Person* _PassengerList, Person*** _Passeng
 	FILE* OutputFile;
 	int TotalStepsTaken = 0;
 	clock_t TotalWatchStart, TotalWatchEnd;
-
-	DoOpenFile(&OutputFile, "output.csv", "w+");
+	
+	char BoardingMethodFileString[128] = "Outputs/";
+	
+	strcat_s(BoardingMethodFileString, 128, _BasicRules.BoardingMethodName);
+	strncat_s(BoardingMethodFileString, 64, ".csv", 4);
+	DoOpenFile(&OutputFile, BoardingMethodFileString, "w+");
 
 	if (!FileExists(OutputFile))
 		return;
@@ -127,7 +148,7 @@ void RunAllSimulationsAndSaveToOutput(Person* _PassengerList, Person*** _Passeng
 
 	fclose(OutputFile);
 
-	printf("\nFinished! Took %d ms and an avr of %d iterations pr run\n", (int)((((double)TotalWatchEnd - (double)TotalWatchStart) / CLOCKS_PER_SEC) * 1000), (TotalStepsTaken / _RunsToDo));
+	printf("\nFinished - %-20s Took %4d ms and an avr of %4d iterations pr run\n", _BasicRules.BoardingMethodName, (int)((((double)TotalWatchEnd - (double)TotalWatchStart) / CLOCKS_PER_SEC) * 1000), (TotalStepsTaken / _RunsToDo));
 }
 
 // A function that runs the simulation once and gets amount of stepts taken

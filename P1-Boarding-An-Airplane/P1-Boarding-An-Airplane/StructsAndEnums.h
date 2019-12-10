@@ -60,6 +60,8 @@ typedef struct _BasicSimulationRules
 	bool AssignToNearestDoor;
 	char** MultipleMaps;
 	int MultipleMapsLength;
+	bool DoAllRuns;
+	char BoardingMethodName[128];
 } BasicSimulationRules;
 
 typedef struct _Location {

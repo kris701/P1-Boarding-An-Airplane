@@ -96,6 +96,13 @@ bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* Fil
 					(*_BasicRules).AssignToNearestDoor = true;
 				continue;
 			}
+			if (strstr(Buffer, "DoAllRuns"))
+			{
+				SubStringBuffer = strchr(Buffer, '=') + 1;
+				if (strstr(SubStringBuffer, "true"))
+					(*_BasicRules).DoAllRuns = true;
+				continue;
+			}
 		}
 
 		free(Buffer);
