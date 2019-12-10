@@ -176,12 +176,11 @@ void SetMapValuesFromFile(FILE* _MapFile, Map* _PlaneMap)
 	long int initialFileCursorLocation = ftell(_MapFile);
 	fseek(_MapFile, 0, SEEK_SET);
 
-	int x = 0, y = 0, doorIndex = 0;
+	int x = -1, y = 0, doorIndex = 0;
 	while (fgets(buffer, bufferLength, _MapFile) != NULL)  // One iteration per line, until NULL is returned at EOF
 	{
 		char field[32];
 		int bufferOffset = 0;
-		int tmpInt;
 
 		while (sscanf_s(buffer + bufferOffset, "%[^,]", field, 32) == 1) // One iteration per field of data in a line
 		{
@@ -190,51 +189,59 @@ void SetMapValuesFromFile(FILE* _MapFile, Map* _PlaneMap)
 			if (bufferOffset > (int)strlen(buffer))
 				break;
 
+			x++;
 			switch (field[0])  // Special characters will typically just be the first character of the field.
 			{
 			case '|':
 				MapLocationSetValue(_PlaneMap, x, y, BoardingGroup_Walkway);
-				x++;
 				break;
 			case 'D':
-				MapLocationSetValue(_PlaneMap, x, y, BoardingGroup_Door);
-				_PlaneMap->Doors[doorIndex].X = x;
-				_PlaneMap->Doors[doorIndex].Y = y;
-				doorIndex++;
-				x++;
+				MapSetDoorValue(_PlaneMap, x, y, &doorIndex);
 				break;
 			case '-':
 				MapLocationSetValue(_PlaneMap, x, y, BoardingGroup_Padding);
-				x++;
 				break;
 			case '\r': break;
 			case '\0': break;
 			case '\n':
 				y++;
-				x = 0;
+				x = -1;
 				break;
 
 			default:
-				if (sscanf_s(field, "%d", &tmpInt) == 1)
-				{
-					MapLocationSetValue(_PlaneMap, x, y, tmpInt);
-					GetMapLocation(_PlaneMap, x, y)->IsTaken = false;
-					_PlaneMap->NumberOfSeats++;
-					x++;
-				}
-				else
-				{
-					fprintf(stderr, "Unknown value '%s'\n", field);
-					MapLocationSetValue(_PlaneMap, x, y, BoardingGroup_Undefined);
-				}
+				MapSetSeatValue(_PlaneMap, x, y, field);
 				break;
 			}
 		}
 		y++;
-		x = 0;
+		x = -1;
 	}
 
 	free(buffer);
 
 	fseek(_MapFile, initialFileCursorLocation, SEEK_SET);
+}
+
+void MapSetDoorValue(Map* _PlaneMap, int _x, int _y, int* _doorIndex)
+{
+	MapLocationSetValue(_PlaneMap, _x, _y, BoardingGroup_Door);
+	_PlaneMap->Doors[*_doorIndex].X = _x;
+	_PlaneMap->Doors[*_doorIndex].Y = _y;
+	(*_doorIndex)++;
+}
+
+void MapSetSeatValue(Map* _PlaneMap, int _x, int _y, char _field[])
+{
+	int _tmpInt = 0;
+	if (sscanf_s(_field, "%d", &_tmpInt) == 1)
+	{
+		MapLocationSetValue(_PlaneMap, _x, _y, _tmpInt);
+		GetMapLocation(_PlaneMap, _x, _y)->IsTaken = false;
+		_PlaneMap->NumberOfSeats++;
+	}
+	else
+	{
+		fprintf(stderr, "Unknown value '%s'\n", _field);
+		MapLocationSetValue(_PlaneMap, _x, _y, BoardingGroup_Undefined);
+	}
 }
