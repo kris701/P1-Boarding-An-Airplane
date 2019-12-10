@@ -22,6 +22,7 @@ int main()
 	AllocatePassengerList(&PassengerList, PlaneMap);
 	AllocatePassengerLocationMatrix(&PassengerLocationMatrix, PlaneMap);
 
+	// 2 function used to get user input
 	UpdateGraphics = GetYNInput("Update Graphics?");
 	RunsToDo = GetIntInput("How many runs?", 0, MaxRuns);
 
@@ -32,11 +33,13 @@ int main()
 	return 0;
 }
 
+// A function that flushes input
 void FlushInput()
 {
 	while (getchar() != '\n');
 }
 
+// A bool function that checks for y/n input
 bool GetYNInput(const char* _Text)
 {
 	char Choice = ' ';
@@ -48,6 +51,7 @@ bool GetYNInput(const char* _Text)
 	return Choice == 'y';
 }
 
+// A function that gets an interger input
 int GetIntInput(const char* _Text, int Min, int Max)
 {
 	int Value = Min - 1;
@@ -60,6 +64,7 @@ int GetIntInput(const char* _Text, int Min, int Max)
 	}
 	return Value;
 }
+
 
 void AllocatePassengerList(Person** _PassengerList, Map _PlaneMap)
 {
@@ -83,6 +88,7 @@ void ResetPassengerLocationMatrix(Person**** _PassengerLocationMatrix, Map _Plan
 	}
 }
 
+// A function that runs the simulation a given amount of times and saves data to a file
 void RunAllSimulationsAndSaveToOutput(Person* _PassengerList, Person*** _PassengerLocationMatrix, Map _PlaneMap, BasicSimulationRules _BasicRules, bool _UpdateGraphics, int _RunsToDo)
 {
 	FILE* OutputFile;
@@ -110,6 +116,7 @@ void RunAllSimulationsAndSaveToOutput(Person* _PassengerList, Person*** _Passeng
 	printf("\nFinished! Took %d ms and an avr of %d iterations pr run\n", (int)((((double)TotalWatchEnd - (double)TotalWatchStart) / CLOCKS_PER_SEC) * 1000), (TotalStepsTaken / _RunsToDo));
 }
 
+// A function that runs the simulation once and gets amount of stepts taken
 int RunOneSimulationAndGetSteps(Person* _PassengerList, Person*** _PassengerLocationMatrix, Map _PlaneMap, BasicSimulationRules _BasicRules, bool _UpdateGraphics, FILE* _OutputFile)
 {
 	int StepsTaken = 0;
