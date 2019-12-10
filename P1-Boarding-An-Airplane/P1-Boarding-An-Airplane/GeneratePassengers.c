@@ -3,7 +3,7 @@
 void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
     for (int i = 0; i < Count; i++) {
-        GeneratePassenger(&(_PersonList[i]), _PlaneMap, _BaseRules);
+        InitialisePassenger(&(_PersonList[i]), _PlaneMap, _BaseRules);
     }
 
 	for (int y = 0; y < _PlaneMap.Height; y++)
@@ -21,7 +21,7 @@ void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap, BasicSim
 	AssignPassengerToDoor(Count, _PersonList, _PlaneMap, _BaseRules);
 }
 
-void GeneratePassenger(Person* Passenger, Map _PlaneMap, BasicSimulationRules _BaseRules) {
+void InitialisePassenger(Person* Passenger, Map _PlaneMap, BasicSimulationRules _BaseRules) {
 	Passenger->WalkingSpeed = GenerateWalkSpeed(_BaseRules);
 
     Passenger->StartingDoorID = 0;
