@@ -31,12 +31,13 @@ int main()
 
 	return 0;
 }
-
+// The getchar function eats up everything until it reaches \n
 void FlushInput()
 {
 	while (getchar() != '\n');
 }
 
+// Checks if the input is 'y'
 bool GetYNInput(const char* _Text)
 {
 	char Choice = ' ';
@@ -48,6 +49,7 @@ bool GetYNInput(const char* _Text)
 	return Choice == 'y';
 }
 
+// Asks the user to input amount of runs wanted
 int GetIntInput(const char* _Text, int Min, int Max)
 {
 	int Value = Min - 1;
