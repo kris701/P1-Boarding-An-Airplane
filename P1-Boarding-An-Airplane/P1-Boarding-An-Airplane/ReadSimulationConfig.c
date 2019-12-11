@@ -30,18 +30,7 @@ bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* Fil
 			}
 			if (strstr(Buffer, "MultipleMaps"))
 			{
-				RemoveIdentifier(&SubStringBuffer, BufferLength, Buffer);
-
-				int ItemCount = GetItemCountInConfig(SubStringBuffer, BufferLength);
-
-				(*_BasicRules).MultipleMaps = calloc(ItemCount, sizeof(char*));
-				(*_BasicRules).MultipleMapsLength = ItemCount;
-
-				for (int i = 0; i < ItemCount; i++)
-				{
-					(*_BasicRules).MultipleMaps[i] = calloc(ItemCount, sizeof(char) * 128);
-					FindStrBetweenChars(&SubStringBuffer, &((*_BasicRules).MultipleMaps[i]), 128, '[', ']');
-				}
+				GetStringsOfItems(BufferLength, Buffer, &((*_BasicRules).MultipleMaps), 128, &((*_BasicRules).MultipleMapsLength));
 				continue;
 			}
 			if (strstr(Buffer, "CrossDelay"))
@@ -56,35 +45,12 @@ bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* Fil
 			}
 			if (strstr(Buffer, "LuggageGen"))
 			{
-				SubStringBuffer = strchr(Buffer, '=') + 1;
-
-				int ItemCount = GetItemCountInConfig(SubStringBuffer, BufferLength);
-
-				(*_BasicRules).LuggageGenerationValues = calloc(ItemCount, sizeof(ValueStatistic));
-				(*_BasicRules).LuggageGenerationValuesLength = ItemCount;
-
-				for (int i = 0; i < ItemCount; i++)
-				{
-					(*_BasicRules).LuggageGenerationValues[i].Value = FindIntBetweenChars(&SubStringBuffer, '[', ',');
-					(*_BasicRules).LuggageGenerationValues[i].Possibility = FindIntBetweenChars(&SubStringBuffer, ',', ']');
-				}
+				GetValueStastisticsOfItems(BufferLength, Buffer, &((*_BasicRules).LuggageGenerationValues), &((*_BasicRules).LuggageGenerationValuesLength));
 				continue;
 			}
 			if (strstr(Buffer, "WalkspeedGen"))
 			{
-				SubStringBuffer = strchr(Buffer, '=') + 1;
-
-				int ItemCount = GetItemCountInConfig(SubStringBuffer, BufferLength);
-
-				(*_BasicRules).WalkingspeedGenerationValues = calloc(ItemCount, sizeof(ValueStatistic));
-				(*_BasicRules).WalkingspeedGenerationValuesLength = ItemCount;
-
-				for (int i = 0; i < ItemCount; i++)
-				{
-					(*_BasicRules).WalkingspeedGenerationValues[i].Value = FindIntBetweenChars(&SubStringBuffer, '[', ',');
-					(*_BasicRules).WalkingspeedGenerationValues[i].Possibility = FindIntBetweenChars(&SubStringBuffer, ',', ']');
-				}
-
+				GetValueStastisticsOfItems(BufferLength, Buffer, &((*_BasicRules).WalkingspeedGenerationValues), &((*_BasicRules).WalkingspeedGenerationValuesLength));
 				continue;
 			}
 			if (strstr(Buffer, "AssignToNearestDoor"))
@@ -139,6 +105,8 @@ void GetStringAfterIdentifier(int BufferSize, char* _Buffer, char* Target[])
 	char* SubStringBuffer = calloc(BufferSize, sizeof(char));
 
 	RemoveIdentifier(&SubStringBuffer, BufferSize, _Buffer);
+	RemoveLastCharacter(&SubStringBuffer, BufferSize, _Buffer);
+
 	strcpy_s(*Target, BufferSize, SubStringBuffer);
 }
 
@@ -147,6 +115,7 @@ int GetIntAfterIdentifier(int BufferSize, char* _Buffer)
 	char* SubStringBuffer = calloc(BufferSize, sizeof(char));
 
 	RemoveIdentifier(&SubStringBuffer, BufferSize, _Buffer);
+	RemoveLastCharacter(&SubStringBuffer, BufferSize, _Buffer);
 	
 	return atoi(SubStringBuffer);
 }
@@ -156,6 +125,7 @@ bool GetBoolAfterIdentifier(int BufferSize, char* _Buffer)
 	char* SubStringBuffer = calloc(BufferSize, sizeof(char));
 
 	RemoveIdentifier(&SubStringBuffer, BufferSize, _Buffer);
+	RemoveLastCharacter(&SubStringBuffer, BufferSize, _Buffer);
 
 	if (strstr(SubStringBuffer, "true"))
 		return true;
@@ -166,6 +136,10 @@ bool GetBoolAfterIdentifier(int BufferSize, char* _Buffer)
 void RemoveIdentifier(char** _SubStringBuffer, int SubStringBufferLength, char* _Buffer)
 {
 	*_SubStringBuffer = strchr(_Buffer, '=') + 1;
+}
+
+void RemoveLastCharacter(char** _SubStringBuffer, int SubStringBufferLength, char* _Buffer)
+{
 	for (int i = 0; i < SubStringBufferLength; i++)
 	{
 		if ((*_SubStringBuffer)[i] == '\n')
@@ -173,5 +147,45 @@ void RemoveIdentifier(char** _SubStringBuffer, int SubStringBufferLength, char* 
 			(*_SubStringBuffer)[i] = '\0';
 			break;
 		}
+	}
+}
+
+void GetStringsOfItems(int SubStringBufferLength, char* _Buffer, char*** Target, int TargetSize, int* TargetLength)
+{
+	char* SubStringBuffer = calloc(SubStringBufferLength, sizeof(char));
+
+	RemoveIdentifier(&SubStringBuffer, SubStringBufferLength, _Buffer);
+
+	int ItemCount = GetItemCountInConfig(SubStringBuffer, SubStringBufferLength);
+
+	RemoveLastCharacter(&SubStringBuffer, SubStringBufferLength, _Buffer);
+
+	*Target = calloc(ItemCount, sizeof(char**));
+	*TargetLength = ItemCount;
+
+	for (int i = 0; i < ItemCount; i++)
+	{
+		(*Target)[i] = calloc(TargetSize, sizeof(char));
+		FindStrBetweenChars(&SubStringBuffer, &((*Target)[i]), TargetSize, '[', ']');
+	}
+}
+
+void GetValueStastisticsOfItems(int SubStringBufferLength, char* _Buffer, ValueStatistic** Target, int* TargetLength)
+{
+	char* SubStringBuffer = calloc(SubStringBufferLength, sizeof(char));
+
+	RemoveIdentifier(&SubStringBuffer, SubStringBufferLength, _Buffer);
+
+	int ItemCount = GetItemCountInConfig(SubStringBuffer, SubStringBufferLength);
+
+	RemoveLastCharacter(&SubStringBuffer, SubStringBufferLength, _Buffer);
+
+	*Target = calloc(ItemCount, sizeof(ValueStatistic));
+	*TargetLength = ItemCount;
+
+	for (int i = 0; i < ItemCount; i++)
+	{
+		(*Target)[i].Value = FindIntBetweenChars(&SubStringBuffer, '[', ',');
+		(*Target)[i].Possibility = FindIntBetweenChars(&SubStringBuffer, ',', ']');
 	}
 }

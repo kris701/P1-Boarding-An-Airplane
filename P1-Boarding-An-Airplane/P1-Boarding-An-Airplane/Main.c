@@ -14,6 +14,7 @@ int main()
 
 	UpdateGraphics = GetYNInput("Update Graphics?");
 	RunsToDo = GetIntInput("How many runs?", 0, MaxRuns);
+
 	if (BasicRules.DoAllRuns)
 		RunMultipleSimulations(PlaneMap, BasicRules, UpdateGraphics, RunsToDo);
 	else
@@ -108,8 +109,8 @@ void RunAllSimulationsAndSaveToOutput(Map _PlaneMap, BasicSimulationRules _Basic
 
 	if (!FileExists(OutputFile)) {
 		fprintf(stderr, "Output file missing");
-	}
 		return;
+	}
 
 	WriteProbabilitiesToOutput(OutputFile, _BasicRules);
 
