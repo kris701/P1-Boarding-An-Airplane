@@ -108,7 +108,7 @@ void RunAllSimulationsAndSaveToOutput(Map _PlaneMap, BasicSimulationRules _Basic
 	DoOpenFile(&OutputFile, AccOutputDir, "w+");
 
 	if (!FileExists(OutputFile)) {
-		fprintf(stderr, "Output file missing");
+		fprintf(stderr, "Output file missing\n");
 		return;
 	}
 
