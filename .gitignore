@@ -18,3 +18,6 @@ BoardingMethodGeneration/Release
 BoardingMethodGeneration/x64
 BoardingMethodGeneration/x32
 .Rproj.user
+*.csv
+RGraphs/.RData
+RGraphs/.Rhistory
