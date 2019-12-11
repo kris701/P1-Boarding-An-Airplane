@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <direct.h>
 
 #include "Map.h"
 #include "GeneratePassengers.h"

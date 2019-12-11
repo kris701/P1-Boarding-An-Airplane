@@ -91,6 +91,7 @@ bool FileExists(FILE* _File)
 // A function to open a file
 void DoOpenFile(FILE** _File, const char* _FileName, const char* _Parameter)
 {
+	_mkdir("./Output"); // Creates a directory. If it already exists. Will do nothing.
 	fopen_s(&(*_File), _FileName, _Parameter);
 }
 
