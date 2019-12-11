@@ -128,17 +128,17 @@ void PrintField(Person** _PassengerLocationMatrix[], Map _PlaneMap)
 		for (int x = 0; x < _PlaneMap.Width; x++)
 		{
 			if (_PassengerLocationMatrix[y][x] != NULL)
-				printf("%-*c", _PlaneMap.LongestDigit, _PassengerLocationMatrix[y][x]->PersonCharacter);
+				printf("%-*c", _PlaneMap.LongestNumber, _PassengerLocationMatrix[y][x]->PersonCharacter);
 			else
 			{
 				Location tmpLocation = *GetMapLocation(&_PlaneMap, x, y);
 				switch (tmpLocation.BoardingGroup) {
-				case BoardingGroup_Door:      printf("%-*c", _PlaneMap.LongestDigit, 'D'); break;
-				case BoardingGroup_Walkway:   printf("%-*c", _PlaneMap.LongestDigit, '|'); break;
-				case BoardingGroup_Padding:   printf("%-*s", _PlaneMap.LongestDigit, ""); break;
-				case BoardingGroup_Undefined: printf("%-*c", _PlaneMap.LongestDigit, 'U'); break;
+				case BoardingGroup_Door:      printf("%-*c", _PlaneMap.LongestNumber, 'D'); break;
+				case BoardingGroup_Walkway:   printf("%-*c", _PlaneMap.LongestNumber, '|'); break;
+				case BoardingGroup_Padding:   printf("%-*s", _PlaneMap.LongestNumber, ""); break;
+				case BoardingGroup_Undefined: printf("%-*c", _PlaneMap.LongestNumber, 'U'); break;
 				default:
-					printf("%-*d", _PlaneMap.LongestDigit, tmpLocation.BoardingGroup);
+					printf("%-*d", _PlaneMap.LongestNumber, tmpLocation.BoardingGroup);
 					break;
 				}
 			}

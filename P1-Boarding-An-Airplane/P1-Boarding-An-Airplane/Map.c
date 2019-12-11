@@ -168,7 +168,7 @@ void SetMapStaticValues(FILE* _MapFile, Map* _PlaneMap)
 	_PlaneMap->Width = GetSeatsPerLine(_MapFile);
 	_PlaneMap->Height = GetNumberOfLinesInFile(_MapFile);
 	_PlaneMap->DoorCount = GetNumberOfDoorsInBoardingMethod(_MapFile);
-	_PlaneMap->LongestDigit = GetLongestNumberInFile(_MapFile);
+	_PlaneMap->LongestNumber = GetLongestNumberInFile(_MapFile);
 }
 
 // A function to set values for map from file
