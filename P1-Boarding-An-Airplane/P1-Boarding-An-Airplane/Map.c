@@ -1,75 +1,76 @@
 #include "Map.h"
 
 // A function to read a map from a file
-bool ReadMapFromFile(Map* _PlaneMap, BasicSimulationRules _BasicRules) 
+bool ReadMapFromFile(Map* _PlaneMap, BasicSimulationRules _BasicRules, const char* OpenFile)
+
 {
 	FILE* MapFile;
 
-	DoOpenFile(&MapFile, _BasicRules.BoardingMethodFile, "r");
+	DoOpenFile(&MapFile, OpenFile, "r");
 
 	if (MapFile == NULL)
 		return false;
 
 	SetMapStaticValues(MapFile, _PlaneMap);
 
-    if (AllocateMap(_PlaneMap) == false) 
+	if (AllocateMap(_PlaneMap) == false)
 	{
-        return false;
-    }
+		return false;
+	}
 
 	SetMapValuesFromFile(MapFile, _PlaneMap);
-	
-    return true;
+
+	return true;
 }
 
 // A function to set a boarding group at a position
-void MapLocationSetValue(Map* _PlaneMap, int _X, int _Y, int Value) 
+void MapLocationSetValue(Map* _PlaneMap, int _X, int _Y, int Value)
 {
 	GetMapLocation(_PlaneMap, _X, _Y)->BoardingGroup = Value;
 }
 
 // A bool function to allocate map and return true if it's a succes and false if it's fails
-bool AllocateMap(Map* _PlaneMap) 
+bool AllocateMap(Map* _PlaneMap)
 {
 	_PlaneMap->Locations = calloc(_PlaneMap->Height, sizeof(Location*));
-    if (_PlaneMap->Locations == NULL) 
+	if (_PlaneMap->Locations == NULL)
 	{
-        fprintf(stderr, "Failed to allocate %d bytes for map width\n", (int)(_PlaneMap->Height * sizeof(Location*)));
-        return false;
-    }
+		fprintf(stderr, "Failed to allocate %d bytes for map width\n", (int)(_PlaneMap->Height * sizeof(Location*)));
+		return false;
+	}
 
-    for (int y = 0; y < _PlaneMap->Height; y++) 
+	for (int y = 0; y < _PlaneMap->Height; y++)
 	{
-        _PlaneMap->Locations[y] = calloc(_PlaneMap->Width, sizeof(Location));
+		_PlaneMap->Locations[y] = calloc(_PlaneMap->Width, sizeof(Location));
 
-        if (_PlaneMap->Locations[y] == NULL) 
+		if (_PlaneMap->Locations[y] == NULL)
 		{
-            fprintf(stderr, "Failed to allocate %d bytes for map row %d\n", (int)(_PlaneMap->Width * sizeof(Location)), y);
-            return false;
-        }
+			fprintf(stderr, "Failed to allocate %d bytes for map row %d\n", (int)(_PlaneMap->Width * sizeof(Location)), y);
+			return false;
+		}
 
-		for (int x = 0; x < _PlaneMap->Width; x++) 
+		for (int x = 0; x < _PlaneMap->Width; x++)
 		{
 			_PlaneMap->Locations[y][x].Point.X = x;
 			_PlaneMap->Locations[y][x].Point.Y = y;
 		}
-    }
+	}
 
 	_PlaneMap->Doors = calloc(_PlaneMap->DoorCount, sizeof(Point*));
 
-    return true;
+	return true;
 }
 
 // A function to free map from memory 
-void FreeMap(Map* _PlaneMap) 
+void FreeMap(Map* _PlaneMap)
 {
-    if (_PlaneMap == NULL) return;
+	if (_PlaneMap == NULL) return;
 
-	if (_PlaneMap->Locations != NULL) 
+	if (_PlaneMap->Locations != NULL)
 	{
-		for (int i = 0; i < _PlaneMap->Width; i++) 
+		for (int i = 0; i < _PlaneMap->Width; i++)
 		{
-			if (_PlaneMap->Locations != NULL) 
+			if (_PlaneMap->Locations != NULL)
 			{
 				free(_PlaneMap->Locations[i]);
 			}
@@ -79,7 +80,7 @@ void FreeMap(Map* _PlaneMap)
 		_PlaneMap->Height = 0;
 	}
 
-	if (_PlaneMap->Doors != NULL) 
+	if (_PlaneMap->Doors != NULL)
 	{
 		free(_PlaneMap->Doors);
 		_PlaneMap->DoorCount = 0;
@@ -87,32 +88,32 @@ void FreeMap(Map* _PlaneMap)
 }
 
 // A function to gets how many seats there are per line
-int GetSeatsPerLine(FILE* _File) 
+int GetSeatsPerLine(FILE* _File)
 {
-    int tmpWidth = 0, highestWidth = 0;
-    long int initialFileCursorLocation = ftell(_File);
-    fseek(_File, 0, SEEK_SET);
+	int tmpWidth = 0, highestWidth = 0;
+	long int initialFileCursorLocation = ftell(_File);
+	fseek(_File, 0, SEEK_SET);
 
-    char ch;
-	while (!feof(_File)) 
+	char ch;
+	while (!feof(_File))
 	{
-        ch = fgetc(_File);
-        switch (ch)
+		ch = fgetc(_File);
+		switch (ch)
 		{
-			case '\n':
-				highestWidth = max(tmpWidth, highestWidth);
-				tmpWidth = 0;
-				break;
-			case ',':
-				tmpWidth++;
-				break;
-			default:
-				break;
-        }
-    }
+		case '\n':
+			highestWidth = max(tmpWidth, highestWidth);
+			tmpWidth = 0;
+			break;
+		case ',':
+			tmpWidth++;
+			break;
+		default:
+			break;
+		}
+	}
 
-    fseek(_File, initialFileCursorLocation, SEEK_SET);
-    return highestWidth;
+	fseek(_File, initialFileCursorLocation, SEEK_SET);
+	return highestWidth;
 }
 
 // A function to get how many number of doors there are in the boarding method
@@ -122,10 +123,10 @@ int GetNumberOfDoorsInBoardingMethod(FILE* _File) {
 
 	int numberOfDoors = 0;
 	char tempChar;
-	while (!feof(_File)) 
+	while (!feof(_File))
 	{
 		tempChar = fgetc(_File);
-		if (tempChar == 'D') 
+		if (tempChar == 'D')
 		{
 			numberOfDoors++;
 		}
@@ -136,7 +137,7 @@ int GetNumberOfDoorsInBoardingMethod(FILE* _File) {
 }
 
 // A function to get the longest digit in file
-int GetLongestDigitInFile(FILE* _File) 
+int GetLongestDigitInFile(FILE* _File)
 {
 	long int initialFileCursorLocation = ftell(_File);
 	fseek(_File, 0, SEEK_SET);
@@ -147,7 +148,7 @@ int GetLongestDigitInFile(FILE* _File)
 	while (!feof(_File))
 	{
 		tempChar = fgetc(_File);
-		if (tempChar == ',') 
+		if (tempChar == ',')
 		{
 			if (DigitCharCounter > HugestDigit)
 				HugestDigit = DigitCharCounter;
@@ -174,6 +175,8 @@ void SetMapStaticValues(FILE* _MapFile, Map* _PlaneMap)
 // A function to set values for map from file
 void SetMapValuesFromFile(FILE* _MapFile, Map* _PlaneMap)
 {
+	_PlaneMap->NumberOfSeats = 0;
+
 	int bufferLength = GetNumberOfCharsForLongestLineInFile(_MapFile);
 	char* buffer = calloc(bufferLength, sizeof(char));
 	if (buffer == NULL)

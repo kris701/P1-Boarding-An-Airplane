@@ -7,7 +7,7 @@
 #include "BasicCalls.h"
 #include "StructsAndEnums.h"
 
-bool ReadMapFromFile(Map* _PlaneMap, BasicSimulationRules _BasicRules);
+bool ReadMapFromFile(Map* _PlaneMap, BasicSimulationRules _BasicRules, const char* OpenFile);
 bool AllocateMap(Map* _PlaneMap);
 void FreeMap(Map* _PlaneMap);
 int GetSeatsPerLine(FILE* _File);
