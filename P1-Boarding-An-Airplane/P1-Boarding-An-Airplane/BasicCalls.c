@@ -93,3 +93,22 @@ void DoOpenFile(FILE** _File, const char* _FileName, const char* _Parameter)
 {
 	fopen_s(&(*_File), _FileName, _Parameter);
 }
+
+// A function to find a string between chars
+void FindStrBetweenChars(char* SubStringBuffer[], char* Target[], int TargetLength, char FromChar, char ToChar)
+{
+	*SubStringBuffer = strchr(*SubStringBuffer, FromChar) + 1;
+	int IndexOffset = 0;
+
+	for (int j = 0; j < TargetLength; j++)
+	{
+		if ((*SubStringBuffer)[j] != ToChar)
+		{
+			(*Target)[IndexOffset] = (*SubStringBuffer)[j];
+			IndexOffset++;
+		}
+		else
+			break;
+	}
+	*SubStringBuffer = strchr(*SubStringBuffer, ToChar);
+}

@@ -1,5 +1,6 @@
 #include "Simulation.h"
 
+// A function that runs the simulation
 int RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool ShouldUpdateVisuals, Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
 	bool AllSeated = false;
@@ -23,6 +24,7 @@ int RunSim(Person _PassengerList[], Person** _PassengerLocationMatrix[], bool Sh
 	return StepsTaken;
 }
 
+// A bool function that checks if a passenger is seated and if they aren't it uses another function to move the passenger
 bool MoveAllPassengersAndCheckIfSeated(Person _PassengerList[], Person** _PassengerLocationMatrix[], Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
 	bool AllSeated = true;
@@ -40,6 +42,7 @@ bool MoveAllPassengersAndCheckIfSeated(Person _PassengerList[], Person** _Passen
 	return AllSeated;
 }
 
+// A bool function that checks if a passenger can sit
 bool CanPassengerSit(Person _Person)
 {
 	if (IsPointEqual(_Person.CurrentPos, _Person.Target) && !_Person.IsBackingUp)
@@ -47,6 +50,7 @@ bool CanPassengerSit(Person _Person)
 	return false;
 }
 
+// A function to update visuals
 void UpdateVisuals(Person** _PassengerLocationMatrix[], Map _PlaneMap, int* ShowRPCCount, int* RPSCount, int* OneSecWatchStart, int* OneSecWatchEnd)
 {
 	PrintField(_PassengerLocationMatrix, _PlaneMap);
@@ -64,6 +68,7 @@ void UpdateVisuals(Person** _PassengerLocationMatrix[], Map _PlaneMap, int* Show
 	}
 }
 
+// A function to move a passenger
 void PassengerMovement(Person* _Passenger, Person** _PassengerLocationMatrix[], Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
 	if (!IsInDelayAction(_Passenger, _PlaneMap))
@@ -82,6 +87,7 @@ void PassengerMovement(Person* _Passenger, Person** _PassengerLocationMatrix[], 
 	}
 }
 
+// A function to attempts to move a passenger one step
 void AttemptToMovePassengerOneStep(Person* _Passenger, Person** _PassengerLocationMatrix[], Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
 	for (int j = 0; j < _Passenger->WalkingSpeed; j++)
@@ -100,6 +106,7 @@ void AttemptToMovePassengerOneStep(Person* _Passenger, Person** _PassengerLocati
 	}
 }
 
+// A function to teleport a passenger to a point
 void TeleportPassengerToPoint(Person* _Passenger, Person** _PassengerLocationMatrix[], Map _PlaneMap, Point _TargetPoint)
 {
 	_PassengerLocationMatrix[_TargetPoint.Y][_TargetPoint.X] = _Passenger;
@@ -110,27 +117,28 @@ void TeleportPassengerToPoint(Person* _Passenger, Person** _PassengerLocationMat
 	_Passenger->CurrentPos = _TargetPoint;
 }
 
+// A function that prints visuals
 void PrintField(Person** _PassengerLocationMatrix[], Map _PlaneMap)
 {
 	system("cls");
 
-	for (int y = 0; y < _PlaneMap.Height - 1; y++)
+	for (int y = 0; y < _PlaneMap.Height; y++)
 	{
 		printf("| ");
 		for (int x = 0; x < _PlaneMap.Width; x++)
 		{
 			if (_PassengerLocationMatrix[y][x] != NULL)
-				printf("%-*c", _PlaneMap.LongestDigit, _PassengerLocationMatrix[y][x]->PersonCharacter);
+				printf("%-*c", _PlaneMap.LongestNumber, _PassengerLocationMatrix[y][x]->PersonCharacter);
 			else
 			{
 				Location tmpLocation = *GetMapLocation(&_PlaneMap, x, y);
 				switch (tmpLocation.BoardingGroup) {
-				case BoardingGroup_Door:      printf("%-*c", _PlaneMap.LongestDigit, 'D'); break;
-				case BoardingGroup_Walkway:   printf("%-*c", _PlaneMap.LongestDigit, '|'); break;
-				case BoardingGroup_Padding:   printf("%-*s", _PlaneMap.LongestDigit, ""); break;
-				case BoardingGroup_Undefined: printf("%-*c", _PlaneMap.LongestDigit, 'U'); break;
+				case BoardingGroup_Door:      printf("%-*c", _PlaneMap.LongestNumber, 'D'); break;
+				case BoardingGroup_Walkway:   printf("%-*c", _PlaneMap.LongestNumber, '|'); break;
+				case BoardingGroup_Padding:   printf("%-*s", _PlaneMap.LongestNumber, ""); break;
+				case BoardingGroup_Undefined: printf("%-*c", _PlaneMap.LongestNumber, 'U'); break;
 				default:
-					printf("%-*d", _PlaneMap.LongestDigit, tmpLocation.BoardingGroup);
+					printf("%-*d", _PlaneMap.LongestNumber, tmpLocation.BoardingGroup);
 					break;
 				}
 			}
@@ -139,6 +147,7 @@ void PrintField(Person** _PassengerLocationMatrix[], Map _PlaneMap)
 	}
 }
 
+// A bool function that checks if there's a passenger on the point a passenger is trying to move to
 bool IsAnyOnPoint(Person** _PassengerLocationMatrix[], Person* _Passenger, Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
 	PerformPassengersNextMove(_Passenger);
@@ -149,7 +158,7 @@ bool IsAnyOnPoint(Person** _PassengerLocationMatrix[], Person* _Passenger, Map _
 		PerformPassengersNextMove(OtherPerson);
 
 		// Seat Interference
-		if (CheckForSeatInterferenceAndPerform(_Passenger, OtherPerson, _PassengerLocationMatrix, _PlaneMap, _BaseRules));
+		if (CheckForSeatInterferenceAndPerform(_Passenger, OtherPerson, _PassengerLocationMatrix, _PlaneMap, _BaseRules))
 			return true;
 
 		// Cross
@@ -163,6 +172,7 @@ bool IsAnyOnPoint(Person** _PassengerLocationMatrix[], Person* _Passenger, Map _
 	return false;
 }
 
+// A function that checks if a passenger needs to cross
 void CheckForCrossingAndPerform(Person* _Person, Person* _OtherPerson, Person** _PassengerLocationMatrix[], Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
 	if (IsPointEqual(_OtherPerson->NextMove, _Person->CurrentPos))
@@ -179,6 +189,7 @@ void CheckForCrossingAndPerform(Person* _Person, Person* _OtherPerson, Person** 
 	}
 }
 
+// A function that checks for seat interference
 bool CheckForSeatInterferenceAndPerform(Person *_Person, Person *_OtherPerson, Person** _PassengerLocationMatrix[], Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
 	if (_Person->Target.Y == _OtherPerson->Target.Y && _Person->CurrentPos.Y == _Person->Target.Y)
@@ -190,6 +201,7 @@ bool CheckForSeatInterferenceAndPerform(Person *_Person, Person *_OtherPerson, P
 	return false;
 }
 
+// A function that performs a passengers next move
 void PerformPassengersNextMove(Person *_Passenger)
 {
 	if (_Passenger->MovedLastTurn)
@@ -200,6 +212,7 @@ void PerformPassengersNextMove(Person *_Passenger)
 	}
 }
 
+// A function that checks for predicted point from a struct
 Point PredictedPoint(Point CurrentPoint, Point TargetPoint)
 {
 	if (CurrentPoint.Y == TargetPoint.Y) 
@@ -219,6 +232,7 @@ Point PredictedPoint(Point CurrentPoint, Point TargetPoint)
 	return SetPoint(0, 0);
 }
 
+// A function that sends row back
 void SendRowBack(Person** _PassengerLocationMatrix[], Person* _Passenger, Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
 	int CurrentXPosition = _Passenger->Target.X;
@@ -244,6 +258,7 @@ void SendRowBack(Person** _PassengerLocationMatrix[], Person* _Passenger, Map _P
 	SendPassengerBack(_Passenger, DistanceToTargetSeat, InnerMostSeat, _BaseRules.SeatInterferenceDelay);
 }
 
+// A function that sends a passenger back
 void SendPassengerBack(Person* _Passenger, int _DistanceToTargetSeat, int _InnerMostSeat, int _AdditionalDelay)
 {
 	_Passenger->IsBackingUp = true;
@@ -251,6 +266,7 @@ void SendPassengerBack(Person* _Passenger, int _DistanceToTargetSeat, int _Inner
 	_Passenger->MovedLastTurn = true;
 }
 
+// A bool function that checks if any is on matrix
 bool IsAnyOnMatrix(Person** _PassengerLocationMatrix[], int X, int Y)
 {
 	if (_PassengerLocationMatrix[Y][X] != NULL)
@@ -258,11 +274,13 @@ bool IsAnyOnMatrix(Person** _PassengerLocationMatrix[], int X, int Y)
 	return false;
 }
 
+// A function for backup wait steps
 int BackupWaitSteps(int TargetSeat, int InnerBlockingSeat, int ExtraPenalty)
 {
 	return TargetSeat + InnerBlockingSeat + 2 + ExtraPenalty;
 }
 
+// A bool function to check if a passenger is in delay action
 bool IsInDelayAction(Person* _Person, Map _PlaneMap)
 {
 	if (_Person->LuggageCount > 0)
