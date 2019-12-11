@@ -20,7 +20,6 @@ int main()
 	AllocatePassengerList(&PassengerList, PlaneMap);
 	AllocatePassengerLocationMatrix(&PassengerLocationMatrix, PlaneMap);
 
-	// 2 function used to get user input
 	UpdateGraphics = GetYNInput("Update Graphics?");
 	RunsToDo = GetIntInput("How many runs?", 0, MaxRuns);
 
@@ -32,6 +31,7 @@ int main()
 	CleanupAllocations(PassengerList, PassengerLocationMatrix);
 
 	return 0;
+
 }
 
 void RunMultipleSimulations(Person* _PassengerList, Person*** _PassengerLocationMatrix, Map _PlaneMap, BasicSimulationRules _BasicRules, bool _UpdateGraphics, int _RunsToDo)
@@ -39,19 +39,18 @@ void RunMultipleSimulations(Person* _PassengerList, Person*** _PassengerLocation
 	for (int i = 0; i < _BasicRules.MultipleMapsLength; i++)
 	{
 		if (!ReadMapFromFile(&_PlaneMap, _BasicRules, _BasicRules.MultipleMaps[i]))
-			return 0;
+			return;
 
 		RunAllSimulationsAndSaveToOutput(_PassengerList, _PassengerLocationMatrix, _PlaneMap, _BasicRules, _UpdateGraphics, _RunsToDo, _BasicRules.MultipleMaps[i]);
 	}
 }
-
-// A function that flushes input
+// The getchar function eats up everything until it reaches \n
 void FlushInput()
 {
 	while (getchar() != '\n');
 }
 
-// A bool function that checks for y/n input
+// Checks if the input is 'y'
 bool GetYNInput(const char* _Text)
 {
 	char Choice = ' ';
@@ -63,7 +62,7 @@ bool GetYNInput(const char* _Text)
 	return Choice == 'y';
 }
 
-// A function that gets an interger input
+// Asks the user to input amount of runs wanted
 int GetIntInput(const char* _Text, int Min, int Max)
 {
 	int Value = Min - 1;
@@ -76,7 +75,6 @@ int GetIntInput(const char* _Text, int Min, int Max)
 	}
 	return Value;
 }
-
 
 void AllocatePassengerList(Person** _PassengerList, Map _PlaneMap)
 {
@@ -100,13 +98,14 @@ void ResetPassengerLocationMatrix(Person**** _PassengerLocationMatrix, Map _Plan
 	}
 }
 
+
 // A function that runs the simulation a given amount of times and saves data to a file
 void RunAllSimulationsAndSaveToOutput(Person* _PassengerList, Person*** _PassengerLocationMatrix, Map _PlaneMap, BasicSimulationRules _BasicRules, bool _UpdateGraphics, int _RunsToDo, char* InputDir)
 {
 	FILE* OutputFile;
 	int TotalStepsTaken = 0;
 	clock_t TotalWatchStart, TotalWatchEnd;
-	
+
 	char* AccOutputDir = calloc(128, sizeof(char));
 
 	ConvertInputDirToOutputDir(InputDir, &AccOutputDir, 128, "Output/", ".csv");
@@ -117,7 +116,7 @@ void RunAllSimulationsAndSaveToOutput(Person* _PassengerList, Person*** _Passeng
 		return;
 
 	WriteProbabilitiesToOutput(OutputFile, _BasicRules);
-	
+
 	fprintf(OutputFile, "Iterations;\n");
 
 	TotalWatchStart = clock();
@@ -134,7 +133,6 @@ void RunAllSimulationsAndSaveToOutput(Person* _PassengerList, Person*** _Passeng
 	printf("\nFinished - %s Took %4d ms and an avr of %4d iterations pr run\n", InputDir, (int)((((double)TotalWatchEnd - (double)TotalWatchStart) / CLOCKS_PER_SEC) * 1000), (TotalStepsTaken / _RunsToDo));
 }
 
-// A function that runs the simulation once and gets amount of stepts taken
 int RunOneSimulationAndGetSteps(Person* _PassengerList, Person*** _PassengerLocationMatrix, Map _PlaneMap, BasicSimulationRules _BasicRules, bool _UpdateGraphics, FILE* _OutputFile)
 {
 	int StepsTaken = 0;
@@ -153,7 +151,7 @@ int RunOneSimulationAndGetSteps(Person* _PassengerList, Person*** _PassengerLoca
 	}
 
 	WriteBasicRulesToOutput(_OutputFile, _BasicRules);
-	
+
 	fprintf(_OutputFile, "%d;\n", StepsTaken);
 
 	return StepsTaken;
