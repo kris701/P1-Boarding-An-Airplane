@@ -107,7 +107,7 @@ void RunAllSimulationsAndSaveToOutput(Map _PlaneMap, BasicSimulationRules _Basic
 	DoOpenFile(&OutputFile, AccOutputDir, "w+");
 
 	if (!FileExists(OutputFile)) {
-		fprintf("Output file missing")
+		fprintf(stderr, "Output file missing");
 	}
 		return;
 
@@ -204,3 +204,4 @@ void WriteBasicRulesToOutput(FILE* _OutputFile, BasicSimulationRules _BasicRules
 		fprintf(_OutputFile, "%d,%d,", _BasicRules.WalkingspeedGenerationValues[i].Value, _BasicRules.WalkingspeedGenerationValues[i].Possibility);
 	}
 }
+
