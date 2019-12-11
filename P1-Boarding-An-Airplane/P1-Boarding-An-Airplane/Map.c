@@ -2,13 +2,12 @@
 
 // A function to read a map from a file
 bool ReadMapFromFile(Map* _PlaneMap, BasicSimulationRules _BasicRules, const char* OpenFile)
-
 {
 	FILE* MapFile;
 
 	DoOpenFile(&MapFile, OpenFile, "r");
 
-	if (MapFile == NULL)
+	if (!FileExists(MapFile))
 		return false;
 
 	SetMapStaticValues(MapFile, _PlaneMap);

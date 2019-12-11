@@ -6,7 +6,7 @@ bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* Fil
 	FILE* BSRFile;
 	fopen_s(&BSRFile, FileName, "r");
 
-	if (BSRFile != NULL)
+	if (FileExists(BSRFile))
 	{
 		int BufferLength = GetNumberOfCharsForLongestLineInFile(BSRFile);
 		char* Buffer = calloc(BufferLength, sizeof(char));
@@ -118,25 +118,6 @@ int FindIntBetweenChars(char* SubStringBuffer[], char FromChar, char ToChar)
 	FindStrBetweenChars(SubStringBuffer, &NumVal, 32, FromChar, ToChar);
 
 	return atoi(NumVal);
-}
-
-// A function to find a string between chars
-void FindStrBetweenChars(char* SubStringBuffer[], char* Target[], int TargetLength, char FromChar, char ToChar)
-{
-	*SubStringBuffer = strchr(*SubStringBuffer, FromChar) + 1;
-	int IndexOffset = 0;
-
-	for (int j = 0; j < TargetLength; j++)
-	{
-		if ((*SubStringBuffer)[j] != ToChar)
-		{
-			(*Target)[IndexOffset] = (*SubStringBuffer)[j];
-			IndexOffset++;
-		}
-		else
-			break;
-	}
-	*SubStringBuffer = strchr(*SubStringBuffer, ToChar);
 }
 
 // A function to get item count from config file

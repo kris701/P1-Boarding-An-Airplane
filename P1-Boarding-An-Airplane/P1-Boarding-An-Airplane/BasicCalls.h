@@ -16,3 +16,4 @@ int GetNumberOfCharsForLongestLineInFile(FILE* _File);
 int GetNumberOfLinesInFile(FILE* _File);
 bool FileExists(FILE* _File);
 void DoOpenFile(FILE** _File, const char* _FileName, const char* _Parameter);
+void FindStrBetweenChars(char* SubStringBuffer[], char* Target[], int TargetLength, char FromChar, char ToChar);

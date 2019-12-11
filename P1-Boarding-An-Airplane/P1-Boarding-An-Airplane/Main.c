@@ -12,15 +12,15 @@ int main()
 	if (!ReadBasicRulesConfigFile(&BasicRules, "config.ini"))
 		return 0;
 
-	if (!ReadMapFromFile(&PlaneMap, BasicRules, BasicRules.BoardingMethodFile))
-		return 0;
-
 	UpdateGraphics = GetYNInput("Update Graphics?");
 	RunsToDo = GetIntInput("How many runs?", 0, MaxRuns);
 	if (BasicRules.DoAllRuns)
 		RunMultipleSimulations(PlaneMap, BasicRules, UpdateGraphics, RunsToDo);
 	else
 	{
+		if (!ReadMapFromFile(&PlaneMap, BasicRules, BasicRules.BoardingMethodFile))
+			return 0;
+
 		RunAllSimulationsAndSaveToOutput(PlaneMap, BasicRules, UpdateGraphics, RunsToDo, BasicRules.BoardingMethodFile);
 	}
 	return 0;
