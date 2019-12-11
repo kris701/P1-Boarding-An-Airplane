@@ -1,10 +1,10 @@
 #include "Map.h"
 
-bool ReadMapFromFile(Map* _PlaneMap, BasicSimulationRules _BasicRules) 
+bool ReadMapFromFile(Map* _PlaneMap, BasicSimulationRules _BasicRules, const char* OpenFile) 
 {
 	FILE* MapFile;
 
-	DoOpenFile(&MapFile, _BasicRules.BoardingMethodFile, "r");
+	DoOpenFile(&MapFile, OpenFile, "r");
 
 	if (MapFile == NULL)
 		return false;
@@ -165,6 +165,8 @@ void SetMapStaticValues(FILE* _MapFile, Map* _PlaneMap)
 
 void SetMapValuesFromFile(FILE* _MapFile, Map* _PlaneMap)
 {
+	_PlaneMap->NumberOfSeats = 0;
+
 	int bufferLength = GetNumberOfCharsForLongestLineInFile(_MapFile);
 	char* buffer = calloc(bufferLength, sizeof(char));
 	if (buffer == NULL)
