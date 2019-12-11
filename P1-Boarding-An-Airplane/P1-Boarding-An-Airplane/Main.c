@@ -117,7 +117,7 @@ void RunAllSimulationsAndSaveToOutput(Person* _PassengerList, Person*** _Passeng
 
 	WriteProbabilitiesToOutput(OutputFile, _BasicRules);
 
-	fprintf(OutputFile, "Iterations;\n");
+	fprintf(OutputFile, "Iterations\n");
 
 	TotalWatchStart = clock();
 
@@ -152,7 +152,7 @@ int RunOneSimulationAndGetSteps(Person* _PassengerList, Person*** _PassengerLoca
 
 	WriteBasicRulesToOutput(_OutputFile, _BasicRules);
 
-	fprintf(_OutputFile, "%d;\n", StepsTaken);
+	fprintf(_OutputFile, "%d\n", StepsTaken);
 
 	return StepsTaken;
 }
