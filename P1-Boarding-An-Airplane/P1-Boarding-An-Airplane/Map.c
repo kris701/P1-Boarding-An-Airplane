@@ -1,5 +1,6 @@
 #include "Map.h"
 
+// A function to read a map from a file
 bool ReadMapFromFile(Map* _PlaneMap, BasicSimulationRules _BasicRules) 
 {
 	FILE* MapFile;
@@ -21,11 +22,13 @@ bool ReadMapFromFile(Map* _PlaneMap, BasicSimulationRules _BasicRules)
     return true;
 }
 
+// A function to set a boarding group at a position
 void MapLocationSetValue(Map* _PlaneMap, int _X, int _Y, int Value) 
 {
 	GetMapLocation(_PlaneMap, _X, _Y)->BoardingGroup = Value;
 }
 
+// A bool function to allocate map and return true if it's a succes and false if it's fails
 bool AllocateMap(Map* _PlaneMap) 
 {
 	_PlaneMap->Locations = calloc(_PlaneMap->Height, sizeof(Location*));
@@ -57,6 +60,7 @@ bool AllocateMap(Map* _PlaneMap)
     return true;
 }
 
+// A function to free map from memory 
 void FreeMap(Map* _PlaneMap) 
 {
     if (_PlaneMap == NULL) return;
@@ -82,6 +86,7 @@ void FreeMap(Map* _PlaneMap)
 	}
 }
 
+// A function to gets how many seats there are per line
 int GetSeatsPerLine(FILE* _File) 
 {
     int tmpWidth = 0, highestWidth = 0;
@@ -110,6 +115,7 @@ int GetSeatsPerLine(FILE* _File)
     return highestWidth;
 }
 
+// A function to get how many number of doors there are in the boarding method
 int GetNumberOfDoorsInBoardingMethod(FILE* _File) {
 	long int initialFileCursorLocation = ftell(_File);
 	fseek(_File, 0, SEEK_SET);
@@ -129,6 +135,7 @@ int GetNumberOfDoorsInBoardingMethod(FILE* _File) {
 	return numberOfDoors;
 }
 
+// A function to get the longest digit in file
 int GetLongestDigitInFile(FILE* _File) 
 {
 	long int initialFileCursorLocation = ftell(_File);
@@ -154,6 +161,7 @@ int GetLongestDigitInFile(FILE* _File)
 	return (HugestDigit + 1);
 }
 
+// A function to set static values for map
 void SetMapStaticValues(FILE* _MapFile, Map* _PlaneMap)
 {
 	FreeMap(_PlaneMap);
@@ -163,6 +171,7 @@ void SetMapStaticValues(FILE* _MapFile, Map* _PlaneMap)
 	_PlaneMap->LongestDigit = GetLongestDigitInFile(_MapFile);
 }
 
+// A function to set values for map from file
 void SetMapValuesFromFile(FILE* _MapFile, Map* _PlaneMap)
 {
 	int bufferLength = GetNumberOfCharsForLongestLineInFile(_MapFile);
@@ -222,6 +231,7 @@ void SetMapValuesFromFile(FILE* _MapFile, Map* _PlaneMap)
 	fseek(_MapFile, initialFileCursorLocation, SEEK_SET);
 }
 
+// A function to set value for door
 void MapSetDoorValue(Map* _PlaneMap, int _x, int _y, int* _doorIndex)
 {
 	MapLocationSetValue(_PlaneMap, _x, _y, BoardingGroup_Door);
@@ -230,6 +240,7 @@ void MapSetDoorValue(Map* _PlaneMap, int _x, int _y, int* _doorIndex)
 	(*_doorIndex)++;
 }
 
+// A function to set value for a seat in map
 void MapSetSeatValue(Map* _PlaneMap, int _x, int _y, char _field[])
 {
 	int _tmpInt = 0;

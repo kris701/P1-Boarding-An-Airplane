@@ -1,5 +1,6 @@
 #include "ReadSimulationConfig.h"
 
+// A function to read basic rules from config file
 bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* FileName)
 {
 	FILE* BSRFile;
@@ -116,6 +117,7 @@ bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* Fil
 	return true;
 }
 
+// A function to find int between chars
 int FindIntBetweenChars(char* SubStringBuffer[], char FromChar, char ToChar)
 {
 	char* NumVal = calloc(32, sizeof(char));
@@ -125,6 +127,7 @@ int FindIntBetweenChars(char* SubStringBuffer[], char FromChar, char ToChar)
 	return atoi(NumVal);
 }
 
+// A function to find a string between chars
 void FindStrBetweenChars(char* SubStringBuffer[], char* Target[], int TargetLength, char FromChar, char ToChar)
 {
 	*SubStringBuffer = strchr(*SubStringBuffer, FromChar) + 1;
@@ -143,6 +146,7 @@ void FindStrBetweenChars(char* SubStringBuffer[], char* Target[], int TargetLeng
 	*SubStringBuffer = strchr(*SubStringBuffer, ToChar);
 }
 
+// A function to get item count from config file
 int GetItemCountInConfig(char SubStringBuffer[], int _BufferLength)
 {
 	int ItemCount = 0;
