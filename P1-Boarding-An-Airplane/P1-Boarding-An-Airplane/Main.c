@@ -4,8 +4,6 @@ int main()
 {
 	bool UpdateGraphics = false;
 	int RunsToDo = 0;
-	Person* PassengerList;
-	Person*** PassengerLocationMatrix;
 	Map PlaneMap = { 0 };
 	BasicSimulationRules BasicRules = { 0 };
 
@@ -17,31 +15,27 @@ int main()
 	if (!ReadMapFromFile(&PlaneMap, BasicRules, BasicRules.BoardingMethodFile))
 		return 0;
 
-	AllocatePassengerList(&PassengerList, PlaneMap);
-	AllocatePassengerLocationMatrix(&PassengerLocationMatrix, PlaneMap);
-
 	UpdateGraphics = GetYNInput("Update Graphics?");
 	RunsToDo = GetIntInput("How many runs?", 0, MaxRuns);
 
 	if (BasicRules.DoAllRuns)
-		RunMultipleSimulations(PassengerList, PassengerLocationMatrix, PlaneMap, BasicRules, UpdateGraphics, RunsToDo);
+		RunMultipleSimulations(PlaneMap, BasicRules, UpdateGraphics, RunsToDo);
 	else
-		RunAllSimulationsAndSaveToOutput(PassengerList, PassengerLocationMatrix, PlaneMap, BasicRules, UpdateGraphics, RunsToDo, BasicRules.BoardingMethodFile);
-
-	CleanupAllocations(PassengerList, PassengerLocationMatrix);
-
+	{
+		RunAllSimulationsAndSaveToOutput(PlaneMap, BasicRules, UpdateGraphics, RunsToDo, BasicRules.BoardingMethodFile);
+	}
 	return 0;
 
 }
 
-void RunMultipleSimulations(Person* _PassengerList, Person*** _PassengerLocationMatrix, Map _PlaneMap, BasicSimulationRules _BasicRules, bool _UpdateGraphics, int _RunsToDo)
+void RunMultipleSimulations(Map _PlaneMap, BasicSimulationRules _BasicRules, bool _UpdateGraphics, int _RunsToDo)
 {
 	for (int i = 0; i < _BasicRules.MultipleMapsLength; i++)
 	{
 		if (!ReadMapFromFile(&_PlaneMap, _BasicRules, _BasicRules.MultipleMaps[i]))
 			return;
 
-		RunAllSimulationsAndSaveToOutput(_PassengerList, _PassengerLocationMatrix, _PlaneMap, _BasicRules, _UpdateGraphics, _RunsToDo, _BasicRules.MultipleMaps[i]);
+		RunAllSimulationsAndSaveToOutput(_PlaneMap, _BasicRules, _UpdateGraphics, _RunsToDo, _BasicRules.MultipleMaps[i]);
 	}
 }
 // The getchar function eats up everything until it reaches \n
@@ -98,13 +92,14 @@ void ResetPassengerLocationMatrix(Person**** _PassengerLocationMatrix, Map _Plan
 	}
 }
 
-
 // A function that runs the simulation a given amount of times and saves data to a file
-void RunAllSimulationsAndSaveToOutput(Person* _PassengerList, Person*** _PassengerLocationMatrix, Map _PlaneMap, BasicSimulationRules _BasicRules, bool _UpdateGraphics, int _RunsToDo, char* InputDir)
+void RunAllSimulationsAndSaveToOutput(Map _PlaneMap, BasicSimulationRules _BasicRules, bool _UpdateGraphics, int _RunsToDo, char* InputDir)
 {
 	FILE* OutputFile;
 	int TotalStepsTaken = 0;
 	clock_t TotalWatchStart, TotalWatchEnd;
+	Person* PassengerList;
+	Person*** PassengerLocationMatrix;
 
 	char* AccOutputDir = calloc(128, sizeof(char));
 
@@ -119,16 +114,21 @@ void RunAllSimulationsAndSaveToOutput(Person* _PassengerList, Person*** _Passeng
 
 	fprintf(OutputFile, "Iterations\n");
 
+	AllocatePassengerList(&PassengerList, _PlaneMap);
+	AllocatePassengerLocationMatrix(&PassengerLocationMatrix, _PlaneMap);
+
 	TotalWatchStart = clock();
 
 	for (int i = 0; i < _RunsToDo; i++)
 	{
-		TotalStepsTaken += RunOneSimulationAndGetSteps(_PassengerList, _PassengerLocationMatrix, _PlaneMap, _BasicRules, _UpdateGraphics, OutputFile);
+		TotalStepsTaken += RunOneSimulationAndGetSteps(PassengerList, PassengerLocationMatrix, _PlaneMap, _BasicRules, _UpdateGraphics, OutputFile);
 	}
 
 	TotalWatchEnd = clock();
 
 	fclose(OutputFile);
+
+	CleanupAllocations(PassengerList, PassengerLocationMatrix);
 
 	printf("\nFinished - %s Took %4d ms and an avr of %4d iterations pr run\n", InputDir, (int)((((double)TotalWatchEnd - (double)TotalWatchStart) / CLOCKS_PER_SEC) * 1000), (TotalStepsTaken / _RunsToDo));
 }

@@ -114,7 +114,7 @@ void PrintField(Person** _PassengerLocationMatrix[], Map _PlaneMap)
 {
 	system("cls");
 
-	for (int y = 0; y < _PlaneMap.Height - 1; y++)
+	for (int y = 0; y < _PlaneMap.Height; y++)
 	{
 		printf("| ");
 		for (int x = 0; x < _PlaneMap.Width; x++)

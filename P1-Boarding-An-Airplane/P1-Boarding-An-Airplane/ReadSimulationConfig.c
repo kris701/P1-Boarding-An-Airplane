@@ -10,6 +10,7 @@ bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* Fil
 		int BufferLength = GetNumberOfCharsForLongestLineInFile(BSRFile);
 		char* Buffer = calloc(BufferLength, sizeof(char));
 		char* SubStringBuffer = calloc(BufferLength, sizeof(char));
+		(*_BasicRules).BoardingMethodFile = calloc(BufferLength, sizeof(char));
 
 		if (Buffer == NULL || BufferLength == 0)
 		{
@@ -23,14 +24,12 @@ bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* Fil
 
 			if (strstr(Buffer, "MapName"))
 			{
-				SubStringBuffer = strchr(Buffer, '=') + 1;
-				SubStringBuffer[strlen(SubStringBuffer) - 1] = 0;
-				strcpy_s((*_BasicRules).BoardingMethodFile, 128, SubStringBuffer);
+				GetStringAfterIdentifier(BufferLength, Buffer, &((*_BasicRules).BoardingMethodFile));
 				continue;
 			}
 			if (strstr(Buffer, "MultipleMaps"))
 			{
-				SubStringBuffer = strchr(Buffer, '=') + 1;
+				RemoveIdentifier(&SubStringBuffer, BufferLength, Buffer);
 
 				int ItemCount = GetItemCountInConfig(SubStringBuffer, BufferLength);
 
@@ -46,14 +45,12 @@ bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* Fil
 			}
 			if (strstr(Buffer, "CrossDelay"))
 			{
-				SubStringBuffer = strchr(Buffer, '=') + 1;
-				(*_BasicRules).CrossDelay = atoi(SubStringBuffer);
+				(*_BasicRules).CrossDelay = GetIntAfterIdentifier(BufferLength, Buffer);
 				continue;
 			}
 			if (strstr(Buffer, "SeatInterferenceDelay"))
 			{
-				SubStringBuffer = strchr(Buffer, '=') + 1;
-				(*_BasicRules).SeatInterferenceDelay = atoi(SubStringBuffer);
+				(*_BasicRules).SeatInterferenceDelay = GetIntAfterIdentifier(BufferLength, Buffer);
 				continue;
 			}
 			if (strstr(Buffer, "LuggageGen"))
@@ -91,16 +88,12 @@ bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* Fil
 			}
 			if (strstr(Buffer, "AssignToNearestDoor"))
 			{
-				SubStringBuffer = strchr(Buffer, '=') + 1;
-				if (strstr(SubStringBuffer, "true"))
-					(*_BasicRules).AssignToNearestDoor = true;
+				(*_BasicRules).AssignToNearestDoor = GetBoolAfterIdentifier(BufferLength, Buffer);
 				continue;
 			}
 			if (strstr(Buffer, "DoAllRuns"))
 			{
-				SubStringBuffer = strchr(Buffer, '=') + 1;
-				if (strstr(SubStringBuffer, "true"))
-					(*_BasicRules).DoAllRuns = true;
+				(*_BasicRules).DoAllRuns = GetBoolAfterIdentifier(BufferLength, Buffer);
 				continue;
 			}
 		}
@@ -154,4 +147,46 @@ int GetItemCountInConfig(char SubStringBuffer[], int _BufferLength)
 			break;
 	}
 	return ItemCount;
+}
+
+void GetStringAfterIdentifier(int BufferSize, char* _Buffer, char* Target[])
+{
+	char* SubStringBuffer = calloc(BufferSize, sizeof(char));
+
+	RemoveIdentifier(&SubStringBuffer, BufferSize, _Buffer);
+	strcpy_s(*Target, BufferSize, SubStringBuffer);
+}
+
+int GetIntAfterIdentifier(int BufferSize, char* _Buffer)
+{
+	char* SubStringBuffer = calloc(BufferSize, sizeof(char));
+
+	RemoveIdentifier(&SubStringBuffer, BufferSize, _Buffer);
+	
+	return atoi(SubStringBuffer);
+}
+
+bool GetBoolAfterIdentifier(int BufferSize, char* _Buffer)
+{
+	char* SubStringBuffer = calloc(BufferSize, sizeof(char));
+
+	RemoveIdentifier(&SubStringBuffer, BufferSize, _Buffer);
+
+	if (strstr(SubStringBuffer, "true"))
+		return true;
+
+	return false;
+}
+
+void RemoveIdentifier(char** _SubStringBuffer, int SubStringBufferLength, char* _Buffer)
+{
+	*_SubStringBuffer = strchr(_Buffer, '=') + 1;
+	for (int i = 0; i < SubStringBufferLength; i++)
+	{
+		if ((*_SubStringBuffer)[i] == '\n')
+		{
+			(*_SubStringBuffer)[i] = '\0';
+			break;
+		}
+	}
 }

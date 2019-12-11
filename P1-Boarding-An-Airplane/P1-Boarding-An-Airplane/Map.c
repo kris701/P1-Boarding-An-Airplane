@@ -172,7 +172,7 @@ void SetMapValuesFromFile(FILE* _MapFile, Map* _PlaneMap)
 	if (buffer == NULL)
 	{
 		fprintf(stderr, "Failed to allocate %d bytes for filebuffer while reading map\n", bufferLength);
-		return false;
+		return;
 	}
 
 	long int initialFileCursorLocation = ftell(_MapFile);

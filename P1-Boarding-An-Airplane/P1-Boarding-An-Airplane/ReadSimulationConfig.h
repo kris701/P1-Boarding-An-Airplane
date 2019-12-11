@@ -11,3 +11,7 @@ bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* Fil
 int FindIntBetweenChars(char* SubStringBuffer[], char FromChar, char ToChar);
 int GetItemCountInConfig(char SubStringBuffer[], int _BufferLength);
 void FindStrBetweenChars(char* SubStringBuffer[], char* Target[], int TargetLength, char FromChar, char ToChar);
+void GetStringAfterIdentifier(int BufferSize, char* _Buffer, char* Target[]);
+void RemoveIdentifier(char** _SubStringBuffer, int SubStringBufferLength, char* _Buffer);
+bool GetBoolAfterIdentifier(int BufferSize, char* _Buffer);
+int GetIntAfterIdentifier(int BufferSize, char* _Buffer);

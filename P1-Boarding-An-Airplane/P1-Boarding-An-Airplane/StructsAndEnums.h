@@ -56,12 +56,11 @@ typedef struct _BasicSimulationRules
 	int LuggageGenerationValuesLength;
 	ValueStatistic* WalkingspeedGenerationValues;
 	int WalkingspeedGenerationValuesLength;
-	char BoardingMethodFile[128];
+	char* BoardingMethodFile;
 	bool AssignToNearestDoor;
 	char** MultipleMaps;
 	int MultipleMapsLength;
 	bool DoAllRuns;
-	char BoardingMethodName[128];
 } BasicSimulationRules;
 
 typedef struct _Location {

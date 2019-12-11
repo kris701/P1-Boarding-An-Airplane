@@ -29,7 +29,7 @@ void InitialisePassenger(Person* Passenger, Map _PlaneMap, BasicSimulationRules 
     Passenger->StartingDoorID = 0;
 	Passenger->CurrentPos = SetPoint(0,0);
     Passenger->IsSeated = false;
-    Passenger->PersonCharacter = 'P';
+    Passenger->PersonCharacter = '.';
 
     Passenger->LuggageCount = GenerateLuggage(_BaseRules);
 
