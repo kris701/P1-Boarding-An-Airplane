@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <direct.h>
 
 #include "Map.h"
 #include "GeneratePassengers.h"
@@ -22,5 +23,5 @@ void CleanupAllocations(Person* _PassengerList, Person*** _PassengerLocationMatr
 void AppendToStartOfString(char** _Str, int _StrLength, const char* AddToStr);
 void WriteProbabilitiesToOutput(FILE* _OutputFile, BasicSimulationRules _BasicRules);
 void WriteBasicRulesToOutput(FILE* _OutputFile, BasicSimulationRules _BasicRules);
-void RunMultipleSimulations(Map _PlaneMap, BasicSimulationRules _BasicRules, bool _UpdateGraphics, int _RunsToDo);
+void RunMultipleSimulations(Map _PlaneMap, BasicSimulationRules* _BasicRules, bool _UpdateGraphics, int _RunsToDo);
 void ConvertInputDirToOutputDir(char* _InputDir, char** _OutputDir, int OutputLength, const char* Dir, const char* FileExtension);

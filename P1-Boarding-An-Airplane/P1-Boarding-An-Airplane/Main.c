@@ -16,7 +16,7 @@ int main()
 	RunsToDo = GetIntInput("How many runs?", 0, MaxRuns);
 
 	if (BasicRules.DoAllRuns)
-		RunMultipleSimulations(PlaneMap, BasicRules, UpdateGraphics, RunsToDo);
+		RunMultipleSimulations(PlaneMap, &BasicRules, UpdateGraphics, RunsToDo);
 	else
 	{
 		if (!ReadMapFromFile(&PlaneMap, BasicRules, BasicRules.BoardingMethodFile))
@@ -28,14 +28,15 @@ int main()
 
 }
 
-void RunMultipleSimulations(Map _PlaneMap, BasicSimulationRules _BasicRules, bool _UpdateGraphics, int _RunsToDo)
+void RunMultipleSimulations(Map _PlaneMap, BasicSimulationRules* _BasicRules, bool _UpdateGraphics, int _RunsToDo)
 {
-	for (int i = 0; i < _BasicRules.MultipleMapsLength; i++)
+	for (int i = 0; i < _BasicRules->MultipleMapsLength; i++)
 	{
-		if (!ReadMapFromFile(&_PlaneMap, _BasicRules, _BasicRules.MultipleMaps[i]))
+		_BasicRules->BoardingMethodFile = _BasicRules->MultipleMaps[i];
+		if (!ReadMapFromFile(&_PlaneMap, *_BasicRules, _BasicRules->MultipleMaps[i]))
 			return;
 
-		RunAllSimulationsAndSaveToOutput(_PlaneMap, _BasicRules, _UpdateGraphics, _RunsToDo, _BasicRules.MultipleMaps[i]);
+		RunAllSimulationsAndSaveToOutput(_PlaneMap, *_BasicRules, _UpdateGraphics, _RunsToDo, _BasicRules->MultipleMaps[i]);
 	}
 }
 // The getchar function eats up everything until it reaches \n
