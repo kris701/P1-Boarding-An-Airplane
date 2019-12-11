@@ -19,7 +19,7 @@ int main()
 	else
 	{
 		if (!ReadMapFromFile(&PlaneMap, BasicRules, BasicRules.BoardingMethodFile))
-			return 0;
+			return 1;
 
 		RunAllSimulationsAndSaveToOutput(PlaneMap, BasicRules, UpdateGraphics, RunsToDo, BasicRules.BoardingMethodFile);
 	}
@@ -106,7 +106,9 @@ void RunAllSimulationsAndSaveToOutput(Map _PlaneMap, BasicSimulationRules _Basic
 
 	DoOpenFile(&OutputFile, AccOutputDir, "w+");
 
-	if (!FileExists(OutputFile))
+	if (!FileExists(OutputFile)) {
+		fprintf("Output file missing")
+	}
 		return;
 
 	WriteProbabilitiesToOutput(OutputFile, _BasicRules);
