@@ -17,7 +17,6 @@ int main()
 
 	UpdateGraphics = GetYNInput("Update Graphics?");
 	RunsToDo = GetIntInput("How many runs?", 0, MaxRuns);
-
 	if (BasicRules.DoAllRuns)
 		RunMultipleSimulations(PlaneMap, BasicRules, UpdateGraphics, RunsToDo);
 	else
@@ -184,7 +183,7 @@ void AppendToStartOfString(char** _Str, int _StrLength, const char* AddToStr)
 
 void WriteProbabilitiesToOutput(FILE* _OutputFile, BasicSimulationRules _BasicRules)
 {
-	fprintf(_OutputFile, "%s,%s,%s,%s", "boarding-method", "cross-delay", "seat-interference-delay", "assign-to-nearest-door");
+	fprintf(_OutputFile, "%s,%s,%s,%s,", "boarding-method", "cross-delay", "seat-interference-delay", "assign-to-nearest-door");
 	for (int i = 0; i < _BasicRules.LuggageGenerationValuesLength; i++) {
 		fprintf(_OutputFile, "%s-%d,%s-%d,", "luggage-count", i, "luggage-count-possibility", i);
 	}
@@ -195,7 +194,7 @@ void WriteProbabilitiesToOutput(FILE* _OutputFile, BasicSimulationRules _BasicRu
 
 void WriteBasicRulesToOutput(FILE* _OutputFile, BasicSimulationRules _BasicRules)
 {
-	fprintf(_OutputFile, "%s,%d,%d,%d", _BasicRules.BoardingMethodFile, _BasicRules.CrossDelay, _BasicRules.SeatInterferenceDelay, _BasicRules.AssignToNearestDoor);
+	fprintf(_OutputFile, "%s,%d,%d,%d,", _BasicRules.BoardingMethodFile, _BasicRules.CrossDelay, _BasicRules.SeatInterferenceDelay, _BasicRules.AssignToNearestDoor);
 	for (int i = 0; i < _BasicRules.LuggageGenerationValuesLength; i++) {
 		fprintf(_OutputFile, "%d,%d,", _BasicRules.LuggageGenerationValues[i].Value, _BasicRules.LuggageGenerationValues[i].Possibility);
 	}
