@@ -158,7 +158,7 @@ bool IsAnyOnPoint(Person** _PassengerLocationMatrix[], Person* _Passenger, Map _
 		PerformPassengersNextMove(OtherPerson);
 
 		// Seat Interference
-		if (CheckForSeatInterferenceAndPerform(_Passenger, OtherPerson, _PassengerLocationMatrix, _PlaneMap, _BaseRules));
+		if (CheckForSeatInterferenceAndPerform(_Passenger, OtherPerson, _PassengerLocationMatrix, _PlaneMap, _BaseRules))
 			return true;
 
 		// Cross
