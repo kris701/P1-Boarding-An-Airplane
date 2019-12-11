@@ -136,12 +136,12 @@ int GetNumberOfDoorsInBoardingMethod(FILE* _File) {
 }
 
 // A function to get the longest digit in file
-int GetLongestDigitInFile(FILE* _File)
+int GetLongestNumberInFile(FILE* _File)
 {
 	long int initialFileCursorLocation = ftell(_File);
 	fseek(_File, 0, SEEK_SET);
 
-	int HugestDigit = 0;
+	int LongestNumber = 0;
 	int DigitCharCounter = 0;
 	char tempChar;
 	while (!feof(_File))
@@ -149,8 +149,8 @@ int GetLongestDigitInFile(FILE* _File)
 		tempChar = fgetc(_File);
 		if (tempChar == ',')
 		{
-			if (DigitCharCounter > HugestDigit)
-				HugestDigit = DigitCharCounter;
+			if (DigitCharCounter > LongestNumber)
+				LongestNumber = DigitCharCounter;
 			DigitCharCounter = 0;
 		}
 		else
@@ -158,7 +158,7 @@ int GetLongestDigitInFile(FILE* _File)
 	}
 
 	fseek(_File, initialFileCursorLocation, SEEK_SET);
-	return (HugestDigit + 1);
+	return (LongestNumber + 1);
 }
 
 // A function to set static values for map
@@ -168,7 +168,7 @@ void SetMapStaticValues(FILE* _MapFile, Map* _PlaneMap)
 	_PlaneMap->Width = GetSeatsPerLine(_MapFile);
 	_PlaneMap->Height = GetNumberOfLinesInFile(_MapFile);
 	_PlaneMap->DoorCount = GetNumberOfDoorsInBoardingMethod(_MapFile);
-	_PlaneMap->LongestDigit = GetLongestDigitInFile(_MapFile);
+	_PlaneMap->LongestDigit = GetLongestNumberInFile(_MapFile);
 }
 
 // A function to set values for map from file
