@@ -5,15 +5,14 @@
 #install.packages('data.table', dependencies = TRUE)
 #install.packages("tidyverse")
 #install.packages("extrafont")
-#library(tidyverse)
+library(tidyverse)
 library(ggplot2)
-#library(dplyr)
-#library(purrr)
+library(dplyr)
+library(purrr)
 #library(extrafont)
 
+
 data = read.csv("data/output.csv");
-
-
 
 data$boardingName <- factor(data$boarding.method, 
    levels = c( 
