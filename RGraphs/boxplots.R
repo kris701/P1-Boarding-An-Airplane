@@ -23,18 +23,38 @@ for( walkSpeed in unique(data$walk.speed.0) ) {
           boardingName
         ) %>%
         summarise(
+          y = max(limitedData$Iterations) * 0.95,
+          label = element_text(label = paste("Count:", nrow(limitedData$boardingName[limitedData$boardingName==boardingName]))),
           meanIterations = mean(Iterations)
         );
       
+      #https://medium.com/@gscheithauer/how-to-add-number-of-observations-to-a-ggplot2-boxplot-b22710f7ef80
+      stat_box_data <- function(y, upper_limit = max(limitedData$Iterations) * 1.15) {
+        return( 
+          data.frame(
+            y = 0.95 * upper_limit,
+            label = paste('count:\n', length(y), '\n',
+                          'mean:\n', round(mean(y), 1), '\n')
+          )
+        )
+      }
+      
+      
       print(paste("Subset rows:", nrow(limitedData)));
       
-      generatedPlot =
+      #generatedPlot =
         limitedData %>% ggplot(aes(x = boardingName, y = Iterations, color = factor(boardingName))) + 
         geom_boxplot(outlier.shape = NA)+
         geom_point(data=means, aes(y = meanIterations, group = factor(boardingName)), 
                    shape = 4,
                    size = 4,
                    position = position_dodge(width = 0.8)) +
+        stat_summary(
+          fun.data = stat_box_data, 
+          geom = "text", 
+          hjust = 0.5,
+          vjust = 0.9
+        ) + 
         labs(title = plotTitle, y="Iterations") +
         theme(
           axis.text.x = element_blank(),
