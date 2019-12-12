@@ -31,18 +31,18 @@ displayData = data %>%
 
 displayData$boardingName <- factor(displayData$boarding.method, 
    levels = c( 
-     "BoardingMethods/backtofront.txt", 
-     "BoardingMethods/backtofront1door.txt", 
-     "BoardingMethods/fronttoback.txt", 
-     "BoardingMethods/fronttoback1door.txt", 
-     "BoardingMethods/random.txt", 
-     "BoardingMethods/random1door.txt", 
-     "BoardingMethods/steffenmodified.txt", 
-     "BoardingMethods/steffenmodified1door.txt", 
-     "BoardingMethods/steffenperfect.txt", 
-     "BoardingMethods/steffenperfect1door.txt", 
-     "BoardingMethods/wilma.txt",
-     "BoardingMethods/wilma1door.txt"
+     "backtofront", 
+     "backtofront1door", 
+     "fronttoback", 
+     "fronttoback1door", 
+     "random", 
+     "random1door", 
+     "steffenmodified", 
+     "steffenmodified1door", 
+     "steffenperfect", 
+     "steffenperfect1door", 
+     "wilma",
+     "wilma1door"
    ),
    
    labels = c( 
@@ -87,10 +87,17 @@ for(iteratedMethod in unique(displayData$boarding.method)) {
   
   limitedData = displayData %>% subset(boarding.method == iteratedMethod)
   
-  generatedPlot = limitedData %>% ggplot(aes(x = luggage.count.0, y=IteMean)) +
+  generatedPlot = limitedData %>% ggplot() +
     ylim(yMin, yMax) +
-    geom_point() + geom_line() +
-    geom_ribbon(aes(x=luggage.count.0, ymax=IteMax, ymin=IteMin), alpha = 0.6, fill = "skyblue") +
+    geom_ribbon(aes(x=luggage.count.0, ymax=IteMaxAssignedDoor  , ymin=IteMinAssignedDoor),   alpha = 0.5, fill = "blue") +
+    geom_ribbon(aes(x=luggage.count.0, ymax=IteMaxUnassignedDoor, ymin=IteMinUnassignedDoor), alpha = 0.5, fill = "orange") +
+    
+    geom_line(aes(x = luggage.count.0, y=IteMeanAssignedDoor), color="blue") +
+    geom_point(aes(x = luggage.count.0, y=IteMeanAssignedDoor), color="blue") +
+    
+    geom_line(aes(x = luggage.count.0, y=IteMeanUnassignedDoor), color="red") +
+    geom_point(aes(x = luggage.count.0, y=IteMeanUnassignedDoor), color="red") +
+    
     facet_wrap(~walkLabel) +
     labs(title = limitedData$boardingName, x="Luggage Count", y="Average Iterations")
   
