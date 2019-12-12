@@ -82,9 +82,11 @@ limitedData %>% ggplot() +
   labs(title = limitedData$boardingName, x="Luggage Count", y="Average Iterations")
 
 
+### All seperate methods
+# Fix x-axis
+
 
 for(iteratedMethod in unique(displayData$boarding.method)) {
-  
   limitedData = displayData %>% subset(boarding.method == iteratedMethod)
   
   generatedPlot = limitedData %>% ggplot() +
@@ -105,4 +107,38 @@ for(iteratedMethod in unique(displayData$boarding.method)) {
          scale = 1, width = 20, height = 10, units = "cm",
          dpi = 300, limitsize = TRUE)
 }
+
+
+
+
+
+
+
+
+### Compare methods
+
+## Boxplot, min, max, median, mean from displayData
+#Luggagecount = 2
+#Walkingspeed = 2
+
+
+comparePlot = ggplot(displayData) + ylim(yMin, yMax);
+for(iteratedMethod in unique(displayData$boarding.method)) {
+  limitedData = displayData %>% subset(boarding.method == iteratedMethod)
+  
+  comparePlot = comparePlot +
+    geom_line(aes(x = limitedData$luggage.count.0, y=limitedData$IteMeanAssignedDoor), color="blue") +
+    geom_point(aes(x = limitedData$luggage.count.0, y=limitedData$IteMeanAssignedDoor), color="blue")
+}
+comparePlot
+  
+  facet_wrap(~walkLabel) +
+  labs(title = limitedData$boardingName, x="Luggage Count", y="Average Iterations")
+
+
+
+
+
+
+
 
