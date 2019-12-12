@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <time.h>
 #include <math.h>
+#include <windows.h>
 
 #include "StructsAndEnums.h"
 #include "BasicCalls.h"

@@ -32,7 +32,6 @@ void RunMultipleSimulations(Map _PlaneMap, BasicSimulationRules* _BasicRules, bo
 {
 	for (int i = 0; i < _BasicRules->MultipleMapsLength; i++)
 	{
-		_BasicRules->BoardingMethodFile = _BasicRules->MultipleMaps[i];
 		if (!ReadMapFromFile(&_PlaneMap, *_BasicRules, _BasicRules->MultipleMaps[i]))
 			return;
 
@@ -124,7 +123,7 @@ void RunAllSimulationsAndSaveToOutput(Map _PlaneMap, BasicSimulationRules _Basic
 
 	for (int i = 0; i < _RunsToDo; i++)
 	{
-		TotalStepsTaken += RunOneSimulationAndGetSteps(PassengerList, PassengerLocationMatrix, _PlaneMap, _BasicRules, _UpdateGraphics, OutputFile);
+		TotalStepsTaken += RunOneSimulationAndGetSteps(PassengerList, PassengerLocationMatrix, _PlaneMap, _BasicRules, _UpdateGraphics, OutputFile, InputDir);
 	}
 
 	TotalWatchEnd = clock();
@@ -136,7 +135,7 @@ void RunAllSimulationsAndSaveToOutput(Map _PlaneMap, BasicSimulationRules _Basic
 	printf("\nFinished - %s Took %4d ms and an avr of %4d iterations pr run\n", InputDir, (int)((((double)TotalWatchEnd - (double)TotalWatchStart) / CLOCKS_PER_SEC) * 1000), (TotalStepsTaken / _RunsToDo));
 }
 
-int RunOneSimulationAndGetSteps(Person* _PassengerList, Person*** _PassengerLocationMatrix, Map _PlaneMap, BasicSimulationRules _BasicRules, bool _UpdateGraphics, FILE* _OutputFile)
+int RunOneSimulationAndGetSteps(Person* _PassengerList, Person*** _PassengerLocationMatrix, Map _PlaneMap, BasicSimulationRules _BasicRules, bool _UpdateGraphics, FILE* _OutputFile, char* MethodFile)
 {
 	int StepsTaken = 0;
 
@@ -153,7 +152,7 @@ int RunOneSimulationAndGetSteps(Person* _PassengerList, Person*** _PassengerLoca
 		Sleep(1000);
 	}
 
-	WriteBasicRulesToOutput(_OutputFile, _BasicRules);
+	WriteBasicRulesToOutput(_OutputFile, _BasicRules, MethodFile);
 
 	fprintf(_OutputFile, "%d\n", StepsTaken);
 
@@ -196,9 +195,9 @@ void WriteProbabilitiesToOutput(FILE* _OutputFile, BasicSimulationRules _BasicRu
 	}
 }
 
-void WriteBasicRulesToOutput(FILE* _OutputFile, BasicSimulationRules _BasicRules)
+void WriteBasicRulesToOutput(FILE* _OutputFile, BasicSimulationRules _BasicRules, const char* MethodFile)
 {
-	fprintf(_OutputFile, "%s,%d,%d,%d,", _BasicRules.BoardingMethodFile, _BasicRules.CrossDelay, _BasicRules.SeatInterferenceDelay, _BasicRules.AssignToNearestDoor);
+	fprintf(_OutputFile, "%s,%d,%d,%d,", MethodFile, _BasicRules.CrossDelay, _BasicRules.SeatInterferenceDelay, _BasicRules.AssignToNearestDoor);
 	for (int i = 0; i < _BasicRules.LuggageGenerationValuesLength; i++) {
 		fprintf(_OutputFile, "%d,%d,", _BasicRules.LuggageGenerationValues[i].Value, _BasicRules.LuggageGenerationValues[i].Possibility);
 	}
