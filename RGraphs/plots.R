@@ -38,7 +38,11 @@ limitedData %>% ggplot() +
   geom_point(aes(x = luggage.count.0, y=IteMeanUnassignedDoor), color="red") +
   
   facet_wrap(~walkLabel) +
-  labs(title = limitedData$boardingName, x="Luggage Count", y="Average Iterations")
+  labs(title = limitedData$boardingName, x="Luggage Count", y="Average Iterations") +
+  scale_x_continuous(breaks = seq(0, 60, by = 1)) +
+  theme(
+    axis.ticks.x = element_line()
+  )
 
 
 ### All seperate methods
@@ -60,7 +64,10 @@ for(iteratedMethod in unique(displayData$boarding.method)) {
     geom_point(aes(x = luggage.count.0, y=IteMeanUnassignedDoor), color="red") +
     
     facet_wrap(~walkLabel) +
-    labs(title = limitedData$boardingName, x="Luggage Count", y="Average Iterations")
+    labs(title = limitedData$boardingName, x="Luggage Count", y="Average Iterations") +
+    theme(
+      axis.ticks.length.x = 1
+    )
   
   ggsave(paste(iteratedMethod,".pdf", sep = ""), plot = generatedPlot, device = "pdf", path = "plots",
          scale = 1, width = 20, height = 10, units = "cm",
