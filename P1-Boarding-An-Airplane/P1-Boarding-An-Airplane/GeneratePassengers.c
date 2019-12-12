@@ -3,23 +3,28 @@
 // A function to generate all passengers with use of some of the other functions
 void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap, BasicSimulationRules _BaseRules)
 {
-    for (int i = 0; i < Count; i++) {
-        InitialisePassenger(&(_PersonList[i]), _PlaneMap, _BaseRules);
-    }
-
-	for (int y = 0; y < _PlaneMap.Height; y++)
-	{
-		for (int x = 0; x < _PlaneMap.Width; x++)
-		{
-			GetMapLocation(&_PlaneMap, x, y)->IsTaken = false;
-		}
-	}
+	ResetPassengerListAndMap(Count, &_PersonList, &_PlaneMap, _BaseRules);
 
 	AssignPassengersToAvailableSeat(Count, _PersonList, _PlaneMap);
 
 	ScramblePassengers(_PersonList, Count);
 
 	AssignPassengerToDoor(Count, _PersonList, _PlaneMap, _BaseRules);
+}
+
+void ResetPassengerListAndMap(int Count, Person* _PersonList[], Map* _PlaneMap, BasicSimulationRules _BaseRules)
+{
+	for (int i = 0; i < Count; i++) {
+		InitialisePassenger(&(*_PersonList)[i], (*_PlaneMap), _BaseRules);
+	}
+
+	for (int y = 0; y < (*_PlaneMap).Height; y++)
+	{
+		for (int x = 0; x < (*_PlaneMap).Width; x++)
+		{
+			GetMapLocation(_PlaneMap, x, y)->IsTaken = false;
+		}
+	}
 }
 
 // A function to initialise passenger. It uses some other functions to generate diffrent parameters for each passenger

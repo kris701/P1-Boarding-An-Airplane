@@ -20,3 +20,4 @@ void AssignPassengerToNearestDoor(int Count, Person _PassengerList[], Map _Plane
 void AssignPassengerToRandomDoor(int Count, Person _PassengerList[], Map _PlaneMap);
 void ScramblePassengers(Person _PassengerList[], int ArrayLength);
 void AssignPassengerToDoor(int Count, Person _PassengerList[], Map _PlaneMap, BasicSimulationRules _BaseRules);
+void ResetPassengerListAndMap(int Count, Person* _PersonList[], Map* _PlaneMap, BasicSimulationRules _BaseRules);
