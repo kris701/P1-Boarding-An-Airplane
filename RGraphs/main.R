@@ -11,7 +11,6 @@ library(dplyr)
 library(purrr)
 #library(extrafont)
 
-
 data = read.csv("data/output.csv");
 
 data$boardingName <- factor(data$boarding.method, 

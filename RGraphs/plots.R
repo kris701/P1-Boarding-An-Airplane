@@ -1,4 +1,6 @@
-source(file="main.R")
+if(is.null(data)) {
+  source(file="main.R")
+}
 
 displayData = data %>% 
   group_by(
