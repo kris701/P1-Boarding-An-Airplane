@@ -21,3 +21,4 @@ BoardingMethodGeneration/x32
 *.csv
 RGraphs/.RData
 RGraphs/.Rhistory
+*.pdf
