@@ -30,7 +30,7 @@ int main(void) {
 }
 
 int OpenConfigFile(BoardingInfo* _BI, FILE* _FP) {
-	fopen_s(&_FP, "config.ini", "r");
+	fopen_s(&_FP, "configerru.ini", "r");
 
 	if (_FP == NULL) {
 		printf("Missing config file\nShutting down\n");
