@@ -9,7 +9,10 @@ int main()
 	srand(time(NULL));
 
 	if (!ReadBasicRulesConfigFile(&BasicRules, "config.ini"))
+	{
+		fprintf(stderr, "Error, config.ini not found!\n");
 		return 0;
+	}
 
 	UpdateGraphics = GetYNInput("Update Graphics?");
 	RunsToDo = GetIntInput("How many runs?", 0, MaxRuns);
@@ -96,7 +99,10 @@ void RunAllSimulationsAndSaveToOutput(BasicSimulationRules _BasicRules, bool _Up
 	Map PlaneMap = { 0 };
 
 	if (!ReadMapFromFile(&PlaneMap, _BasicRules, InputDir))
+	{
+		fprintf(stderr, "Error, input method could not be opened!\n");
 		return;
+	}
 
 	char* AccOutputDir = calloc(128, sizeof(char));
 
@@ -104,7 +110,8 @@ void RunAllSimulationsAndSaveToOutput(BasicSimulationRules _BasicRules, bool _Up
 
 	DoOpenFile(&OutputFile, AccOutputDir, "w+");
 
-	if (!FileExists(OutputFile)) {
+	if (!FileExists(OutputFile)) 
+	{
 		fprintf(stderr, "Output file missing\n");
 		return;
 	}
