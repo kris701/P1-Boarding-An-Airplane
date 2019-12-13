@@ -130,7 +130,12 @@ void RunAllSimulationsAndSaveToOutput(BasicSimulationRules _BasicRules, bool _Up
 	free(AccOutputDir);
 	CleanupAllocations(&PassengerList, &PassengerLocationMatrix, &PlaneMap);
 
-	printf("\nFinished - %s Took %4d ms and an avr of %4d iterations pr run\n", InputDir, (int)((((double)TotalWatchEnd - (double)TotalWatchStart) / CLOCKS_PER_SEC) * 1000), (TotalStepsTaken / _RunsToDo));
+	printf("\nFinished - %s Took %4d ms and an avr of %4d iterations pr run\n", InputDir, GetTimeFromWatches(TotalWatchStart, TotalWatchEnd), (TotalStepsTaken / _RunsToDo));
+}
+
+int GetTimeFromWatches(clock_t StartClock, clock_t EndClock)
+{
+	return (int)((((double)EndClock - (double)StartClock) / CLOCKS_PER_SEC) * 1000);
 }
 
 int RunOneSimulationAndGetSteps(Person* _PassengerList, Person*** _PassengerLocationMatrix, Map _PlaneMap, BasicSimulationRules _BasicRules, bool _UpdateGraphics, FILE* _OutputFile, char* MethodFile)

@@ -25,3 +25,4 @@ void WriteProbabilitiesToOutput(FILE* _OutputFile, BasicSimulationRules _BasicRu
 void WriteBasicRulesToOutput(FILE* _OutputFile, BasicSimulationRules _BasicRules, const char* MethodFile);
 void RunMultipleSimulations(BasicSimulationRules* _BasicRules, bool _UpdateGraphics, int _RunsToDo);
 void ConvertInputDirToOutputDir(char* _InputDir, char** _OutputDir, int OutputLength, const char* Dir, const char* FileExtension);
+int GetTimeFromWatches(clock_t StartClock, clock_t EndClock);
