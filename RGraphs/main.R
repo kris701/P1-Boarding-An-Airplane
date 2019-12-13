@@ -45,7 +45,16 @@ data$boardingName <- factor(data$boarding.method,
    )
 );
 
+isSingleDoor = function(methodName) {
+   return(grepl(methodName, "1"))
+}
+
+
+yMax = max(data$Iterations);
+yMin = min(data$Iterations);
+
 print("Loaded Main.R");
+
 
 
 

@@ -1,4 +1,4 @@
-if(is.null(data)) {
+if(class(data) != "data.frame") {
   source(file="main.R")
 }
 
@@ -20,10 +20,6 @@ displayData = data %>%
   );
 
 displayData$walkLabel <- sprintf( "%s walking speed", displayData$walk.speed.0 )
-
-
-yMax = max(data$Iterations);
-yMin = min(data$Iterations);
 
 limitedData = displayData %>% subset(boarding.method == "backtofront")
 limitedData %>% ggplot() +
@@ -52,7 +48,8 @@ limitedData %>% ggplot() +
 for(iteratedMethod in unique(displayData$boarding.method)) {
   limitedData = displayData %>% subset(boarding.method == iteratedMethod)
   
-  generatedPlot = limitedData %>% ggplot() +
+  generatedPlot =
+    limitedData %>% ggplot() +
     ylim(yMin, yMax) +
     geom_ribbon(aes(x=luggage.count.0, ymax=IteMaxAssignedDoor  , ymin=IteMinAssignedDoor),   alpha = 0.5, fill = "blue") +
     geom_ribbon(aes(x=luggage.count.0, ymax=IteMaxUnassignedDoor, ymin=IteMinUnassignedDoor), alpha = 0.5, fill = "orange") +
@@ -65,10 +62,12 @@ for(iteratedMethod in unique(displayData$boarding.method)) {
     
     facet_wrap(~walkLabel) +
     labs(title = limitedData$boardingName, x="Luggage Count", y="Average Iterations") +
+    scale_x_continuous(breaks = seq(0, 60, by = 1)) +
     theme(
-      axis.ticks.length.x = 1
+      axis.ticks.x = element_line()
     )
   
+  print(paste(iteratedMethod,".pdf", sep = ""))
   ggsave(paste(iteratedMethod,".pdf", sep = ""), plot = generatedPlot, device = "pdf", path = "plots",
          scale = 1, width = 20, height = 10, units = "cm",
          dpi = 300, limitsize = TRUE)

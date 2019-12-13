@@ -1,4 +1,4 @@
-if(is.null(data)) {
+if(class(data) != "data.frame") {
   source(file="main.R")
 }
 
@@ -44,6 +44,7 @@ for( walkSpeed in unique(data$walk.speed.0) ) {
       
       generatedPlot =
         limitedData %>% ggplot(aes(x = boardingName, y = Iterations, color = factor(boardingName))) + 
+        #ylim(yMin, yMax) +
         geom_boxplot(outlier.shape = NA)+
         geom_point(data=means, aes(y = meanIterations, group = factor(boardingName)), 
                    shape = 4,
