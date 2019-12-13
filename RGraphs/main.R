@@ -4,30 +4,48 @@
 #install.packages('ggplot2', dependencies = TRUE)
 #install.packages('data.table', dependencies = TRUE)
 #install.packages("tidyverse")
+#install.packages("extrafont")
 library(tidyverse)
 library(ggplot2)
 library(dplyr)
 library(purrr)
+#library(extrafont)
 
-data = read.csv("data/outputfile.csv");
+data = read.csv("data/output.csv");
 
-displayData <- data %>% 
-  group_by(
-    boarding.method,
-    luggage.count.0,
-    walk.speed.0
-    ) %>% 
-  summarise(
-    IteMean = mean(Iterations), 
-    IteMax = max(Iterations), 
-    IteMin = min(Iterations)
-  );
+data$boardingName <- factor(data$boarding.method, 
+   levels = c( 
+     "backtofront", 
+     "backtofront1door", 
+     "fronttoback", 
+     "fronttoback1door", 
+     "random", 
+     "random1door", 
+     "steffenmodified", 
+     "steffenmodified1door", 
+     "steffenperfect", 
+     "steffenperfect1door", 
+     "wilma",
+     "wilma1door"
+   ),
+   
+   labels = c( 
+     "Back to Front ( 2 doors )", 
+     "Back to Front ( 1 door )", 
+     "Front to back ( 2 doors )", 
+     "Front to back ( 1 door )", 
+     "Random ( 2 doors )", 
+     "Random ( 1 door )", 
+     "Steffen Modified ( 2 doors )", 
+     "Steffen Modified ( 1 door )", 
+     "Steffen Perfect ( 2 doors )", 
+     "Steffen Perfect ( 1 door )", 
+     "Wilma ( 2 doors )",
+     "Wilma ( 1 door )"
+   )
+);
 
-displayData %>% ggplot(aes(x = luggage.count.0, y=IteMean, color = factor(boarding.method))) + 
-  geom_point() + geom_line() +
-  geom_ribbon(aes(x=luggage.count.0, ymax=IteMax, ymin=IteMin), alpha = 0.6, fill = "skyblue") +
-  facet_wrap(~walk.speed.0)
-
+print("Loaded Main.R");
 
 
 

@@ -67,7 +67,7 @@ void FreeMap(Map* _PlaneMap)
 
 	if (_PlaneMap->Locations != NULL)
 	{
-		for (int i = 0; i < _PlaneMap->Width; i++)
+		for (int i = 0; i < _PlaneMap->Height; i++)
 		{
 			if (_PlaneMap->Locations != NULL)
 			{

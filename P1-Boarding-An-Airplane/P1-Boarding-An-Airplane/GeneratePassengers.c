@@ -58,6 +58,9 @@ int GenerateLuggage(BasicSimulationRules _BaseRules)
 		ChanceOffset += _BaseRules.LuggageGenerationValues[i].Possibility;
 	}
 
+	printf("Error, Luggage generation did not add up!\n");
+	Sleep(500);
+
     return 0;
 }
 
@@ -89,7 +92,10 @@ int GenerateWalkSpeed(BasicSimulationRules _BaseRules)
 		ChanceOffset += _BaseRules.WalkingspeedGenerationValues[i].Possibility;
 	}
 
-	return 0;
+	printf("Error, Walking speed generation did not add up!\n");
+	Sleep(500);
+
+	return 1;
 }
 
 // A function that uses our to other assign door functions to determine which door to start at
