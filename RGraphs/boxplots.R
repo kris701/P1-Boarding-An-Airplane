@@ -23,8 +23,8 @@ for( walkSpeed in unique(data$walk.speed.0) ) {
           boardingName
         ) %>%
         summarise(
-          y = max(limitedData$Iterations) * 0.95,
-          label = element_text(label = paste("Count:", nrow(limitedData$boardingName[limitedData$boardingName==boardingName]))),
+          #y = max(limitedData$Iterations) * 0.95,
+          #label = element_text(label = paste("Count:", nrow(limitedData$boardingName[limitedData$boardingName==boardingName]))),
           meanIterations = mean(Iterations)
         );
       
@@ -42,19 +42,19 @@ for( walkSpeed in unique(data$walk.speed.0) ) {
       
       print(paste("Subset rows:", nrow(limitedData)));
       
-      #generatedPlot =
+      generatedPlot =
         limitedData %>% ggplot(aes(x = boardingName, y = Iterations, color = factor(boardingName))) + 
         geom_boxplot(outlier.shape = NA)+
         geom_point(data=means, aes(y = meanIterations, group = factor(boardingName)), 
                    shape = 4,
                    size = 4,
                    position = position_dodge(width = 0.8)) +
-        stat_summary(
-          fun.data = stat_box_data, 
-          geom = "text", 
-          hjust = 0.5,
-          vjust = 0.9
-        ) + 
+        #stat_summary(
+        #  fun.data = stat_box_data, 
+        #  geom = "text", 
+        #  hjust = 0.5,
+        #  vjust = 0.9
+        #) + 
         labs(title = plotTitle, y="Iterations") +
         theme(
           axis.text.x = element_blank(),
