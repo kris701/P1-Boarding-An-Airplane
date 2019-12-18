@@ -12,7 +12,7 @@
 #define MaxRuns 10000000
 
 void FlushInput();
-bool GetYNInput(const char* _Text);
+bool GetBoolInput(const char* _Text);
 int GetIntInput(const char* _Text, int Min, int Max);
 void AllocatePassengerList(Person** _PassengerList, Map _PlaneMap);
 void AllocatePassengerLocationMatrix(Person**** _PassengerLocationMatrix, Map _PlaneMap);

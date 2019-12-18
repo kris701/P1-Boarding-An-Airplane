@@ -14,15 +14,14 @@ int main()
 		return 0;
 	}
 
-	UpdateGraphics = GetYNInput("Update Graphics?");
+	UpdateGraphics = GetBoolInput("Update Graphics?");
 	RunsToDo = GetIntInput("How many runs?", 0, MaxRuns);
 
 	if (BasicRules.DoAllRuns)
 		RunMultipleSimulations(&BasicRules, UpdateGraphics, RunsToDo);
 	else
-	{
 		RunAllSimulationsAndSaveToOutput(BasicRules, UpdateGraphics, RunsToDo, BasicRules.BoardingMethodFile);
-	}
+
 	return 0;
 
 }
@@ -41,7 +40,7 @@ void FlushInput()
 }
 
 // Checks if the input is 'y'
-bool GetYNInput(const char* _Text)
+bool GetBoolInput(const char* _Text)
 {
 	char Choice = ' ';
 	while (Choice != 'y' && Choice != 'n')
