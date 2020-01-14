@@ -7,7 +7,7 @@
 #include "StructsAndEnums.h"
 #include "BasicCalls.h"
 
-bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* FileName);
+bool ReadSimulationConfigFile(SimulationConfig* _Config, const char* FileName);
 int FindIntBetweenChars(char* SubStringBuffer[], char FromChar, char ToChar);
 int GetItemCountInConfig(char SubStringBuffer[], int _BufferLength);
 void GetStringAfterIdentifier(int BufferSize, char* _Buffer, char* Target[]);

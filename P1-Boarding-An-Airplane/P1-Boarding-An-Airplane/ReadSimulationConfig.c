@@ -1,21 +1,19 @@
 #include "ReadSimulationConfig.h"
 
-// A function to read basic rules from config file
-bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* FileName)
+// A function to read config file
+bool ReadSimulationConfigFile(SimulationConfig* _Config, const char* FileName)
 {
 	FILE* BSRFile;
-	fopen_s(&BSRFile, FileName, "r");
 
-	if (FileExists(BSRFile))
+	if (DoOpenFile(&BSRFile, FileName, "r"))
 	{
 		int BufferLength = GetNumberOfCharsForLongestLineInFile(BSRFile);
 		char* Buffer = calloc(BufferLength, sizeof(char));
 		char* SubStringBuffer = calloc(BufferLength, sizeof(char));
-		(*_BasicRules).BoardingMethodFile = calloc(BufferLength, sizeof(char));
 
 		if (Buffer == NULL || BufferLength == 0)
 		{
-			printf("Error reading config file!");
+			fprintf(stderr, "Error reading config file!");
 			return false;
 		}
 
@@ -23,44 +21,34 @@ bool ReadBasicRulesConfigFile(BasicSimulationRules* _BasicRules, const char* Fil
 		{
 			fgets(Buffer, BufferLength, BSRFile);
 
-			if (strstr(Buffer, "MapName"))
-			{
-				GetStringAfterIdentifier(BufferLength, Buffer, &((*_BasicRules).BoardingMethodFile));
-				continue;
-			}
 			if (strstr(Buffer, "MultipleMaps"))
 			{
-				GetStringsOfItems(BufferLength, Buffer, &((*_BasicRules).MultipleMaps), 128, &((*_BasicRules).MultipleMapsLength));
+				GetStringsOfItems(BufferLength, Buffer, &((*_Config).MultipleMaps), 128, &((*_Config).MultipleMapsLength));
 				continue;
 			}
 			if (strstr(Buffer, "CrossDelay"))
 			{
-				(*_BasicRules).CrossDelay = GetIntAfterIdentifier(BufferLength, Buffer);
+				(*_Config).CrossDelay = GetIntAfterIdentifier(BufferLength, Buffer);
 				continue;
 			}
 			if (strstr(Buffer, "SeatInterferenceDelay"))
 			{
-				(*_BasicRules).SeatInterferenceDelay = GetIntAfterIdentifier(BufferLength, Buffer);
+				(*_Config).SeatInterferenceDelay = GetIntAfterIdentifier(BufferLength, Buffer);
 				continue;
 			}
 			if (strstr(Buffer, "LuggageGen"))
 			{
-				GetValueStastisticsOfItems(BufferLength, Buffer, &((*_BasicRules).LuggageGenerationValues), &((*_BasicRules).LuggageGenerationValuesLength));
+				GetValueStastisticsOfItems(BufferLength, Buffer, &((*_Config).LuggageGenerationValues), &((*_Config).LuggageGenerationValuesLength));
 				continue;
 			}
 			if (strstr(Buffer, "WalkspeedGen"))
 			{
-				GetValueStastisticsOfItems(BufferLength, Buffer, &((*_BasicRules).WalkingspeedGenerationValues), &((*_BasicRules).WalkingspeedGenerationValuesLength));
+				GetValueStastisticsOfItems(BufferLength, Buffer, &((*_Config).WalkingspeedGenerationValues), &((*_Config).WalkingspeedGenerationValuesLength));
 				continue;
 			}
 			if (strstr(Buffer, "AssignToNearestDoor"))
 			{
-				(*_BasicRules).AssignToNearestDoor = GetBoolAfterIdentifier(BufferLength, Buffer);
-				continue;
-			}
-			if (strstr(Buffer, "DoAllRuns"))
-			{
-				(*_BasicRules).DoAllRuns = GetBoolAfterIdentifier(BufferLength, Buffer);
+				(*_Config).AssignToNearestDoor = GetBoolAfterIdentifier(BufferLength, Buffer);
 				continue;
 			}
 		}
@@ -81,7 +69,7 @@ int FindIntBetweenChars(char* SubStringBuffer[], char FromChar, char ToChar)
 {
 	char* NumVal = calloc(32, sizeof(char));
 
-	FindStrBetweenChars(SubStringBuffer, &NumVal, 32, FromChar, ToChar);
+	FindStrBetweenDelimiters(SubStringBuffer, &NumVal, 32, FromChar, ToChar);
 
 	return atoi(NumVal);
 }
@@ -166,7 +154,7 @@ void GetStringsOfItems(int SubStringBufferLength, char* _Buffer, char*** Target,
 	for (int i = 0; i < ItemCount; i++)
 	{
 		(*Target)[i] = calloc(TargetSize, sizeof(char));
-		FindStrBetweenChars(&SubStringBuffer, &((*Target)[i]), TargetSize, '[', ']');
+		FindStrBetweenDelimiters(&SubStringBuffer, &((*Target)[i]), TargetSize, '[', ']');
 	}
 }
 

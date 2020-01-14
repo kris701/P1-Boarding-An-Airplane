@@ -1,7 +1,7 @@
 #include "GeneratePassengers.h"
 
 // A function to generate all passengers with use of some of the other functions
-void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap, BasicSimulationRules _BaseRules)
+void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap, SimulationConfig _BaseRules)
 {
 	ResetPassengerListAndMap(Count, &_PersonList, &_PlaneMap, _BaseRules);
 
@@ -12,7 +12,7 @@ void GeneratePassengers(int Count, Person _PersonList[], Map _PlaneMap, BasicSim
 	AssignPassengerToDoor(Count, _PersonList, _PlaneMap, _BaseRules);
 }
 
-void ResetPassengerListAndMap(int Count, Person* _PersonList[], Map* _PlaneMap, BasicSimulationRules _BaseRules)
+void ResetPassengerListAndMap(int Count, Person* _PersonList[], Map* _PlaneMap, SimulationConfig _BaseRules)
 {
 	for (int i = 0; i < Count; i++) {
 		InitialisePassenger(&(*_PersonList)[i], (*_PlaneMap), _BaseRules);
@@ -28,26 +28,26 @@ void ResetPassengerListAndMap(int Count, Person* _PersonList[], Map* _PlaneMap, 
 }
 
 // A function to initialise passenger. It uses some other functions to generate diffrent parameters for each passenger
-void InitialisePassenger(Person* Passenger, Map _PlaneMap, BasicSimulationRules _BaseRules) {
+void InitialisePassenger(Person* Passenger, Map _PlaneMap, SimulationConfig _BaseRules) {
 	Passenger->WalkingSpeed = GenerateWalkSpeed(_BaseRules);
 
     Passenger->StartingDoorID = 0;
 	Passenger->CurrentPos = SetPoint(0,0);
     Passenger->IsSeated = false;
-    Passenger->PersonCharacter = '.';
+    Passenger->PersonCharacter = 'P';
 
     Passenger->LuggageCount = GenerateLuggage(_BaseRules);
 
-    Passenger->IsBackingUp = false;
-    Passenger->SeatInterferenceDelay = 0;
-    Passenger->CrossDelay = 0;
+    Passenger->IsDoneWithSeatInterference = false;
+    Passenger->SeatInterferenceDelayCount = 0;
+    Passenger->CrossDelayCount = 0;
 
 	Passenger->MovedLastTurn = true;
 	Passenger->NextMove = SetPoint(0,0);
 }
 
 // A function to genereate how much luggage a passenger has with them
-int GenerateLuggage(BasicSimulationRules _BaseRules)
+int GenerateLuggage(SimulationConfig _BaseRules)
 {
 	int ChanceValue = GetRandomNumberRanged(1, 100);
 	int ChanceOffset = 0;
@@ -58,7 +58,7 @@ int GenerateLuggage(BasicSimulationRules _BaseRules)
 		ChanceOffset += _BaseRules.LuggageGenerationValues[i].Possibility;
 	}
 
-	printf("Error, Luggage generation did not add up!\n");
+	fprintf(stderr, "Luggage generation did not add up!\n");
 	Sleep(500);
 
     return 0;
@@ -67,7 +67,7 @@ int GenerateLuggage(BasicSimulationRules _BaseRules)
 // A function to get the ID on the nearest starting door
 int GetNearestStartingDoorID(Person* Passenger, Map _PlaneMap) 
 {
-	int MinLength = 9999;
+	int MinLength = INT_MAX;
 	int TargetIndex = 0;
 	for (int i = 0; i < _PlaneMap.DoorCount; i++)
 	{
@@ -81,7 +81,7 @@ int GetNearestStartingDoorID(Person* Passenger, Map _PlaneMap)
 }
 
 // A function generate walking speed for a passenger
-int GenerateWalkSpeed(BasicSimulationRules _BaseRules)
+int GenerateWalkSpeed(SimulationConfig _BaseRules)
 {
 	int ChanceValue = GetRandomNumberRanged(1, 100);
 	int ChanceOffset = 0;
@@ -92,14 +92,14 @@ int GenerateWalkSpeed(BasicSimulationRules _BaseRules)
 		ChanceOffset += _BaseRules.WalkingspeedGenerationValues[i].Possibility;
 	}
 
-	printf("Error, Walking speed generation did not add up!\n");
+	fprintf(stderr, "Walking speed generation did not add up!\n");
 	Sleep(500);
 
 	return 1;
 }
 
 // A function that uses our to other assign door functions to determine which door to start at
-void AssignPassengerToDoor(int Count, Person _PassengerList[], Map _PlaneMap, BasicSimulationRules _BaseRules)
+void AssignPassengerToDoor(int Count, Person _PassengerList[], Map _PlaneMap, SimulationConfig _BaseRules)
 {
 	if (_BaseRules.AssignToNearestDoor)
 		AssignPassengerToNearestDoor(Count, _PassengerList, _PlaneMap);

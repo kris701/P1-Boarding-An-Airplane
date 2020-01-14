@@ -4,35 +4,31 @@ int main()
 {
 	bool UpdateGraphics = false;
 	int RunsToDo = 0;
-	BasicSimulationRules BasicRules = { 0 };
+	SimulationConfig Config = { 0 };
 
 	srand(time(NULL));
 
-	if (!ReadBasicRulesConfigFile(&BasicRules, "config.ini"))
+	if (!ReadSimulationConfigFile(&Config, "config.ini"))
 	{
 		fprintf(stderr, "Error, config.ini not found!\n");
 		return 0;
 	}
 
 	UpdateGraphics = GetBoolInput("Update Graphics?");
-	RunsToDo = GetIntInput("How many runs?", 0, MaxRuns);
+	RunsToDo = GetIntInput("How many runs?", 0, INT_MAX);
 
-	if (BasicRules.DoAllRuns)
-		RunMultipleSimulations(&BasicRules, UpdateGraphics, RunsToDo);
-	else
-		RunAllSimulationsAndSaveToOutput(BasicRules, UpdateGraphics, RunsToDo, BasicRules.BoardingMethodFile);
+	for (int i = 0; i < Config.MultipleMapsLength; i++)
+	{
+		RunSimulationsAndSaveToOutput(Config, UpdateGraphics, RunsToDo, Config.MultipleMaps[i]);
+	}
+
+	// Debug
+	system("pause");
 
 	return 0;
 
 }
 
-void RunMultipleSimulations(BasicSimulationRules* _BasicRules, bool _UpdateGraphics, int _RunsToDo)
-{
-	for (int i = 0; i < _BasicRules->MultipleMapsLength; i++)
-	{
-		RunAllSimulationsAndSaveToOutput(*_BasicRules, _UpdateGraphics, _RunsToDo, _BasicRules->MultipleMaps[i]);
-	}
-}
 // The getchar function eats up everything until it reaches \n
 void FlushInput()
 {
@@ -88,7 +84,7 @@ void ResetPassengerLocationMatrix(Person**** _PassengerLocationMatrix, Map _Plan
 }
 
 // A function that runs the simulation a given amount of times and saves data to a file
-void RunAllSimulationsAndSaveToOutput(BasicSimulationRules _BasicRules, bool _UpdateGraphics, int _RunsToDo, char* InputDir)
+void RunSimulationsAndSaveToOutput(SimulationConfig _Config, bool _UpdateGraphics, int _RunsToDo, char* InputDir)
 {
 	FILE* OutputFile;
 	int TotalStepsTaken = 0;
@@ -97,27 +93,24 @@ void RunAllSimulationsAndSaveToOutput(BasicSimulationRules _BasicRules, bool _Up
 	Person*** PassengerLocationMatrix;
 	Map PlaneMap = { 0 };
 
-	if (!ReadMapFromFile(&PlaneMap, _BasicRules, InputDir))
+	if (!ReadMapFromFile(&PlaneMap, _Config, InputDir))
 	{
 		fprintf(stderr, "Error, input method could not be opened!\n");
 		return;
 	}
 
-	char* AccOutputDir = calloc(128, sizeof(char));
+	char* OutputDir = calloc(128, sizeof(char));
 
-	ConvertInputDirToOutputDir(InputDir, &AccOutputDir, 128, "Output/", ".csv");
+	_mkdir("./Output"); // Creates a directory. If it already exists. Will do nothing.
+	GenerateOutputDirString(InputDir, &OutputDir, 128, "Output/", ".csv");
 
-	DoOpenFile(&OutputFile, AccOutputDir, "w+");
-
-	if (!FileExists(OutputFile)) 
+	if (!DoOpenFile(&OutputFile, OutputDir, "w+"))
 	{
 		fprintf(stderr, "Output file missing\n");
 		return;
 	}
 
-	WriteProbabilitiesToOutput(OutputFile, _BasicRules);
-
-	fprintf(OutputFile, "Iterations\n");
+	WriteHeaderToOutput(OutputFile, _Config);
 
 	AllocatePassengerList(&PassengerList, PlaneMap);
 	AllocatePassengerLocationMatrix(&PassengerLocationMatrix, PlaneMap);
@@ -126,33 +119,33 @@ void RunAllSimulationsAndSaveToOutput(BasicSimulationRules _BasicRules, bool _Up
 
 	for (int i = 0; i < _RunsToDo; i++)
 	{
-		TotalStepsTaken += RunOneSimulationAndGetSteps(PassengerList, PassengerLocationMatrix, PlaneMap, _BasicRules, _UpdateGraphics, OutputFile, InputDir);
+		int Value = RunOneSimulationAndGetSteps(PassengerList, PassengerLocationMatrix, PlaneMap, _Config, _UpdateGraphics, OutputFile, InputDir);
+		TotalStepsTaken += Value;
+
+		WriteConfigValuesToOutput(OutputFile, _Config, InputDir);
+
+		fprintf(OutputFile, "%d\n", Value);
 	}
 
 	TotalWatchEnd = clock();
 
 	fclose(OutputFile);
 
-	free(AccOutputDir);
+	free(OutputDir);
 	CleanupAllocations(&PassengerList, &PassengerLocationMatrix, &PlaneMap);
 
-	printf("\nFinished - %s Took %4d ms and an avr of %4d iterations pr run\n", InputDir, GetTimeFromWatches(TotalWatchStart, TotalWatchEnd), (TotalStepsTaken / _RunsToDo));
+	printf("\nFinished - %s Took %4d ms and an avr of %4d iterations pr run\n", InputDir, TimeDifference(TotalWatchStart, TotalWatchEnd), (TotalStepsTaken / _RunsToDo));
 }
 
-int GetTimeFromWatches(clock_t StartClock, clock_t EndClock)
-{
-	return (int)((((double)EndClock - (double)StartClock) / CLOCKS_PER_SEC) * 1000);
-}
-
-int RunOneSimulationAndGetSteps(Person* _PassengerList, Person*** _PassengerLocationMatrix, Map _PlaneMap, BasicSimulationRules _BasicRules, bool _UpdateGraphics, FILE* _OutputFile, char* MethodFile)
+int RunOneSimulationAndGetSteps(Person* _PassengerList, Person*** _PassengerLocationMatrix, Map _PlaneMap, SimulationConfig _Config, bool _UpdateGraphics, FILE* _OutputFile, char* MethodFile)
 {
 	int StepsTaken = 0;
 
 	ResetPassengerLocationMatrix(&_PassengerLocationMatrix, _PlaneMap);
 
-	GeneratePassengers(_PlaneMap.NumberOfSeats, _PassengerList, _PlaneMap, _BasicRules);
+	GeneratePassengers(_PlaneMap.NumberOfSeats, _PassengerList, _PlaneMap, _Config);
 
-	StepsTaken = RunSim(_PassengerList, _PassengerLocationMatrix, _UpdateGraphics, _PlaneMap, _BasicRules);
+	StepsTaken = RunSim(_PassengerList, _PassengerLocationMatrix, _UpdateGraphics, _PlaneMap, _Config);
 
 	if (_UpdateGraphics)
 	{
@@ -160,10 +153,6 @@ int RunOneSimulationAndGetSteps(Person* _PassengerList, Person*** _PassengerLoca
 
 		Sleep(1000);
 	}
-
-	WriteBasicRulesToOutput(_OutputFile, _BasicRules, MethodFile);
-
-	fprintf(_OutputFile, "%d\n", StepsTaken);
 
 	return StepsTaken;
 }
@@ -181,9 +170,9 @@ void CleanupAllocations(Person** _PassengerList, Person**** _PassengerLocationMa
 	FreeMap(_PlaneMap);
 }
 
-void ConvertInputDirToOutputDir(char* _InputDir, char** _OutputDir, int OutputLength, const char* Dir, const char* FileExtension)
+void GenerateOutputDirString(char* _InputDir, char** _OutputDir, int OutputLength, const char* Dir, const char* FileExtension)
 {
-	FindStrBetweenChars(&_InputDir, &(*_OutputDir), OutputLength, '/', '.');
+	FindStrBetweenDelimiters(&_InputDir, &(*_OutputDir), OutputLength, '/', '.');
 
 	AppendToStartOfString(_OutputDir, OutputLength, Dir);
 
@@ -200,25 +189,26 @@ void AppendToStartOfString(char** _Str, int _StrLength, const char* AddToStr)
 	free(tmp);
 }
 
-void WriteProbabilitiesToOutput(FILE* _OutputFile, BasicSimulationRules _BasicRules)
+void WriteHeaderToOutput(FILE* _OutputFile, SimulationConfig _Config)
 {
 	fprintf(_OutputFile, "%s,%s,%s,%s,", "boarding-method", "cross-delay", "seat-interference-delay", "assign-to-nearest-door");
-	for (int i = 0; i < _BasicRules.LuggageGenerationValuesLength; i++) {
+	for (int i = 0; i < _Config.LuggageGenerationValuesLength; i++) {
 		fprintf(_OutputFile, "%s-%d,%s-%d,", "luggage-count", i, "luggage-count-possibility", i);
 	}
-	for (int i = 0; i < _BasicRules.WalkingspeedGenerationValuesLength; i++) {
+	for (int i = 0; i < _Config.WalkingspeedGenerationValuesLength; i++) {
 		fprintf(_OutputFile, "%s-%d,%s-%d,", "walk-speed", i, "walk-speed-possibility", i);
 	}
+	fprintf(_OutputFile, "Iterations\n");
 }
 
-void WriteBasicRulesToOutput(FILE* _OutputFile, BasicSimulationRules _BasicRules, const char* MethodFile)
+void WriteConfigValuesToOutput(FILE* _OutputFile, SimulationConfig _Config, const char* MethodFile)
 {
-	fprintf(_OutputFile, "%s,%d,%d,%d,", MethodFile, _BasicRules.CrossDelay, _BasicRules.SeatInterferenceDelay, _BasicRules.AssignToNearestDoor);
-	for (int i = 0; i < _BasicRules.LuggageGenerationValuesLength; i++) {
-		fprintf(_OutputFile, "%d,%d,", _BasicRules.LuggageGenerationValues[i].Value, _BasicRules.LuggageGenerationValues[i].Possibility);
+	fprintf(_OutputFile, "%s,%d,%d,%d,", MethodFile, _Config.CrossDelay, _Config.SeatInterferenceDelay, _Config.AssignToNearestDoor);
+	for (int i = 0; i < _Config.LuggageGenerationValuesLength; i++) {
+		fprintf(_OutputFile, "%d,%d,", _Config.LuggageGenerationValues[i].Value, _Config.LuggageGenerationValues[i].Possibility);
 	}
-	for (int i = 0; i < _BasicRules.WalkingspeedGenerationValuesLength; i++) {
-		fprintf(_OutputFile, "%d,%d,", _BasicRules.WalkingspeedGenerationValues[i].Value, _BasicRules.WalkingspeedGenerationValues[i].Possibility);
+	for (int i = 0; i < _Config.WalkingspeedGenerationValuesLength; i++) {
+		fprintf(_OutputFile, "%d,%d,", _Config.WalkingspeedGenerationValues[i].Value, _Config.WalkingspeedGenerationValues[i].Possibility);
 	}
 }
 
