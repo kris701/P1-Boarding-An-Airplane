@@ -1,21 +1,17 @@
 #include "Map.h"
 
 // A function to read a map from a file
-bool ReadMapFromFile(Map* _PlaneMap, BasicSimulationRules _BasicRules, const char* OpenFile)
+bool ReadMapFromFile(Map* _PlaneMap, SimulationConfig _Config, const char* OpenFile)
 {
 	FILE* MapFile;
 
-	DoOpenFile(&MapFile, OpenFile, "r");
-
-	if (!FileExists(MapFile))
+	if (!DoOpenFile(&MapFile, OpenFile, "r"))
 		return false;
 
 	SetMapStaticValues(MapFile, _PlaneMap);
 
-	if (AllocateMap(_PlaneMap) == false)
-	{
+	if (!AllocateMap(_PlaneMap))
 		return false;
-	}
 
 	SetMapValuesFromFile(MapFile, _PlaneMap);
 
@@ -23,7 +19,7 @@ bool ReadMapFromFile(Map* _PlaneMap, BasicSimulationRules _BasicRules, const cha
 }
 
 // A function to set a boarding group at a position
-void MapLocationSetValue(Map* _PlaneMap, int _X, int _Y, int Value)
+void MapLocationSetType(Map* _PlaneMap, int _X, int _Y, int Value)
 {
 	GetMapLocation(_PlaneMap, _X, _Y)->BoardingGroup = Value;
 }
@@ -204,13 +200,13 @@ void SetMapValuesFromFile(FILE* _MapFile, Map* _PlaneMap)
 			switch (field[0])  // Special characters will typically just be the first character of the field.
 			{
 			case '|':
-				MapLocationSetValue(_PlaneMap, x, y, BoardingGroup_Walkway);
+				MapLocationSetType(_PlaneMap, x, y, BoardingGroup_Walkway);
 				break;
 			case 'D':
-				MapSetDoorValue(_PlaneMap, x, y, &doorIndex);
+				MapAddDoor(_PlaneMap, x, y, &doorIndex);
 				break;
 			case '-':
-				MapLocationSetValue(_PlaneMap, x, y, BoardingGroup_Padding);
+				MapLocationSetType(_PlaneMap, x, y, BoardingGroup_Padding);
 				break;
 			case '\r': break;
 			case '\0': break;
@@ -220,7 +216,7 @@ void SetMapValuesFromFile(FILE* _MapFile, Map* _PlaneMap)
 				break;
 
 			default:
-				MapSetSeatValue(_PlaneMap, x, y, field);
+				MapSetSeatBoardingGroup(_PlaneMap, x, y, field);
 				break;
 			}
 		}
@@ -234,27 +230,27 @@ void SetMapValuesFromFile(FILE* _MapFile, Map* _PlaneMap)
 }
 
 // A function to set value for door
-void MapSetDoorValue(Map* _PlaneMap, int _x, int _y, int* _doorIndex)
+void MapAddDoor(Map* _PlaneMap, int _x, int _y, int* _doorIndex)
 {
-	MapLocationSetValue(_PlaneMap, _x, _y, BoardingGroup_Door);
+	MapLocationSetType(_PlaneMap, _x, _y, BoardingGroup_Door);
 	_PlaneMap->Doors[*_doorIndex].X = _x;
 	_PlaneMap->Doors[*_doorIndex].Y = _y;
 	(*_doorIndex)++;
 }
 
 // A function to set value for a seat in map
-void MapSetSeatValue(Map* _PlaneMap, int _x, int _y, char _field[])
+void MapSetSeatBoardingGroup(Map* _PlaneMap, int _x, int _y, char _field[])
 {
 	int _tmpInt = 0;
 	if (sscanf_s(_field, "%d", &_tmpInt) == 1)
 	{
-		MapLocationSetValue(_PlaneMap, _x, _y, _tmpInt);
+		MapLocationSetType(_PlaneMap, _x, _y, _tmpInt);
 		GetMapLocation(_PlaneMap, _x, _y)->IsTaken = false;
 		_PlaneMap->NumberOfSeats++;
 	}
 	else
 	{
 		fprintf(stderr, "Unknown value '%s'\n", _field);
-		MapLocationSetValue(_PlaneMap, _x, _y, BoardingGroup_Undefined);
+		MapLocationSetType(_PlaneMap, _x, _y, BoardingGroup_Undefined);
 	}
 }

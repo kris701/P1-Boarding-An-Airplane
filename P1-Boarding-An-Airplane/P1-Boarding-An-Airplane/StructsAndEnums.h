@@ -34,9 +34,9 @@ typedef struct _Person
 	int StartingDoorID;
 	char PersonCharacter;
 	int LuggageCount;
-	bool IsBackingUp;
-	int SeatInterferenceDelay;
-	int CrossDelay;
+	bool IsDoneWithSeatInterference;
+	int SeatInterferenceDelayCount;
+	int CrossDelayCount;
 	bool MovedLastTurn;
 	Point NextMove;
 	int BoardingGroup;
@@ -48,7 +48,7 @@ typedef struct _ValueStatistic
 	int Possibility;
 } ValueStatistic;
 
-typedef struct _BasicSimulationRules
+typedef struct _SimulationConfig
 {
 	int SeatInterferenceDelay;
 	int CrossDelay;
@@ -56,12 +56,10 @@ typedef struct _BasicSimulationRules
 	int LuggageGenerationValuesLength;
 	ValueStatistic* WalkingspeedGenerationValues;
 	int WalkingspeedGenerationValuesLength;
-	char* BoardingMethodFile;
 	bool AssignToNearestDoor;
 	char** MultipleMaps;
 	int MultipleMapsLength;
-	bool DoAllRuns;
-} BasicSimulationRules;
+} SimulationConfig;
 
 typedef struct _Location {
 	Point Point;

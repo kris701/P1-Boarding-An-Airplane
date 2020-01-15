@@ -3,14 +3,7 @@
 // A  function to check if two points are equal to find out if a passenger is in it's seat
 bool IsPointEqual(Point A, Point B)
 {
-	if (A.X == B.X)
-	{
-		if (A.Y == B.Y)
-		{
-			return true;
-		}
-	}
-	return false;
+	return (A.X == B.X) && (A.Y == B.Y);
 }
 
 // A function to allocate a point to a struct
@@ -80,23 +73,16 @@ int GetNumberOfLinesInFile(FILE* _File)
 	return lines;
 }
 
-// A bool function to check if a file exist
-bool FileExists(FILE* _File)
-{
-	if (_File != NULL)
-		return true;
-	return false;
-}
-
 // A function to open a file
-void DoOpenFile(FILE** _File, const char* _FileName, const char* _Parameter)
+bool DoOpenFile(FILE** _File, const char* _FileName, const char* _Parameter)
 {
-	_mkdir("./Output"); // Creates a directory. If it already exists. Will do nothing.
 	fopen_s(&(*_File), _FileName, _Parameter);
+
+	return (*_File != NULL);
 }
 
 // A function to find a string between chars
-void FindStrBetweenChars(char* SubStringBuffer[], char* Target[], int TargetLength, char FromChar, char ToChar)
+void FindStrBetweenDelimiters(char* SubStringBuffer[], char* Target[], int TargetLength, char FromChar, char ToChar)
 {
 	*SubStringBuffer = strchr(*SubStringBuffer, FromChar) + 1;
 	int IndexOffset = 0;
@@ -112,4 +98,10 @@ void FindStrBetweenChars(char* SubStringBuffer[], char* Target[], int TargetLeng
 			break;
 	}
 	*SubStringBuffer = strchr(*SubStringBuffer, ToChar);
+}
+
+// Gets the time difference between two clocks
+int TimeDifference(clock_t ClockStart, clock_t ClockEnd)
+{
+	return (ClockEnd - ClockStart) * 1000 / CLOCKS_PER_SEC;
 }
